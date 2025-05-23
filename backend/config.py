@@ -1,0 +1,41 @@
+import os
+from application.settings import BASE_DIR
+
+# ================================================= #
+# ************** mysql数据库 配置  ************** #
+# ================================================= #
+# 数据库类型 MYSQL/SQLITE3/POSTGRESQL
+DATABASE_TYPE = "MYSQL"
+# 数据库地址
+DATABASE_HOST = "127.0.0.1"
+# 数据库端口
+DATABASE_PORT = 3306
+# 数据库用户名
+DATABASE_USER = "root"
+# 数据库密码
+DATABASE_PASSWORD = "root"
+# 数据库名
+DATABASE_NAME = "lyadmin_pro"
+
+# ================================================= #
+# ************** redis 配置  ************** #
+# ================================================= #
+
+REDIS_PASSWORD = ''
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+REDIS_URL = f'redis://:{REDIS_PASSWORD or ""}@{REDIS_HOST}:{REDIS_PORT}'
+
+# ================================================= #
+# ************** 服务器基本 配置  ************** #
+# ================================================= #
+IS_DEMO = False #是否演示模式（演示模式只能查看无法保存、编辑、删除、新增）
+DEBUG = True #是否调试模式
+ALLOWED_HOSTS = ["*"]
+LOGIN_AUTH_CAPTCHA = True #是否开启登录页验证码验证
+IS_SINGLE_TOKEN = False #是否只允许单用户单一地点登录(只有一个人在线上)(默认多地点登录),只针对后台用户生效
+ALLOW_FRONTEND = True#是否关闭前端API访问
+LOGIN_ERROR_RETRY_TIMES = 0 #登录错误次数限制，0表示不限制
+LOGIN_ERROR_RETRY_TIMEOUT = 60 #登录错误次数过期时间，单位秒
+FRONTEND_API_LIST = ['/api/app/','/api/xcx/','/api/h5/']#微服务前端接口前缀
+DOMAIN_HOST = "http://127.0.0.1:8000"#控制图片上传后保存所使用到的url前缀

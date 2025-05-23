@@ -1,0 +1,11 @@
+daphne
+Django==4.1.8
+django-comment-migrate
+django-cors-headers
+django-filter
+django-ranged-response
+django-simple-captcha
+djangorestframework
+djangorestframework-simplejwt
+PyMySQL
+#psycopg2

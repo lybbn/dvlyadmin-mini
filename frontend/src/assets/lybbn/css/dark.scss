@@ -1,0 +1,52 @@
+html.dark {
+	//变量
+	--el-text-color-primary: #d0d0d0;
+	--el-color-primary-dark-2: var(--el-color-primary-light-2) !important;
+	--el-color-primary-light-9: var(--el-color-primary-dark-8) !important;
+	--el-color-primary-light-8: var(--el-color-primary-dark-7) !important;
+	--el-color-primary-light-7: var(--el-color-primary-dark-6) !important;
+	--el-color-primary-light-5: var(--el-color-primary-dark-4) !important;
+	--el-color-primary-light-3: var(--el-color-primary-dark-3) !important;
+
+	//背景
+	#app {background: var(--el-bg-color);}
+
+	//登录背景
+	.login_bg {background: var(--el-bg-color);}
+
+	//框架
+	.lybbn-panel-header {background: var(--el-bg-color-overlay);border-bottom: 1px solid var(--el-border-color-light);}
+	.lybbn-panel-side-split {background: var(--el-bg-color);}
+	.lybbn-panel-side-split li {color: var(--el-text-color-primary);}
+	.lybbn-panel-side {background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
+	.lybbn-panel-side-top, .adminui-side-bottom {border-color: var(--el-border-color-light);}
+	.lybbn-panel-side-top h2 {color: var(--el-text-color-primary);}
+	.lybbn-panel-topbar, .adminui-tags {background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
+	.lybbn-panel-main {background: var(--el-bg-color);}
+	.lybbn-panel-header-menu .el-menu {--el-menu-bg-color:var(--el-bg-color-overlay) !important;--el-menu-hover-bg-color: #171819 !important;}
+	.lybbn-panel-header-menu .el-menu .el-sub-menu__title {background-color:transparent !important;}
+	.lybbn-fullbg{background: var(--el-bg-color)}
+	.rymenu{background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
+
+	//全局滚动条样式
+	::-webkit-scrollbar-thumb {background-color: rgba(163, 166, 173, 0.3);}
+	::-webkit-scrollbar-thumb:hover {background-color: rgba(163, 166, 173, 0.5);}
+
+	//组件
+	.el-header, .el-main.nopadding, .el-footer {background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
+	.el-main {background: var(--el-bg-color);}
+	.el-aside {background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
+	.el-table .el-table__body-wrapper {background: var(--el-bg-color);}
+	.el-table th.is-sortable:hover {background: #111;}
+    .lybbn-panel-side-bottom{border-top: 1px solid var(--el-border-color-light);}
+    .el-tabs--card>.el-tabs__header .el-tabs__item.is-active {border-bottom-color: var(--el-border-color-light);}
+    .lyterminal-container .contextmenu{background: #111;border: 1px solid var(--el-border-color-light);}
+
+	//最大化
+	.main-maximize-exit {display: none;position: fixed;z-index: 3000;top:-20px;left:50%;margin-left: -20px;border-radius: 50%;width: 40px;height: 40px;cursor: pointer;background: rgba(68, 67, 67, 0.2);text-align: center;}
+	.main-maximize-exit:hover {background: rgba(68, 67, 67, 0.8);}
+
+	//蒙层
+	.softmask {background-color: rgba(38, 37, 37,1) !important;}
+	.soft-ins-guide-dialog{background-color: rgba(38, 37, 37,1) !important;box-shadow: 0 0 10px 1px #161616;border: 1px solid #161616;}
+}
