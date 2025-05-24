@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
 from django.views.generic.base import RedirectView
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
 #自定义
 from utils.streamingmedia_response import streamingmedia_serve
 from mysystem.views.login import LoginView,CaptchaView

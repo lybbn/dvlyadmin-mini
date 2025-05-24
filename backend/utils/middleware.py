@@ -10,27 +10,15 @@ from mysystem.models import OperationLog
 from utils.request_util import get_request_user, get_request_ip, get_request_data, get_request_path, get_os,get_browser, get_verbose_name
 
 from django.http import HttpResponseForbidden,HttpResponse
-from config import ALLOW_FRONTEND,FRONTEND_API_LIST,IS_SINGLE_TOKEN,LOG_IP_AREA
+from config import ALLOW_FRONTEND,FRONTEND_API_LIST,IS_SINGLE_TOKEN
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication,JWTTokenUserAuthentication
 from rest_framework.views import APIView
 from utils.jsonResponse import SuccessResponse,ErrorResponse
 from utils.common import get_parameter_dic
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from django_redis import get_redis_connection
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, User
-from channels.auth import AuthMiddlewareStack
-from channels.db import database_sync_to_async
-from channels.middleware import BaseMiddleware
-from django.db import close_old_connections
-from jwt import decode as jwt_decode
-from rest_framework_simplejwt.authentication import AUTH_HEADER_TYPE_BYTES
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from rest_framework_simplejwt.tokens import UntypedToken
-from config import IS_DEMO
 
 IS_ALLOW_FRONTEND = ALLOW_FRONTEND
 
@@ -72,16 +60,16 @@ class ApiLoggingMiddleware(MiddlewareMixin):
         user = get_request_user(request)
         request_ip = getattr(request, 'request_ip', 'unknown')
         info = {
-            'request_ip': getattr(request, 'request_ip', 'unknown'),
+            'req_ip': request_ip,
             'creator': user if not isinstance(user, AnonymousUser) else None,
-            'dept_belong_id': getattr(request.user, 'dept_id', None),
-            'request_method': request.method,
-            'request_path': request.request_path,
-            'request_body': body,
-            'response_code': response.data.get('code'),
-            'request_os': get_os(request),
-            'request_browser': get_browser(request),
-            'request_msg': request.session.get('request_msg'),
+            'dept_belong': getattr(request.user, 'dept_id', None),
+            'req_method': request.method,
+            'req_path': request.request_path,
+            'req_body': body,
+            'resp_code': response.data.get('code'),
+            'req_os': get_os(request),
+            'req_browser': get_browser(request),
+            'req_msg': request.session.get('request_msg'),
             'status': True if response.data.get('code') in [2000, ] else False,
             'json_result': {"code": response.data.get('code'),"data":response.data.get('data'), "msg": response.data.get('msg')},
         }
@@ -91,7 +79,7 @@ class ApiLoggingMiddleware(MiddlewareMixin):
         else:
             temp_request_modular = self.request_modular
 
-        operation_log = OperationLog.objects.create(request_modular=temp_request_modular,request_ip=info['request_ip'],ip_area=ip_area,creator=info['creator'],dept_belong_id=info['dept_belong_id'],request_method=info['request_method'],request_path=info['request_path'],request_body=info['request_body'],response_code=info['response_code'],request_os=info['request_os'],request_browser=info['request_browser'],request_msg=info['request_msg'],status=info['status'],json_result=info['json_result'])
+        operation_log = OperationLog.objects.create(req_modular=temp_request_modular,req_ip=info['req_ip'],ip_area="",creator=info['creator'],dept_belong=info['dept_belong'],req_method=info['req_method'],req_path=info['req_path'],req_body=info['req_body'],resp_code=info['resp_code'],req_os=info['req_os'],req_browser=info['req_browser'],req_msg=info['req_msg'],status=info['status'],json_result=info['json_result'])
 
         self.request_modular = ""
 
@@ -123,8 +111,6 @@ class ApiLoggingMiddleware(MiddlewareMixin):
                     except Exception as e:
                         print(e)
                         return HttpResponse(json.dumps(errordata), content_type='application/json',status=200,charset='utf-8')
-
-
 
     def process_response(self, request, response):
         """
@@ -168,16 +154,6 @@ class OperateAllowFrontendView(APIView):
         }
         return SuccessResponse(data=data,msg='success')
 
-    @swagger_auto_schema(operation_summary='设置当前是否禁止前端访问',
-    request_body=openapi.Schema(#POST请求需要
-        type=openapi.TYPE_OBJECT,
-        required=['is_allow'],
-        properties={
-                'is_allow':openapi.Schema(type=openapi.TYPE_INTEGER,description="1允许访问,0 禁止访问"),
-             },
-        ),
-    responses={200:'success'},
-    )
     def post(self,request):
         """
         设置当前是否禁止前端访问
@@ -197,130 +173,3 @@ class OperateAllowFrontendView(APIView):
             return SuccessResponse(data=data,msg='设置成功')
         else:
             return ErrorResponse(msg="您没有权限操作")
-
-# ======================================================================= #
-# ************** channels websocket使用simple-jwt 认证/权限验证中间件  ************** #
-# ======================================================================= #
-#该中间件可以在channels里通过 self.scope["user"] 获取到一个用户实例
-
-@database_sync_to_async
-def get_user(validated_token):
-    try:
-        user = get_user_model().objects.get(id=validated_token["user_id"])
-        return user
-
-    except User.DoesNotExist:
-        return AnonymousUser()
-
-def ValidationApi(reqApi, validApi):
-    """
-    验证当前用户是否有接口权限
-    :param reqApi: 当前请求的接口
-    :param validApi: 用于验证的接口
-    :return: True或者False
-    """
-    if validApi is not None:
-        valid_api = validApi.replace('{id}', '.*?')
-        matchObj = re.match(valid_api, reqApi, re.M | re.I)
-        if matchObj:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-@database_sync_to_async
-def has_permission(user, path):
-    """
-    接口地址、方法授权验证
-    """
-    # 判断是否是超级管理员
-    if user.is_superuser:
-        return True
-    else:
-        api = path  # 当前请求接口
-        method = "WS"  # 当前请求方法
-        methodList = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','WS']
-        method = methodList.index(method)
-        if not hasattr(user, "role"):
-            return False
-        if method == 5 and api == "/ws/msg/":
-            return True
-        userApiList = user.role.values('permission__api', 'permission__method')  # 获取当前用户的角色拥有的所有接口
-        for item in userApiList:
-            valid = ValidationApi(api, item.get('permission__api'))
-            if valid and (method == item.get('permission__method')):
-                return True
-    return False
-
-class JwtAuthMiddleware(BaseMiddleware):
-    def __init__(self, inner):
-        self.inner = inner
-
-    async def __call__(self, scope, receive, send):
-        # 关闭旧的数据库连接，以防止使用超时的连接
-        close_old_connections()
-        # 自定义校验逻辑,获取子协议内容
-        protocol = dict(scope['headers']).get(b'sec-websocket-protocol', b'')
-        # print(protocol)
-        if len(protocol) == 0:
-            # Empty AUTHORIZATION header sent
-            return None
-
-        alltoken = protocol.split(b', ')
-
-        if not len(alltoken) == 2:
-            return None
-
-        if not alltoken[0] == b'JWTLYADMIN':
-            return None
-
-        parts = alltoken[1].split(b'lybbn')
-        if len(parts) == 0:
-            return None
-
-        if parts[0] not in AUTH_HEADER_TYPE_BYTES:
-            # Assume the header does not contain a JSON web token
-            return None
-
-        if len(parts) != 2:
-            return None
-
-        token = parts[1]
-        # Get the token
-        # Try to authenticate the user
-        try:
-            # This will automatically validate the token and raise an error if token is invalid
-            UntypedToken(token)
-        except (InvalidToken, TokenError) as e:
-            # Token is invalid
-            # print(e,'InvalidToken,TokenError')
-            return None
-        else:
-            #  Then token is valid, decode it
-            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-            # print(decoded_data,'success decode token')
-            # Will return a dictionary like -
-            # {
-            #     "token_type": "access",
-            #     "exp": 1568770772,
-            #     "jti": "5c15e80d65b04c20ad34d77b6703251b",
-            #     "user_id": 6
-            # }
-
-            # Get the user using ID
-            scope["user"] = await get_user(validated_token=decoded_data)
-            user = scope['user']
-            if isinstance(user, AnonymousUser):
-                return None
-            if not user.is_active:
-                return None
-            path = scope['path']
-            haspermission = await has_permission(user,path)
-            if not haspermission:
-                return None
-
-        return await super().__call__(scope, receive, send)
-
-def JwtAuthMiddlewareStack(inner):
-    return JwtAuthMiddleware(AuthMiddlewareStack(inner))

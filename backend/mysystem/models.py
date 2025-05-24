@@ -42,8 +42,6 @@ class Users(AbstractBaseUser, CoreModel):
     REQUIRED_FIELDS = []
 
     class Meta:
-        default_permissions = ()  # 移除 add/change/delete/view 权限
-        permissions = []  # 清空权限
         db_table = table_prefix + "users"
         verbose_name = '用户表'
         verbose_name_plural = verbose_name

@@ -244,8 +244,7 @@ def getminrandomodernum():
     basecode = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     basecode = basecode[2:]
     chagecode1 = random.randint(10,99)
-    chagecode3 = random.randint(10,99)
-    return str(basecode)+str(chagecode1)+str(chagecode3)
+    return str(basecode)+str(chagecode1)
 
 #生成订单号（长订单号）
 def getrandomodernum():

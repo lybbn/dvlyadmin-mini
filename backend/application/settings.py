@@ -194,9 +194,19 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+# 收集静态文件，必须将 MEDIA_ROOT,STATICFILES_DIRS先注释
+# python manage.py collectstatic
+STATIC_ROOT=os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    os.path.join(FRONTEND_ROOT,"admin","static"),
+    os.path.join(FRONTEND_ROOT,"h5","static"),
+]
+# 访问上传文件的url地址前缀
+if not os.path.exists(os.path.join(BASE_DIR, 'media')):
+    os.makedirs(os.path.join(BASE_DIR, 'media'))
 
-STATIC_ROOT=FRONTEND_ROOT
+MEDIA_URL = "/media/"
 # 项目中存储上传文件的根目录
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -204,12 +214,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ================================================= #
-# ******************** 自定义权限 ******************** #
-# ================================================= #
-
-AUTHENTICATION_BACKENDS = ["utils.customBackend.CustomBackend"]
 
 # ================================================= #
 # **************** 验证码配置  ******************* #
@@ -255,7 +259,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
-
     ),
     'DEFAULT_PAGINATION_CLASS': 'utils.pagination.CustomPagination',  # 自定义分页
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -280,24 +283,24 @@ REST_FRAMEWORK = {
     ),
 }
 
-# ================================================= #
-# ****************** spectacular配置 ***************** #
-# ================================================= #
-
+# ====================================#
+# ****************swagger************#
+#====================================#
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'dvlyadmin-mini',
-    'DESCRIPTION': '全栈快速web开发框架',
+    'TITLE': 'dvlyadmin-mini API',
+    'DESCRIPTION': 'dvlyadmin-mini全栈快速web开发框架的API文档',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    # 中文配置
-    'SCHEMA_PATH_PREFIX': '/api',
-    'SWAGGER_UI_SETTINGS': {
-        'deepLinking': True,
-        'displayOperationId': True,
-        'defaultModelsExpandDepth': -1,
-    }
+    'SERVE_INCLUDE_SCHEMA': True, # 如果不需要在浏览器中直接查看，可以设置为 False(线上部署可为False)
+    # 或者如果有统一的前缀，可以设置成
+    'SCHEMA_PATH_PREFIX': '^/api/',
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+    },
+    # 修改图标
+    # "SWAGGER_UI_FAVICON_HREF": "https://xxxxx/xxxx/xxx/XXXX.png",
 }
-
 # ================================================= #
 # ****************** simplejwt配置 ***************** #
 # ================================================= #

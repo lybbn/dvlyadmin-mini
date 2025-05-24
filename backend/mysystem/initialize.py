@@ -3,7 +3,6 @@ import os
 
 import django
 
-# 在environ字典里设置默认Django环境，'xxxx.settings'指Django项目的配置文件
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'application.settings')
 django.setup()
 
@@ -16,7 +15,7 @@ class Initialize:
         delete 是否删除已初始化数据
         """
         self.delete = delete
-        self.creator_id = "456b688c-8ad5-46de-bc2e-d41d8047bd42"
+        self.creator_id = "0"
 
     def save(self, obj, data: list, name):
         print(f"正在初始化【{name}】")
@@ -67,17 +66,13 @@ if object.{key}:
         self.button_data = [
             {"id": "4547b93a-36b9-410d-987c-3c52a9b51156", "name": "编辑", "value": "Update", },
             {"id": "4a410769-6b0a-4ed3-90f0-b5d89a6f802c", "name": "删除", "value": "Delete", },
-            {"id": "644e9c34-e3d6-4518-b795-a603a6e9a137", "name": "单例", "value": "Retrieve", },
+            {"id": "644e9c34-e3d6-4518-b795-a603a6e9a137", "name": "详情", "value": "Detail", },
             {"id": "80cb145b-5035-4517-a28a-7d59426f73f8", "name": "新增", "value": "Create", },
             {"id": "ccc3f35f-c80c-4929-b8cc-67531698f397", "name": "查询", "value": "Search", },
             {"id": "83a9b774-4669-4d2f-b61d-8ee4944c2316", "name": "保存", "value": "Save", },
-            {"id": "2d763a6d6dcf409d87056efd06aace0a", "name": "修改密码", "value": "Changepassword", },
+            {"id": "2d763a6d6dcf409d87056efd06aace0a", "name": "修改密码", "value": "ChangePass", },
             {"id": "6e0a41e5308c44a8b0d2785e05b2c07a", "name": "禁用", "value": "Disable", },
-            {"id": "f3f365e9bfab44f587cbd91e3691ef0f", "name": "终端", "value": "Terminal", },
-            {"id": "c66a0ab23a6044189ae0beb530ac68cf", "name": "发货", "value": "Deliver", },
-            {"id": "43d89c33967545a387a3ac27c02460b6", "name": "统计", "value": "Statistics", },
-            {"id": "09134d7643504804a6c7cc3d16e06684", "name": "日志", "value": "Logs", },
-            {"id": "5bf695439e9d4c4d9601bf4fb558b3a2", "name": "任务列表", "value": "Tasklist", },
+            {"id": "09134d7643504804a6c7cc3d16e06684", "name": "日志", "value": "Logs", }
 
         ]
         self.save(Button, self.button_data, "权限表标识")
@@ -110,16 +105,6 @@ if object.{key}:
             {'id': '77edf447326b4e0dbc6f9719c1de8a12', 'name': '系统监控', 'sort': 888, 'web_path': '','icon': 'TrendCharts', 'parent_id': None, 'component': None,'component_name': None, 'visible': 1, 'isautopm': 0},
             {'id': 'bcbeeee5c91a4e2ea2c2a31237e33616', 'name': '服务监控', 'sort': 10, 'web_path': 'server','icon': '', 'parent_id': '77edf447326b4e0dbc6f9719c1de8a12', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
             {'id': '09a42810d4dd4b2eb939f8eb0b01d9d1', 'name': '计划任务', 'sort': 20, 'web_path': 'crontab', 'icon': '','parent_id': '77edf447326b4e0dbc6f9719c1de8a12', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': '718daec1b94b456c96d773889648173e', 'name': '终端服务', 'sort': 30, 'web_path': 'terminal', 'icon': '','parent_id': '77edf447326b4e0dbc6f9719c1de8a12', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': 'a28f8ca682d04c8fb2953fdeb3d9e2e6', 'name': '商城管理', 'sort': 188, 'web_path': '', 'icon': 'GoodsFilled','parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': 'd470ab18859a4472b525e605ae96c325', 'name': '商品管理', 'sort': 1, 'web_path': 'goodsManage', 'icon': '','parent_id': 'a28f8ca682d04c8fb2953fdeb3d9e2e6', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': 'b999c50996864465b851575e378c5aea', 'name': '商品分类', 'sort': 2, 'web_path': 'goodsType', 'icon': '','parent_id': 'a28f8ca682d04c8fb2953fdeb3d9e2e6', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': 'a524f17e9ac74be3baf9d113f014184c', 'name': '订单管理', 'sort': 199, 'web_path': '', 'icon': 'List','parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': '2e07b715d5e24e2ca45997527430e9d3', 'name': '商城订单', 'sort': 1, 'web_path': 'mallOrderManage', 'icon': '','parent_id': 'a524f17e9ac74be3baf9d113f014184c', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': '2a7c0142f7514dacb7999383e4e67aca', 'name': '财务管理', 'sort': 299, 'web_path': '', 'icon': 'WalletFilled','parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': 'dc8c173b425048e7a8c9b59513596c7f', 'name': '商品财务流水', 'sort': 1, 'web_path': 'financeStatisticsGoods', 'icon': '','parent_id': '2a7c0142f7514dacb7999383e4e67aca', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-            {'id': '3c13161f70f1469a913d539e7616c577', 'name': '意见反馈', 'sort': 8, 'web_path': 'userFeekback', 'icon': '','parent_id': 'd4e2fe169a8b40f3846421ac04e4fccb', 'component': None, 'component_name': None, 'visible': 1,'isautopm': 0},
-
         ]
         self.save(Menu, self.menu_data, "菜单表")
 
@@ -133,7 +118,7 @@ if object.{key}:
             {'id': '0209de89-6b9f-4d8a-84d3-ccfc3cc8b4da', 'menu_id': '151035da-77a3-4a62-b474-fce6824571fb','name': '编辑', 'value': 'Update', 'api': '/api/system/button/{id}/', 'method': 2},
             {'id': '04896a47-0f3a-4e2f-a111-bfe15f9e31c5', 'menu_id': '56c3f341-4f46-4b04-9cfc-c8a14701707e','name': '编辑', 'value': 'Update', 'api': '/api/system/menu/{id}/', 'method': 2},
             {'id': '3e11db64-b8e8-4558-963b-71d063a7db16', 'menu_id': '4236eb70-1558-43a0-9cf2-037230c547f9','name': '编辑', 'value': 'Update', 'api': '/api/system/dept/{id}/', 'method': 2},
-            {'id': '5d77d14e-b199-481f-a97d-6e4c0e84fe71', 'menu_id': '25735adb-d051-4b7b-bbb7-1154526f3e4c','name': '修改密码', 'value': 'Changepassword', 'api': '/api/system/user/change_password/{id}/', 'method': 2},
+            {'id': '5d77d14e-b199-481f-a97d-6e4c0e84fe71', 'menu_id': '25735adb-d051-4b7b-bbb7-1154526f3e4c','name': '修改密码', 'value': 'ChangePass', 'api': '/api/system/user/change_password/{id}/', 'method': 2},
             {'id': '875bdfeb-0c34-441d-8ee3-bb93c21e17dd', 'menu_id': '244b28685cd14a39a383189981510d4a','name': '编辑', 'value': 'Update', 'api': '/api/users/users/{id}/', 'method': 2},
             {'id': '875bdfeb0c34441d8ee3bb93c21e17dd', 'menu_id': 'd73f73a399af48cea6a8490ac508d7a0','name': '编辑', 'value': 'Update', 'api': '/api/users/users/{id}/', 'method': 2},
             {'id': 'bc114580-e62d-4e08-b707-843759817344', 'menu_id': '2e3438c8-3ddc-43ff-b8d8-cca328e4856e','name': '编辑', 'value': 'Update', 'api': '/api/system/user/{id}/', 'method': 2},
@@ -190,29 +175,29 @@ if object.{key}:
             {'id': '676e32850165441cad01782e453de925', 'menu_id': 'b999c50996864465b851575e378c5aea','name': '新增', 'value': 'Create', 'api': '/api/mall/goodstype/', 'method': 1},
             {'id': '19d01a929bc9414cac1a8defd48597c9', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1', 'name': '新增','value': 'Create', 'api': '/api/crontab/periodictask/', 'method': 1},
             {'id': '103d4310b98e4ff1ba71336af8d4c6c2', 'menu_id': '49160b589f004e44b3920c82583c2581', 'name': '新增','value': 'Create', 'api': '/api/platformsettings/sysconfig/', 'method': 1},
-            {'id': 'a3088120763d49ad93498eb515c7c244', 'menu_id': 'ae5629946df4497cbec10419e8375dd9','name': '单例', 'value': 'Retrieve', 'api': '/api/platformsettings/lunboimg/{id}/', 'method': 0},
-            {'id': '1d4441fdc418499f856c23aa4e1be2c0', 'menu_id': '80a340eae92b430abe17635468c2df1d','name': '单例', 'value': 'Retrieve', 'api': '/api/platformsettings/other/{id}/', 'method': 0},
-            {'id': '14e7088f-a39b-47ae-bd67-b9bbcabae96b', 'menu_id': '244b28685cd14a39a383189981510d4a','name': '单例', 'value': 'Retrieve', 'api': '/api/users/users/{id}/', 'method': 0},
-            {'id': '14e7088fa39b47aebd67b9bbcabae96b', 'menu_id': 'd73f73a399af48cea6a8490ac508d7a0','name': '单例', 'value': 'Retrieve', 'api': '/api/users/users/{id}/', 'method': 0},
-            {'id': '6208f412-6bca-4d7b-a5a0-0103b7ba6091', 'menu_id': '151035da-77a3-4a62-b474-fce6824571fb','name': '单例', 'value': 'Retrieve', 'api': '/api/system/button/{id}/', 'method': 0},
-            {'id': '6300774a-d19c-43ad-8102-d7bf341eff33', 'menu_id': '4236eb70-1558-43a0-9cf2-037230c547f9','name': '单例', 'value': 'Retrieve', 'api': '/api/system/dept/{id}/', 'method': 0},
-            {'id': '8b7a0e79-a6ef-4946-87c6-8c042b887e1c', 'menu_id': '4ba07859-8b73-4524-a1a6-bbff36d98337','name': '单例', 'value': 'Retrieve', 'api': '/api/system/operation_log/{id}/', 'method': 0},
-            {'id': '96022ae5-6425-47b9-8f89-01edc33eb2b7', 'menu_id': '15c9ebc5-d12f-470a-a560-938a7dc57570','name': '单例', 'value': 'Retrieve', 'api': '/api/system/role/{id}/', 'method': 0},
-            {'id': 'f0e080c0-275d-4085-b56c-735b49510eff', 'menu_id': '2e3438c8-3ddc-43ff-b8d8-cca328e4856e','name': '单例', 'value': 'Retrieve', 'api': '/api/system/user/{id}/', 'method': 0},
-            {'id': 'fcbe4cec-cc2d-436d-92ba-023f8c9ad31c', 'menu_id': '56c3f341-4f46-4b04-9cfc-c8a14701707e','name': '单例', 'value': 'Retrieve', 'api': '/api/system/menu/{id}/', 'method': 0},
-            {'id': 'fe96f32c-6124-4b24-b809-4964186f5163', 'menu_id': 'e0f53902-e901-490c-83f3-331e60b97fcf','name': '单例', 'value': 'Retrieve', 'api': '/api/system/menu_button/{id}/', 'method': 0},
-            {'id': '6b88361b326a4e55a8a5135c08ba66f1', 'menu_id': '3171db16eda048ae92b16536fc1241b6','name': '单例', 'value': 'Retrieve', 'api': '/api/messages/messagenotice/{id}/', 'method': 0},
-            {'id': '6d6b6689d1224900b09c8101b3344f42', 'menu_id': 'a607e820-36e5-45c0-aabf-85a8e4e2c7ac','name': '单例', 'value': 'Retrieve', 'api': '/api/system/role_id_to_menu/{id}/', 'method': 0},
-            {'id': 'f19826f7df9842089cee94a795681b2e', 'menu_id': '9065cb5445ac42ef93eb9e75e6287792','name': '单例', 'value': 'Retrieve', 'api': '', 'method': 0},
-            {'id': 'ea18bb51400b482a8aad5dc18357bcab', 'menu_id': '718daec1b94b456c96d773889648173e','name': '单例', 'value': 'Retrieve', 'api': '/api/terminal/terminal/{id}/', 'method': 0},
-            {'id': 'efcbf104971a4266a26d9469e58c1327', 'menu_id': '02c24003527546359b5a77ae07adc7d5','name': '单例', 'value': 'Retrieve', 'api': '/api/address/area/{id}/', 'method': 0},
-            {'id': '2235160bd56c423880572f5450b94f16', 'menu_id': 'd470ab18859a4472b525e605ae96c325','name': '单例', 'value': 'Retrieve', 'api': '/api/mall/goodsspu/{id}/', 'method': 0},
-            {'id': '118ce77cc07140a08d9a92ab8800f2cf', 'menu_id': 'b999c50996864465b851575e378c5aea','name': '单例', 'value': 'Retrieve', 'api': '/api/mall/goodstype/{id}/', 'method': 0},
-            {'id': '3737d4afa1e2437b93e8cdcd7116180a', 'menu_id': '2e07b715d5e24e2ca45997527430e9d3','name': '单例', 'value': 'Retrieve', 'api': '/api/mall/goodsorder/{id}/', 'method': 0},
-            {'id': '6e9d454742f74437928959c02be42456', 'menu_id': 'dc8c173b425048e7a8c9b59513596c7f','name': '单例', 'value': 'Retrieve', 'api': '/api/mall/goodsforderinfo/{id}/', 'method': 0},
-            {'id': '11d334fcadf1490e85e6a045126dea78', 'menu_id': '3c13161f70f1469a913d539e7616c577','name': '单例', 'value': 'Retrieve', 'api': '/api/platformsettings/userfeeckback/{id}/', 'method': 0},
-            {'id': '6e27757847c64e228934b60ae81baedf', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1', 'name': '单例','value': 'Retrieve', 'api': '/api/crontab/periodictask/{id}/', 'method': 0},
-            {'id': '14514da3c11441c2b63f2331e3f897d0', 'menu_id': '49160b589f004e44b3920c82583c2581', 'name': '单例','value': 'Retrieve', 'api': '/api/platformsettings/sysconfig/{id}/', 'method': 0},
+            {'id': 'a3088120763d49ad93498eb515c7c244', 'menu_id': 'ae5629946df4497cbec10419e8375dd9','name': '单例', 'value': 'Detail', 'api': '/api/platformsettings/lunboimg/{id}/', 'method': 0},
+            {'id': '1d4441fdc418499f856c23aa4e1be2c0', 'menu_id': '80a340eae92b430abe17635468c2df1d','name': '单例', 'value': 'Detail', 'api': '/api/platformsettings/other/{id}/', 'method': 0},
+            {'id': '14e7088f-a39b-47ae-bd67-b9bbcabae96b', 'menu_id': '244b28685cd14a39a383189981510d4a','name': '单例', 'value': 'Detail', 'api': '/api/users/users/{id}/', 'method': 0},
+            {'id': '14e7088fa39b47aebd67b9bbcabae96b', 'menu_id': 'd73f73a399af48cea6a8490ac508d7a0','name': '单例', 'value': 'Detail', 'api': '/api/users/users/{id}/', 'method': 0},
+            {'id': '6208f412-6bca-4d7b-a5a0-0103b7ba6091', 'menu_id': '151035da-77a3-4a62-b474-fce6824571fb','name': '单例', 'value': 'Detail', 'api': '/api/system/button/{id}/', 'method': 0},
+            {'id': '6300774a-d19c-43ad-8102-d7bf341eff33', 'menu_id': '4236eb70-1558-43a0-9cf2-037230c547f9','name': '单例', 'value': 'Detail', 'api': '/api/system/dept/{id}/', 'method': 0},
+            {'id': '8b7a0e79-a6ef-4946-87c6-8c042b887e1c', 'menu_id': '4ba07859-8b73-4524-a1a6-bbff36d98337','name': '单例', 'value': 'Detail', 'api': '/api/system/operation_log/{id}/', 'method': 0},
+            {'id': '96022ae5-6425-47b9-8f89-01edc33eb2b7', 'menu_id': '15c9ebc5-d12f-470a-a560-938a7dc57570','name': '单例', 'value': 'Detail', 'api': '/api/system/role/{id}/', 'method': 0},
+            {'id': 'f0e080c0-275d-4085-b56c-735b49510eff', 'menu_id': '2e3438c8-3ddc-43ff-b8d8-cca328e4856e','name': '单例', 'value': 'Detail', 'api': '/api/system/user/{id}/', 'method': 0},
+            {'id': 'fcbe4cec-cc2d-436d-92ba-023f8c9ad31c', 'menu_id': '56c3f341-4f46-4b04-9cfc-c8a14701707e','name': '单例', 'value': 'Detail', 'api': '/api/system/menu/{id}/', 'method': 0},
+            {'id': 'fe96f32c-6124-4b24-b809-4964186f5163', 'menu_id': 'e0f53902-e901-490c-83f3-331e60b97fcf','name': '单例', 'value': 'Detail', 'api': '/api/system/menu_button/{id}/', 'method': 0},
+            {'id': '6b88361b326a4e55a8a5135c08ba66f1', 'menu_id': '3171db16eda048ae92b16536fc1241b6','name': '单例', 'value': 'Detail', 'api': '/api/messages/messagenotice/{id}/', 'method': 0},
+            {'id': '6d6b6689d1224900b09c8101b3344f42', 'menu_id': 'a607e820-36e5-45c0-aabf-85a8e4e2c7ac','name': '单例', 'value': 'Detail', 'api': '/api/system/role_id_to_menu/{id}/', 'method': 0},
+            {'id': 'f19826f7df9842089cee94a795681b2e', 'menu_id': '9065cb5445ac42ef93eb9e75e6287792','name': '单例', 'value': 'Detail', 'api': '', 'method': 0},
+            {'id': 'ea18bb51400b482a8aad5dc18357bcab', 'menu_id': '718daec1b94b456c96d773889648173e','name': '单例', 'value': 'Detail', 'api': '/api/terminal/terminal/{id}/', 'method': 0},
+            {'id': 'efcbf104971a4266a26d9469e58c1327', 'menu_id': '02c24003527546359b5a77ae07adc7d5','name': '单例', 'value': 'Detail', 'api': '/api/address/area/{id}/', 'method': 0},
+            {'id': '2235160bd56c423880572f5450b94f16', 'menu_id': 'd470ab18859a4472b525e605ae96c325','name': '单例', 'value': 'Detail', 'api': '/api/mall/goodsspu/{id}/', 'method': 0},
+            {'id': '118ce77cc07140a08d9a92ab8800f2cf', 'menu_id': 'b999c50996864465b851575e378c5aea','name': '单例', 'value': 'Detail', 'api': '/api/mall/goodstype/{id}/', 'method': 0},
+            {'id': '3737d4afa1e2437b93e8cdcd7116180a', 'menu_id': '2e07b715d5e24e2ca45997527430e9d3','name': '单例', 'value': 'Detail', 'api': '/api/mall/goodsorder/{id}/', 'method': 0},
+            {'id': '6e9d454742f74437928959c02be42456', 'menu_id': 'dc8c173b425048e7a8c9b59513596c7f','name': '单例', 'value': 'Detail', 'api': '/api/mall/goodsforderinfo/{id}/', 'method': 0},
+            {'id': '11d334fcadf1490e85e6a045126dea78', 'menu_id': '3c13161f70f1469a913d539e7616c577','name': '单例', 'value': 'Detail', 'api': '/api/platformsettings/userfeeckback/{id}/', 'method': 0},
+            {'id': '6e27757847c64e228934b60ae81baedf', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1', 'name': '单例','value': 'Detail', 'api': '/api/crontab/periodictask/{id}/', 'method': 0},
+            {'id': '14514da3c11441c2b63f2331e3f897d0', 'menu_id': '49160b589f004e44b3920c82583c2581', 'name': '单例','value': 'Detail', 'api': '/api/platformsettings/sysconfig/{id}/', 'method': 0},
             {'id': '0088e172566f4ee388092ec2be3584ee', 'menu_id': 'ae5629946df4497cbec10419e8375dd9','name': '删除', 'value': 'Delete', 'api': '/api/platformsettings/lunboimg/{id}/', 'method': 3},
             {'id': '264cc3d69f7a46d5a117997e9c78506c', 'menu_id': '80a340eae92b430abe17635468c2df1d','name': '删除', 'value': 'Delete', 'api': '/api/platformsettings/other/{id}/', 'method': 3},
             {'id': '2c53efc8-e6a4-4192-8688-03baed0874a4', 'menu_id': '2e3438c8-3ddc-43ff-b8d8-cca328e4856e','name': '删除', 'value': 'Delete', 'api': '/api/system/user/{id}/', 'method': 3},
@@ -240,13 +225,9 @@ if object.{key}:
             {'id': '80c8eb6939a245e9890dede241b5d1d6', 'menu_id': 'd73f73a399af48cea6a8490ac508d7a0','name': '禁用', 'value': 'Disable', 'api': '/api/users/users/disableuser/{id}/', 'method': 2},
             {'id': 'a45559c4cc6f48e2b7194c2dc577af3a', 'menu_id': 'd470ab18859a4472b525e605ae96c325','name': '禁用', 'value': 'Disable', 'api': '/api/mall/goodsspu/islaunched/{id}/', 'method': 2},
             {'id': '0ce04d99cbd249a9af88fe1496591a89', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1', 'name': '禁用','value': 'Disable', 'api': '/api/crontab/periodictask/enabled/{id}/', 'method': 2},
-            {'id': '6af0929440a345238c28ee9b1fe341ba', 'menu_id': '718daec1b94b456c96d773889648173e','name': '终端', 'value': 'Terminal', 'api': '/ws/webssh/', 'method': 5},
-            {'id': 'bec59f93068a4d7aaaf5b4ccfbc12265', 'menu_id': '2e07b715d5e24e2ca45997527430e9d3','name': '统计', 'value': 'Statistics', 'api': '/api/mall/goodsorder/orderstatistics/', 'method': 0},
-            {'id': '53e6d5a4192c4f0f8bdd7f5647124147', 'menu_id': 'dc8c173b425048e7a8c9b59513596c7f','name': '统计', 'value': 'Statistics', 'api': '/api/mall/goodsforderinfo/orderstatistics/', 'method': 0},
+            {'id': '6af0929440a345238c28ee9b1fe341ba', 'menu_id': '718daec1b94b456c96d773889648173e','name': '终端', 'value': 'Terminal', 'api': '/ws/webssh/', 'method': 5}
             {'id': 'c28461a142d7464f8865752c969d82de', 'menu_id': '2e07b715d5e24e2ca45997527430e9d3','name': '发货', 'value': 'Deliver', 'api': '/api/mall/goodsorder/sendoutgoods/', 'method': 1},
-            {'id': '0b5bf0f1caac45beabf54fb5d930187b', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1','name': '日志', 'value': 'Logs', 'api': '/api/crontab/taskresult/', 'method': 0},
-            {'id': 'fa8d945124b74379aba32bcf34ea5383', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1','name': '任务列表', 'value': 'Search', 'api': '/api/crontab/periodictask/tasklist/', 'method': 0},
-
+            {'id': '0b5bf0f1caac45beabf54fb5d930187b', 'menu_id': '09a42810d4dd4b2eb939f8eb0b01d9d1','name': '日志', 'value': 'Logs', 'api': '/api/crontab/taskresult/', 'method': 0}
         ]
         self.save(MenuButton, self.menu_button_data, "菜单权限表")
 
@@ -255,22 +236,8 @@ if object.{key}:
         初始化角色表
         """
         data = [
-            {"id": "36001d1a-1b3e-4413-bdfe-b3bc04375f46", "name": "管理员", "key": "admin", "sort": 1, "status": 1,
-             "admin": 1, "data_range": 3,
-             "menu": [ele.get("id") for ele in self.menu_data],
-             "permission": [ele.get("id") for ele in self.menu_button_data]
-             },
-            {"id": "35b58d98-b506-4f93-be79-ed1e109da071", "name": "普通用户", "key": "public", "sort": 2, "status": 1,
-             "admin": 0, "data_range": 4,
-             "dept": ["d2c03bd9-dad0-4262-88ca-c3681d224fc3", "fd8230ca-67bd-4347-8a9b-57eb19be5d9e"],
-             "menu": ["15c9ebc5-d12f-470a-a560-938a7dc57570", "4236eb70-1558-43a0-9cf2-037230c547f9",
-                      "54f769b0-3dff-416c-8102-e55ec44827cc", "56c3f341-4f46-4b04-9cfc-c8a14701707e",
-                      "244b28685cd14a39a383189981510d4a"],
-             "permission": []
-             },
-            #自定义
-
-
+            {"id": "36001d1a-1b3e-4413-bdfe-b3bc04375f46", "name": "管理员", "key": "admin", "sort": 1, "status": 1,"data_scope": 4},
+            {"id": "35b58d98-b506-4f93-be79-ed1e109da071", "name": "普通用户", "key": "public", "sort": 2, "status": 1, "data_scope": 0}
         ]
         self.save(Role, data, "角色表")
 
@@ -279,7 +246,7 @@ if object.{key}:
         初始化用户表
         """
         data = [
-            {"id": "456b688c-8ad5-46de-bc2e-d41d8047bd42",
+            {"id": "0",
              "password": "pbkdf2_sha256$260000$oE0tnjC7PRIV6aCEah0J1F$scZo6l2/kekoClW8jZ6bM4PmSXevb4qzqHLro8PvzLc=",
              "is_superuser": 1, "is_staff": 1,"identity":0,
              "is_active": 1, "username": "superadmin", "name": "超级管理员",

@@ -51,7 +51,7 @@ class UserSerializer(CustomModelSerializer):
     class Meta:
         model = Users
         read_only_fields = ["id"]
-        exclude = ['password','user_permissions','groups']
+        exclude = ['password']
         extra_kwargs = {
             'post': {'required': False},
         }
