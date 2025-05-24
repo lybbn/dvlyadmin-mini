@@ -3,10 +3,9 @@
 """
 @Remark: 自定义过滤器
 """
-import re
 from rest_framework.filters import BaseFilterBackend
 
-from mysystem.models import Dept,RoleMenuDataRange,MenuButton
+from mysystem.models import Dept
 
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.constants import LOOKUP_SEP
@@ -36,22 +35,6 @@ def get_dept(dept_id, dept_all_list=None, dept_list=None):
             get_dept(ele.get('id'), dept_all_list, dept_list)
     return list(set(dept_list))
 
-def getApiMenuList(request):
-    """
-    根据请求接口获取对应菜单列表（一个接口可能配置到多个菜单中），要严格控制，建议一个接口配置到一个菜单中
-    :param request: 当前请求
-    :return: []
-    """
-    menu_id_list = []
-    reqApi = request.path
-    ApiList = MenuButton.objects.filter(api__isnull = False).exclude(api = '').values("api","method","menu_id")
-    for a in ApiList:
-        validApi = a.get('api')
-        valid_api = validApi.replace('{id}', '.*?')
-        matchObj = re.match(valid_api, reqApi, re.M | re.I)
-        if matchObj:
-            menu_id_list.append(a.get('menu_id'))
-    return list(set(menu_id_list))
 
 class DataLevelPermissionsFilter(BaseFilterBackend):
     """
@@ -85,96 +68,30 @@ class DataLevelPermissionsFilter(BaseFilterBackend):
             if not hasattr(request.user, 'role'):
                 return queryset.filter(dept_belong_id=user_dept_id)
 
-            # 菜单数据权限
-            lypageList = getApiMenuList(request)
-            menu_dataScope_list = []
             # 3. 根据所有角色 获取所有权限范围
-            role_list = request.user.role.filter(status=1).values('id','admin', 'data_range')
-            role_ids = []
+            role_list = request.user.role.filter(status=1).values('admin', 'data_range')
             dataScope_list = []
             for ele in role_list:
-                role_ids.append(ele.get('id'))
                 # 3.1 判断用户是否为超级管理员角色/如果有1(所有数据) 则返回所有数据
-                # if 3 == ele.get('data_range') or ele.get('admin') == True:#该权限已禁用，默认系统只能有一个超级管理员
-                # if 3 == ele.get('data_range'):
-                #     return queryset
+                # if 3 == ele.get('data_range') or ele.get('admin') == True:
+                if 3 == ele.get('data_range'):
+                    return queryset
                 dataScope_list.append(ele.get('data_range'))
             dataScope_list = list(set(dataScope_list))
-            if lypageList:
-                menu_dataScope_list = list(set(RoleMenuDataRange.objects.filter(role_id__in=role_ids,menu_id__in=lypageList).values_list("data_range",flat=True)))
-            if 3 in dataScope_list:#全局全部数据权限-菜单数据权限-放通全部数据权限
-                if 5 in menu_dataScope_list or 3 in menu_dataScope_list or not menu_dataScope_list:
-                    return queryset
-                if 0 in menu_dataScope_list:
-                    return queryset.filter(creator=request.user, dept_belong_id=user_dept_id)
-                dept_list = []
-                if 1 in menu_dataScope_list or 2 in menu_dataScope_list:
-                    for role_menu_datarange in menu_dataScope_list:
-                        if role_menu_datarange == 2:#"本部门及以下数据权限"
-                            dept_list.extend(get_dept(user_dept_id, ))
-                        elif role_menu_datarange == 1:#"本部门数据权限"
-                            dept_list.append(user_dept_id)
 
-                    return queryset.filter(dept_belong_id__in=list(set(dept_list)))
             # 4. 只为仅本人数据权限时只返回过滤本人数据，并且部门为自己本部门(考虑到用户会变部门，只能看当前用户所在的部门数据)
             if 0 in dataScope_list:
-                if menu_dataScope_list:
-                    if 3 in menu_dataScope_list:
-                        return queryset
-                    elif 1 in menu_dataScope_list or 2 in menu_dataScope_list:
-                        dept_list = []
-                        for role_menu_datarange in menu_dataScope_list:
-                            if role_menu_datarange == 2:#"本部门及以下数据权限"
-                                dept_list.extend(get_dept(user_dept_id, ))
-                            elif role_menu_datarange == 1:#"本部门数据权限"
-                                dept_list.append(user_dept_id)
-                        return queryset.filter(dept_belong_id__in=list(set(dept_list)))
-                #不存在菜单数据权限和菜单数据权限为0和5时则为仅本人数据权限
                 return queryset.filter(creator=request.user, dept_belong_id=user_dept_id)
 
-            # 5. 自定义数据权限 获取部门，根据部门过滤
+            # 5. 自定数据权限 获取部门，根据部门过滤
             dept_list = []
             for ele in dataScope_list:
                 if ele == 4:#自定义数据权限会读取role里面的dept部门
-                    if menu_dataScope_list:
-                        if 3 in menu_dataScope_list:
-                            return queryset
-                        elif 0 in menu_dataScope_list:
-                            return queryset.filter(creator=request.user, dept_belong_id=user_dept_id)
-                        elif 1 in menu_dataScope_list or 2 in menu_dataScope_list:
-                            for role_menu_datarange in menu_dataScope_list:
-                                if role_menu_datarange == 2:#"本部门及以下数据权限"
-                                    dept_list.extend(get_dept(user_dept_id, ))
-                                elif role_menu_datarange == 1:#"本部门数据权限"
-                                    dept_list.append(user_dept_id)
-                        else:
-                            dept_list.extend(request.user.role.filter(status=1).values_list('dept__id', flat=True))
-                    else:
-                        dept_list.extend(request.user.role.filter(status=1).values_list('dept__id', flat=True))
+                    dept_list.extend(request.user.role.filter(status=1).values_list('dept__id', flat=True))
                 elif ele == 2:#"本部门及以下数据权限"
-                    if menu_dataScope_list:
-                        if 3 in menu_dataScope_list:
-                            return queryset
-                        elif 0 in menu_dataScope_list:
-                            return queryset.filter(creator=request.user, dept_belong_id=user_dept_id)
-                        elif 1 in menu_dataScope_list:
-                            dept_list.append(user_dept_id)
-                        else:
-                            dept_list.extend(get_dept(user_dept_id, ))
-                    else:
-                        dept_list.extend(get_dept(user_dept_id, ))
+                    dept_list.extend(get_dept(user_dept_id, ))
                 elif ele == 1:#"本部门数据权限"
-                    if menu_dataScope_list:
-                        if 3 in menu_dataScope_list:
-                            return queryset
-                        elif 0 in menu_dataScope_list:
-                            return queryset.filter(creator=request.user, dept_belong_id=user_dept_id)
-                        elif 2 in menu_dataScope_list:
-                            dept_list.extend(get_dept(user_dept_id, ))
-                        else:
-                            dept_list.append(user_dept_id)
-                    else:
-                        dept_list.append(user_dept_id)
+                    dept_list.append(user_dept_id)
             if queryset.model._meta.model_name == 'dept':
                 return queryset.filter(id__in=list(set(dept_list)))
             return queryset.filter(dept_belong_id__in=list(set(dept_list)))

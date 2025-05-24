@@ -30,7 +30,6 @@ from jwt import decode as jwt_decode
 from rest_framework_simplejwt.authentication import AUTH_HEADER_TYPE_BYTES
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import UntypedToken
-from utils.ip_util import IPQQwry
 from config import IS_DEMO
 
 IS_ALLOW_FRONTEND = ALLOW_FRONTEND
@@ -45,8 +44,6 @@ class ApiLoggingMiddleware(MiddlewareMixin):
         self.enable = getattr(settings, 'API_LOG_ENABLE', None) or False
         self.methods = getattr(settings, 'API_LOG_METHODS', None) or set()
         self.request_modular = ""
-        self.enable_log_ip_area = LOG_IP_AREA
-        self.qqwry = IPQQwry() if LOG_IP_AREA else None
 
     @classmethod
     def __handle_request(cls, request):
@@ -74,10 +71,8 @@ class ApiLoggingMiddleware(MiddlewareMixin):
             return
         user = get_request_user(request)
         request_ip = getattr(request, 'request_ip', 'unknown')
-        ip_area =self.qqwry.get_local_ips_area([request_ip])[0] if self.enable_log_ip_area else ""
         info = {
             'request_ip': getattr(request, 'request_ip', 'unknown'),
-            'ip_area':ip_area,
             'creator': user if not isinstance(user, AnonymousUser) else None,
             'dept_belong_id': getattr(request.user, 'dept_id', None),
             'request_method': request.method,

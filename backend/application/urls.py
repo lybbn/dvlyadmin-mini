@@ -14,5 +14,30 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import path,include, re_path
+from django.views.static import serve
+from django.conf import settings
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
+from django.views.generic.base import RedirectView
+from django.views.generic import TemplateView
+#自定义
+from utils.streamingmedia_response import streamingmedia_serve
+from mysystem.views.login import LoginView,CaptchaView
+from mysystem.views.frontend import h5web
 
+urlpatterns = [
+    path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT},),  # 处理静态文件
+    path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
+    #管理后台的标准接口
+    path('api/system/', include('mysystem.urls')),
+    path('api/token/', LoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/captcha/', CaptchaView.as_view()),
+
+    #集成部署后端管理页面
+    path('h5/',h5web ,name='h5端页面部署'),
+    path('favicon.ico',RedirectView.as_view(url=r'static/favicon.ico')),
+    path('', TemplateView.as_view(template_name="index.html"),name='后台管理默认页面'),
+]

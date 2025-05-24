@@ -182,6 +182,30 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ================================================= #
+# ******************** 自定义权限 ******************** #
+# ================================================= #
+
+AUTHENTICATION_BACKENDS = ["utils.customBackend.CustomBackend"]
+
+# ================================================= #
+# **************** 验证码配置  ******************* #
+# ================================================= #
+CAPTCHA_STATE = True
+CAPTCHA_IMAGE_SIZE = (160, 60)  # 设置 captcha 图片大小
+CAPTCHA_LENGTH = 4  # 字符个数
+CAPTCHA_TIMEOUT = 1  # 超时(minutes)
+CAPTCHA_OUTPUT_FORMAT = '%(image)s %(text_field)s %(hidden_field)s '
+CAPTCHA_FONT_SIZE = 42  # 字体大小
+CAPTCHA_FOREGROUND_COLOR = '#296dff'  # 前景色
+CAPTCHA_BACKGROUND_COLOR = '#FFFFFF'  # 背景色
+CAPTCHA_NOISE_FUNCTIONS = (
+    'captcha.helpers.noise_arcs', # 线
+    # 'captcha.helpers.noise_dots', # 点
+)
+# CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge' #字母验证码
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge' # 加减乘除验证码
+
+# ================================================= #
 # ******************* 跨域的配置 ******************* #
 # ================================================= #
 # 如果为True，则将不使用白名单，并且将接受所有来源。默认为False

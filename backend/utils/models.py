@@ -23,8 +23,8 @@ class CoreModel(models.Model):
     核心标准抽象模型模型,可直接继承使用
     增加审计字段, 覆盖字段时, 字段名称请勿修改, 必须统一审计字段名称
     """
-    id = models.BigAutoField(primary_key=True, help_text="Id", verbose_name="Id")
-    # id = models.CharField(max_length=100, primary_key=True, default=make_uuid, help_text="Id", verbose_name="Id")
+    # id = models.BigAutoField(primary_key=True, help_text="Id", verbose_name="Id")
+    id = models.CharField(max_length=100, primary_key=True, default=make_uuid, help_text="Id", verbose_name="Id")
     creator = models.ForeignKey(to=settings.AUTH_USER_MODEL, related_query_name='creator_query', null=True,verbose_name='创建人', help_text="创建人", on_delete=models.SET_NULL, db_constraint=False)
     modifier = models.CharField(max_length=100, null=True, blank=True, help_text="修改人", verbose_name="修改人")
     dept_belong = models.CharField(max_length=100, help_text="数据归属部门", null=True, blank=True, verbose_name="数据归属部门")
@@ -49,7 +49,6 @@ class BaseModel(models.Model):
         abstract = True  # 表示该类是一个抽象类，只用来继承，不参与迁移操作
         verbose_name = '基本模型'
         verbose_name_plural = verbose_name
-
 
 def get_all_models_objects(model_name=None):
     """

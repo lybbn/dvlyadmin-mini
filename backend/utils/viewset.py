@@ -3,8 +3,6 @@
 """
 @Remark: 自定义视图集
 """
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
@@ -19,7 +17,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import utils
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
-from utils.export_excel2 import LyExportExcel
 
 def get_object_or_404(queryset, *filter_args, **filter_kwargs):
     """
@@ -125,27 +122,6 @@ class CustomModelViewSet(ModelViewSet):
             return action_serializer_class
         return super().get_serializer_class()
 
-    # 导出Excel
-    @action(methods=['post'], detail=False)
-    def export(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        request_data = request.data
-        ids = request_data.get('ids', None)  # 存在导出的id数据列表则只导出指定的数据
-        if ids:
-            queryset = queryset.filter(id__in=ids)
-        export_serializer_class = self.export_serializer_class if self.export_serializer_class else self.serializer_class
-        data = export_serializer_class(queryset, many=True, request=request).data
-        if self.export_download_filename:
-            result = LyExportExcel(request=request, downloadMode=self.export_download_mode,
-                                   fileName=self.export_download_filename + ".xlsx").export_data(
-                self.export_field_dict, data)
-        else:
-            result = LyExportExcel(request=request, downloadMode=self.export_download_mode).export_data(
-                self.export_field_dict, data)
-        if self.export_download_mode == "temp":
-            return result
-        return DetailResponse(data=result, msg="导出成功")
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, request=request)
         serializer.is_valid(raise_exception=True)
@@ -203,20 +179,7 @@ class CustomModelViewSet(ModelViewSet):
     def perform_destroy(self, instance):
         instance.delete()
 
-    #原来得单id删除方法
-    # def destroy(self, request, *args, **kwargs):
-    #     instance = self.get_object()
-    #     self.perform_destroy(instance)
-    #     return SuccessResponse(data=[], msg="删除成功")
-
     #新的批量删除方法
-    keys = openapi.Schema(description='主键列表', type=openapi.TYPE_ARRAY, items=openapi.TYPE_STRING)
-
-    @swagger_auto_schema(request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['keys'],
-        properties={'keys': keys}
-    ), operation_summary='批量删除')
     @action(methods=['delete'], detail=False)
     def multiple_delete(self, request, *args, **kwargs):
         request_data = request.data
