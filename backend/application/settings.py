@@ -31,6 +31,9 @@ ALLOWED_HOSTS = locals().get('ALLOWED_HOSTS', ['*'])
 AUTH_USER_MODEL = 'mysystem.Users'
 USERNAME_FIELD = 'username'
 
+#路由结尾不强制带斜杠
+APPEND_SLASH = False
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'drf_spectacular',
     'captcha',
     'mysystem',
 ]
@@ -124,6 +128,26 @@ CACHES = {
             'CONNECTION_POOL_KWARGS': {
                 'max_connections': 512,  # 连接池的连接(最大连接)
             },
+        }
+    },
+    "authapi": {  # 接口安全校验（验证接口重复第二次访问会拒绝）
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': [
+            f'{REDIS_URL}/1',
+        ],
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
+        }
+    },
+    "singletoken": {  # jwt单用户登录（确保一个账户只有一个地点登录，后一个会顶掉前一个）
+        'BACKEND': 'django_redis.cache.RedisCache',  # 缓存后端 Redis
+        # 连接Redis数据库(服务器地址)
+        'LOCATION': [
+            f'{REDIS_URL}/2',
+        ],
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
+            'CONNECTION_POOL_KWARGS': {'decode_responses': True}, # 添加这一行,防止取出的值带有b'' bytes
         }
     },
 }
@@ -226,6 +250,7 @@ CORS_EXPOSE_HEADERS = ['Content-Disposition'] # Content-Disposition 头部添加
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S",  # 日期时间格式配置
     'DATE_FORMAT': "%Y-%m-%d",
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -253,6 +278,24 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES':(
         'rest_framework.renderers.JSONRenderer',
     ),
+}
+
+# ================================================= #
+# ****************** spectacular配置 ***************** #
+# ================================================= #
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'dvlyadmin-mini',
+    'DESCRIPTION': '全栈快速web开发框架',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # 中文配置
+    'SCHEMA_PATH_PREFIX': '/api',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'displayOperationId': True,
+        'defaultModelsExpandDepth': -1,
+    }
 }
 
 # ================================================= #

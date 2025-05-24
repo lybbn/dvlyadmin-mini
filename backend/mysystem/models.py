@@ -42,6 +42,8 @@ class Users(AbstractBaseUser, CoreModel):
     REQUIRED_FIELDS = []
 
     class Meta:
+        default_permissions = ()  # 移除 add/change/delete/view 权限
+        permissions = []  # 清空权限
         db_table = table_prefix + "users"
         verbose_name = '用户表'
         verbose_name_plural = verbose_name
@@ -51,9 +53,9 @@ DATASCOPE_CHOICES = (
     (0, "仅本人数据权限"),
     (1, "本部门数据权限"),
     (2, "本部门及以下数据权限"),
-    (3, "全部数据权限"),
-    (4, "自定数据权限"),
-    (5, "同全局数据权限"),
+    (3, "自定义部门数据权限"),
+    (4, "全部数据权限"),
+    (5, "自定义数据权限"),#走按钮接口数据权限
 )
 
 class Role(CoreModel):
@@ -61,7 +63,7 @@ class Role(CoreModel):
     key = models.CharField(max_length=64, verbose_name="权限字符", help_text="权限字符",unique=True,error_messages={'unique': '权限字符已存在'})
     sort = models.IntegerField(default=1, verbose_name="角色顺序", help_text="角色顺序")
     status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
-    data_scope = models.SmallIntegerField(default=0, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
+    data_scope = models.SmallIntegerField(default=3, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
     dept = models.ManyToManyField(to='Dept', verbose_name='数据权限-关联部门', db_constraint=False, help_text="数据权限-关联部门")#data_scope=4时会使用
     remark = models.CharField(max_length=255,null=True, blank=True, verbose_name="备注")
 
@@ -79,7 +81,7 @@ class RoleMenuPermission(models.Model):
         db_table = table_prefix + "role_menu_permission"
         verbose_name = "角色菜单权限表"
         verbose_name_plural = verbose_name
-        ordering = ("-create_datetime",)
+        ordering = ("-id",)
 
 class RoleMenuButtonPermission(models.Model):
     role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu_button",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
@@ -91,7 +93,7 @@ class RoleMenuButtonPermission(models.Model):
         db_table = table_prefix + "role_menubutton_permission"
         verbose_name = "角色接口权限表"
         verbose_name_plural = verbose_name
-        ordering = ("-create_datetime",)
+        ordering = ("-id",)
 
 class Dept(CoreModel):
     name = models.CharField(max_length=64, verbose_name="部门名称", help_text="部门名称")
@@ -353,7 +355,7 @@ class Dictionary(CoreModel):
     name = models.CharField(max_length=100, blank=True, null=True, verbose_name="名称", help_text="名称")
     status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
     sort = models.IntegerField(default=1, verbose_name="显示排序", null=True, blank=True, help_text="显示排序")
-    parent = models.ForeignKey(to="subdicts", db_constraint=False, on_delete=models.PROTECT, blank=True, null=True,verbose_name="父级", help_text="父级")
+    parent = models.ForeignKey(to='Dictionary',related_name="subdicts", db_constraint=False, on_delete=models.PROTECT, blank=True, null=True,verbose_name="父级", help_text="父级")
     remark = models.CharField(max_length=255, blank=True, null=True, verbose_name="备注", help_text="备注")
 
     class Meta:
@@ -364,15 +366,16 @@ class Dictionary(CoreModel):
 
 
 class OperationLog(CoreModel):
-    request_modular = models.CharField(max_length=64, verbose_name="请求模块", null=True, blank=True, help_text="请求模块")
-    request_path = models.TextField(verbose_name="请求地址", null=True, blank=True, help_text="请求地址")
-    request_body = models.TextField(verbose_name="请求参数", null=True, blank=True, help_text="请求参数")
-    request_method = models.CharField(max_length=8, verbose_name="请求方式", null=True, blank=True, help_text="请求方式")
-    request_msg = models.TextField(verbose_name="操作说明", null=True, blank=True, help_text="操作说明")
-    request_ip = models.CharField(max_length=32, verbose_name="请求ip地址", null=True, blank=True, help_text="请求ip地址")
-    request_browser = models.CharField(max_length=64, verbose_name="请求浏览器", null=True, blank=True, help_text="请求浏览器")
-    response_code = models.CharField(max_length=32, verbose_name="响应状态码", null=True, blank=True, help_text="响应状态码")
-    request_os = models.CharField(max_length=64, verbose_name="操作系统", null=True, blank=True, help_text="操作系统")
+    req_modular = models.CharField(max_length=64, verbose_name="请求模块", null=True, blank=True, help_text="请求模块")
+    req_path = models.TextField(verbose_name="请求地址", null=True, blank=True, help_text="请求地址")
+    req_body = models.TextField(verbose_name="请求参数", null=True, blank=True, help_text="请求参数")
+    req_method = models.CharField(max_length=8, verbose_name="请求方式", null=True, blank=True, help_text="请求方式")
+    req_msg = models.TextField(verbose_name="操作说明", null=True, blank=True, help_text="操作说明")
+    req_ip = models.CharField(max_length=32, verbose_name="请求ip地址", null=True, blank=True, help_text="请求ip地址")
+    req_browser = models.CharField(max_length=64, verbose_name="请求浏览器", null=True, blank=True, help_text="请求浏览器")
+    resp_code = models.CharField(max_length=32, verbose_name="响应状态码", null=True, blank=True, help_text="响应状态码")
+    req_os = models.CharField(max_length=64, verbose_name="操作系统", null=True, blank=True, help_text="操作系统")
+    ip_area = models.CharField(max_length=100, verbose_name="IP归属地", null=True, blank=True, help_text="IP归属地")
     json_result = models.TextField(verbose_name="返回信息", null=True, blank=True, help_text="返回信息")
     status = models.BooleanField(default=False, verbose_name="响应状态", help_text="响应状态")
 
@@ -393,6 +396,7 @@ class LoginLog(CoreModel):
     browser = models.CharField(max_length=200, verbose_name="浏览器名", null=True, blank=True, help_text="浏览器名")
     os = models.CharField(max_length=150, verbose_name="操作系统", null=True, blank=True, help_text="操作系统")
     login_type = models.IntegerField(default=1, choices=LOGIN_TYPE_CHOICES, verbose_name="登录类型", help_text="登录类型")
+    ip_area = models.CharField(max_length=100, verbose_name="IP归属地", null=True, blank=True, help_text="IP归属地")
 
     class Meta:
         db_table = table_prefix + 'login_log'

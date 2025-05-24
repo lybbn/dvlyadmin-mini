@@ -12,7 +12,7 @@ from mysystem.views.menu import MenuSerializer
 from mysystem.views.menu_button import MenuButtonSerializer
 from utils.jsonResponse import SuccessResponse
 from utils.serializers import CustomModelSerializer
-from utils.validator import CustomUniqueValidator
+from rest_framework.validators import UniqueValidator
 from utils.viewset import CustomModelViewSet
 
 
@@ -31,12 +31,9 @@ class RoleCreateUpdateSerializer(CustomModelSerializer):
     """
     角色管理 创建/更新时的列化器
     """
-    menu = MenuSerializer(many=True, read_only=True)
     dept = DeptSerializer(many=True, read_only=True)
-    permission = MenuButtonSerializer(many=True, read_only=True)
-    key = serializers.CharField(max_length=50,
-                                validators=[CustomUniqueValidator(queryset=Role.objects.all(), message="权限字符必须唯一")])
-    name = serializers.CharField(max_length=50, validators=[CustomUniqueValidator(queryset=Role.objects.all())])
+    key = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Role.objects.all(), message="权限字符必须唯一")])
+    name = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Role.objects.all(),message="角色名称必须唯一")])
 
     def validate(self, attrs: dict):
         return super().validate(attrs)
@@ -44,8 +41,6 @@ class RoleCreateUpdateSerializer(CustomModelSerializer):
     def save(self, **kwargs):
         data = super().save(**kwargs)
         data.dept.set(self.initial_data.get('dept', []))
-        data.menu.set(self.initial_data.get('menu', []))
-        data.permission.set(self.initial_data.get('permission', []))
         return data
 
     class Meta:

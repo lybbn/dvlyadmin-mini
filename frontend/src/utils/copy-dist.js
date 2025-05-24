@@ -1,7 +1,10 @@
-const fs = require('fs-extra');
-const path = require('path');
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // 源目录 (Vite 默认输出目录)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const distPath = path.resolve(__dirname, '../../dist');
 
 // 目标目录列表
@@ -18,7 +21,7 @@ targetDirs.forEach(target => {
         fs.ensureDirSync(target); // 确保目录存在
         fs.emptyDirSync(target);  // 清空目录
         fs.copySync(distPath, target);
-        console.log(`✓ 成功复制到: ${path.relative(path.resolve(currentDir, '../../..'), target)}`);
+        console.log(`✓ 成功复制到: ${target}`);
     } catch (err) {
         console.error(`✗ 复制到 ${target} 失败:`, err.message);
     }

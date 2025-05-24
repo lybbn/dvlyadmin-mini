@@ -8,7 +8,29 @@ from mysystem.models import OperationLog
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
 from utils.jsonResponse import SuccessResponse, ErrorResponse
-from utils.filters import OperationLogTimeFilter
+import django_filters
+
+class OperationLogTimeFilter(django_filters.rest_framework.FilterSet):
+    """
+    日志管理 简单过滤器
+    """
+    #开始时间
+    beginAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='gte')
+    #结束时间
+    endAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='lte')
+    # 模糊搜索
+    req_modular = django_filters.CharFilter(field_name='req_modular', lookup_expr='icontains')
+    # 模糊搜索
+    req_path = django_filters.CharFilter(field_name='req_path', lookup_expr='icontains')
+    # 模糊搜索
+    req_ip = django_filters.CharFilter(field_name='req_ip', lookup_expr='icontains') 
+    req_os = django_filters.CharFilter(field_name='req_os', lookup_expr='icontains')
+    req_body = django_filters.CharFilter(field_name='req_body', lookup_expr='icontains')
+    req_method = django_filters.CharFilter(field_name='re_method', lookup_expr='icontains')
+
+    class Meta:
+        model = OperationLog
+        fields = ['beginAt', 'endAt','req_modular','req_path','req_ip','req_os','req_body','req_method']
 
 
 class OperationLogSerializer(CustomModelSerializer):

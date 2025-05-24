@@ -1,6 +1,3 @@
-import os
-from application.settings import BASE_DIR
-
 # ================================================= #
 # ************** mysql数据库 配置  ************** #
 # ================================================= #
@@ -15,7 +12,7 @@ DATABASE_USER = "root"
 # 数据库密码
 DATABASE_PASSWORD = "root"
 # 数据库名
-DATABASE_NAME = "lyadmin_pro"
+DATABASE_NAME = "dvlyadmin_mini"
 
 # ================================================= #
 # ************** redis 配置  ************** #

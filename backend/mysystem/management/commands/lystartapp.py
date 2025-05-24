@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     向apps目录中创建App命令:
-    python manage.py lyadminstartapp app名
-    python manage.py lyadminstartapp app名1 app名2
+    python manage.py lystartapp app名
+    python manage.py lystartapp app名1 app名2
     """
 
     def add_arguments(self, parser):

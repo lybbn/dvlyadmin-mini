@@ -10,11 +10,34 @@ from mysystem.models import Users,Role
 from utils.jsonResponse import SuccessResponse, ErrorResponse
 from utils.permission import CustomPermission
 from utils.serializers import CustomModelSerializer
-from utils.validator import CustomUniqueValidator
 from utils.viewset import CustomModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-from utils.filters import UsersManageTimeFilter
+from rest_framework.validators import UniqueValidator
+import django_filters
+
+class UsersManageTimeFilter(django_filters.rest_framework.FilterSet):
+    """
+    用户管理 简单过滤器
+    """
+    #开始时间
+    beginAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='gte')
+    #结束时间
+    endAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='lte')
+    # 模糊搜索
+    username = django_filters.CharFilter(field_name='username', lookup_expr='icontains')
+    # 模糊搜索
+    nickname = django_filters.CharFilter(field_name='nickname', lookup_expr='icontains')
+    # 模糊搜索
+    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
+    # 模糊搜索
+    mobile = django_filters.CharFilter(field_name='mobile', lookup_expr='icontains')
+    is_active = django_filters.CharFilter(field_name='is_active')
+    dept_id = django_filters.CharFilter(field_name='dept_id')
+
+    class Meta:
+        model = Users
+        fields = ['beginAt', 'endAt','username','mobile','is_active','nickname','name','dept_id']
+
 
 class UserSerializer(CustomModelSerializer):
     """
@@ -38,7 +61,7 @@ class UserCreateSerializer(CustomModelSerializer):
     """
     管理员用户新增-序列化器
     """
-    username = serializers.CharField(max_length=50,validators=[CustomUniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
+    username = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
     password = serializers.CharField(required=False, default=make_password("123456"))
 
     is_staff = serializers.BooleanField(required=False,default=True)#是否允许登录后台
@@ -68,7 +91,7 @@ class UserUpdateSerializer(CustomModelSerializer):
     """
     用户修改-序列化器
     """
-    username = serializers.CharField(max_length=50,validators=[CustomUniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
+    username = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
     password = serializers.CharField(required=False, allow_blank=True)
 
     def update(self, instance, validated_data):

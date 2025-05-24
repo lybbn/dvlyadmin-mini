@@ -7,8 +7,6 @@ import base64
 from datetime import datetime, timedelta
 from captcha.views import CaptchaStore, captcha_image
 from django.utils.translation import gettext_lazy as _
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -16,7 +14,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from mysystem.models import Users
 from utils.jsonResponse import SuccessResponse
-from utils.validator import CustomValidationError
 from utils.request_util import save_login_log
 from django_redis import get_redis_connection
 from django.conf import settings
@@ -28,14 +25,6 @@ class CaptchaView(APIView):
     """
     authentication_classes = []
 
-    @swagger_auto_schema(
-        responses={
-            '200': openapi.Response('获取成功')
-        },
-        security=[],
-        operation_id='captcha-get',
-        operation_description='验证码获取',
-    )
     def get(self, request):
         hashkey = CaptchaStore.generate_key()
         id = CaptchaStore.objects.filter(hashkey=hashkey).first().id
@@ -67,13 +56,13 @@ class LoginSerializer(TokenObtainPairSerializer):
         five_minute_ago = datetime.now() - timedelta(hours=0, minutes=5, seconds=0)
         if self.image_code and five_minute_ago > self.image_code.expiration:
             self.image_code and self.image_code.delete()
-            raise CustomValidationError('验证码过期')
+            raise ValueError('验证码过期')
         else:
             if self.image_code and (self.image_code.response == captcha or self.image_code.challenge == captcha):
                 self.image_code and self.image_code.delete()
             else:
                 self.image_code and self.image_code.delete()
-                raise CustomValidationError("图片验证码错误")
+                raise ValueError("图片验证码错误")
 
     def validate(self, attrs):
         username = attrs['username']

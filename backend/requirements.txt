@@ -8,4 +8,8 @@ django-simple-captcha
 djangorestframework
 djangorestframework-simplejwt
 PyMySQL
+django_redis
+drf-spectacular
+user-agents
+six
 #psycopg2
