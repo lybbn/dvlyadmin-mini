@@ -36,8 +36,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/captcha/', CaptchaView.as_view()),
 
-    #集成部署后端管理页面
+    #集成部署后端管理页面和uniapp h5页面
     path('h5/',h5web ,name='h5端页面部署'),
     path('favicon.ico',RedirectView.as_view(url=r'static/favicon.ico')),
-    path('', TemplateView.as_view(template_name="index.html"),name='后台管理默认页面'),
+    path('', TemplateView.as_view(template_name="admin/index.html"),name='后台管理默认页面'),
 ]
