@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
     'captcha',
     'mysystem',
 ]
@@ -71,7 +72,15 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [FRONTEND_ROOT],
-        'APP_DIRS': False,# 启用应用目录下的模板加载
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
     },
 ]
 
@@ -284,22 +293,25 @@ REST_FRAMEWORK = {
 }
 
 # ====================================#
-# ****************swagger************#
+# ****************SPECTACULAR************#
 #====================================#
 SPECTACULAR_SETTINGS = {
     'TITLE': 'dvlyadmin-mini API',
     'DESCRIPTION': 'dvlyadmin-mini全栈快速web开发框架的API文档',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True, # 如果不需要在浏览器中直接查看，可以设置为 False(线上部署可为False)
-    # 或者如果有统一的前缀，可以设置成
-    'SCHEMA_PATH_PREFIX': '^/api/',
+    'SWAGGER_UI_DIST':'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF':'SIDECAR',
+    'REDOC_DIST':'SIDECAR',
+    'SERVE_INCLUDE_SCHEMA': False, # 如果不需要在浏览器中直接查看，可以设置为 False(线上部署可为False)
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api/',
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "persistAuthorization": True,
         "displayOperationId": True,
     },
-    # 修改图标
-    # "SWAGGER_UI_FAVICON_HREF": "https://xxxxx/xxxx/xxx/XXXX.png",
+    'PREPROCESSING_HOOKS': ['drf_spectacular.hooks.preprocess_exclude_path_format'],
+    'SECURITY': [{'jwt': []}],
 }
 # ================================================= #
 # ****************** simplejwt配置 ***************** #

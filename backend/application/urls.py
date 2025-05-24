@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
 )
 from django.views.generic.base import RedirectView
 from django.views.generic import TemplateView
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 #自定义
 from utils.streamingmedia_response import streamingmedia_serve
@@ -34,9 +34,9 @@ urlpatterns = [
     path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
     
     #接口文档（线上部署需注释掉，确保安全性）
-    path('api/lyschema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/lydocs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/lyredoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     #管理后台的标准接口
     path('api/system/', include('mysystem.urls')),
