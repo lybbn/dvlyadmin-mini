@@ -4,13 +4,30 @@ vue3+vite+elementplus
 
 ## 安装依赖
 
+```
 npm install --registry=https://registry.npmmirror.com
+```
 
 ## 本地开发-启动方式
 
+```
 npm start
+```
 
 ## 打包线上
 
-npm run build
+### 单独打包
 
+```
+npm run build
+```
+
+注意：默认打包后的静态文件位置：```backend/frontend/admin``` 目录中
+
+### 集成部署打包
+
+```
+npm run build:backend
+```
+
+注意：此命令会把打包后的静态文件复制到：```backend/frontend/admin``` 目录中，方面与后端集成部署

@@ -1,0 +1,5 @@
+集成部署后台的前端页面时，请把frontend打包后的dist内的文件复制到此目录
+
+如果直接在前端项目frontend运行 npm run build:backend 打包命令时，会直接打包admin页面到此目录
+
+如无需集成部署可忽略

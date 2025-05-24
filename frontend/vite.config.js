@@ -33,6 +33,7 @@ export default defineConfig({
     manifest: false,
     sourcemap: false,
     outDir: 'dist',
+    emptyOutDir: true, // 构建前清空输出目录
     assetsDir: 'static',
     chunkSizeWarningLimit: 2000,
     terserOptions: {

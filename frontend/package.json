@@ -14,6 +14,8 @@
     "start": "vite --host",
     "dev": "vite",
     "build": "vite build",
+    "build:backend": "vite build && npm run copy-dist",
+    "copy-dist": "node src/utils/copy-dist.js",
     "preview": "vite preview"
   },
   "dependencies": {

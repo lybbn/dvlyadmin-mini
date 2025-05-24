@@ -6,9 +6,10 @@ from utils.models import CoreModel,BaseModel, table_prefix
 #自定义
 
 GENDER_CHOICES = (
-        (0, "女"),
-        (1, "男"),
-    )
+    (0, "未知"),
+    (1, "女"),
+    (2, "男"),
+)
 
 class Users(AbstractBaseUser, CoreModel):
     IDENTITY_CHOICES = (
@@ -24,12 +25,12 @@ class Users(AbstractBaseUser, CoreModel):
     name = models.CharField(max_length=40, verbose_name="姓名", help_text="姓名")
     nickname = models.CharField(max_length=100, help_text="用户昵称", verbose_name="用户昵称",default="")
     gender = models.SmallIntegerField(choices=GENDER_CHOICES, verbose_name="性别", null=True, blank=True, help_text="性别")
-    role = models.ManyToManyField(to='Role', verbose_name='关联角色', db_constraint=False, help_text="关联角色")#这个就是保留跨表查询的便利(双下划线跨表查询```),但是不用约束字段了,一般公司都用false,这样就省的报错,因为没有了约束(Field字段对象,既约束,又建立表与表之间的关系
+    role = models.ManyToManyField(to='Role', verbose_name='关联角色', db_constraint=False,related_name="role_users", help_text="关联角色")
     dept = models.ForeignKey(to='Dept', verbose_name='所属部门', on_delete=models.PROTECT, db_constraint=False, null=True,blank=True, help_text="关联部门")
     
     login_error_nums = models.IntegerField(default=0, verbose_name="登录错误次数", help_text="登录错误次数")
     identity = models.SmallIntegerField(choices=IDENTITY_CHOICES, verbose_name="身份标识", null=True, blank=True, default=2,help_text="身份标识")
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='钱包余额')  # 钱包余额
+    # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='钱包余额')
     is_delete = models.BooleanField(default=False, verbose_name="是否逻辑删除", help_text="是否逻辑删除")
 
     is_staff = models.BooleanField(verbose_name="是否员工",default=False)
@@ -52,13 +53,17 @@ DATASCOPE_CHOICES = (
     (2, "本部门及以下数据权限"),
     (3, "全部数据权限"),
     (4, "自定数据权限"),
+    (5, "同全局数据权限"),
 )
 
 class Role(CoreModel):
-    name = models.CharField(max_length=64, verbose_name="角色名称", help_text="角色名称")
-    key = models.CharField(max_length=64, verbose_name="权限字符", help_text="权限字符")
+    name = models.CharField(max_length=64, verbose_name="角色名称", help_text="角色名称",unique=True,error_messages={'unique': '角色名称已存在'})
+    key = models.CharField(max_length=64, verbose_name="权限字符", help_text="权限字符",unique=True,error_messages={'unique': '权限字符已存在'})
     sort = models.IntegerField(default=1, verbose_name="角色顺序", help_text="角色顺序")
     status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
+    data_scope = models.SmallIntegerField(default=0, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
+    dept = models.ManyToManyField(to='Dept', verbose_name='数据权限-关联部门', db_constraint=False, help_text="数据权限-关联部门")#data_scope=4时会使用
+    remark = models.CharField(max_length=255,null=True, blank=True, verbose_name="备注")
 
     class Meta:
         db_table = table_prefix + 'role'
@@ -66,9 +71,9 @@ class Role(CoreModel):
         verbose_name_plural = verbose_name
         ordering = ('sort',)
 
-class RoleMenuPermission(CoreModel):
-    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
-    menu = models.ForeignKey(to="Menu",db_constraint=False,related_name="role_menu",on_delete=models.CASCADE,verbose_name="关联菜单",help_text="关联菜单")
+class RoleMenuPermission(models.Model):
+    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_permissions",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
+    menu = models.ForeignKey(to="Menu",db_constraint=False,related_name="menu_permissions",on_delete=models.CASCADE,verbose_name="关联菜单",help_text="关联菜单")
 
     class Meta:
         db_table = table_prefix + "role_menu_permission"
@@ -76,15 +81,15 @@ class RoleMenuPermission(CoreModel):
         verbose_name_plural = verbose_name
         ordering = ("-create_datetime",)
 
-class RoleMenuButtonPermission(CoreModel):
+class RoleMenuButtonPermission(models.Model):
     role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu_button",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
     menu_button = models.ForeignKey(to="MenuButton",db_constraint=False,related_name="menu_button_permission",on_delete=models.CASCADE,verbose_name="关联菜单按钮",help_text="关联菜单按钮",null=True,blank=True)
-    data_range = models.SmallIntegerField(default=0, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")
-    dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")
+    data_scope = models.SmallIntegerField(default=3, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#局部接口数据权限，默认全部数据权限
+    dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=4时会使用
 
     class Meta:
         db_table = table_prefix + "role_menubutton_permission"
-        verbose_name = "角色权限表"
+        verbose_name = "角色接口权限表"
         verbose_name_plural = verbose_name
         ordering = ("-create_datetime",)
 
@@ -168,18 +173,16 @@ class Dept(CoreModel):
         verbose_name_plural = verbose_name
         ordering = ('sort',)
 
-
 class Button(CoreModel):
     name = models.CharField(max_length=64, verbose_name="权限名称", help_text="权限名称")
     value = models.CharField(max_length=64, verbose_name="权限值", help_text="权限值")
-    status = models.BooleanField(default=True, verbose_name="按钮状态", null=True, blank=True, help_text="按钮状态")
+    status = models.BooleanField(default=True, verbose_name="状态", null=True, blank=True, help_text="状态")
 
     class Meta:
         db_table = table_prefix + "button"
         verbose_name = '权限标识表'
         verbose_name_plural = verbose_name
         ordering = ('-name',)
-
 
 class Menu(CoreModel):
     parent = models.ForeignKey(to='Menu', on_delete=models.CASCADE, verbose_name="上级菜单", null=True, blank=True,db_constraint=False, help_text="上级菜单")
@@ -202,14 +205,130 @@ class Menu(CoreModel):
     cache = models.BooleanField(default=False, verbose_name="是否页面缓存", null=True, blank=True, help_text="是否页面缓存")
     visible = models.BooleanField(default=True, verbose_name="侧边栏中是否显示", null=True, blank=True, help_text="侧边栏中是否显示")
 
+    @classmethod
+    def get_parent_chain(cls, menu_id, include_self = False):
+        """
+        获取从根节点到指定菜单的完整父链（自顶向下）
+        :param menu_id: 目标菜单ID
+        :param include_self: 是否包含目标菜单本身
+        :return: 有序菜单列表[根菜单, ..., 父菜单, (目标菜单)]
+        """
+        # 一次性获取所有菜单数据，避免多次查询
+        all_menus = list(Menu.objects.values("id", "name", "parent").order_by("sort"))
+        menu_map = {m["id"]: m for m in all_menus}
+        
+        chain = []
+        current_id = menu_id
+        
+        # 向上追溯父节点
+        while current_id in menu_map:
+            current_menu = menu_map[current_id]
+            chain.insert(0, current_menu)  # 插入到开头保证顺序
+            current_id = current_menu["parent"]
+        
+        return chain if include_self else chain[:-1]
+
+    @classmethod
+    def get_breadcrumb_path(cls, menu_id, separator= " > "):
+        """
+        生成面包屑导航路径
+        :param menu_id: 目标菜单ID
+        :param separator: 分隔符
+        :return: 如"系统设置 > 权限管理 > 菜单管理"
+        """
+        chain = cls.get_parent_chain(menu_id, include_self=True)
+        return separator.join(item["name"] for item in chain)
+
+    @classmethod
+    def get_all_children(cls, menu_id, flat = True):
+        """
+        获取所有子节点（支持树形和平铺两种格式）
+        :param menu_id: 父菜单ID
+        :param flat: True返回平铺列表，False返回树形结构
+        :return: 菜单列表或树
+        """
+        all_menus = list(Menu.objects.values("id", "name", "parent", "sort").order_by("sort"))
+        
+        if flat:
+            # 平铺格式（DFS顺序）
+            children = []
+            stack = [menu_id]
+            
+            parent_child_map = {}
+            for m in all_menus:
+                parent_child_map.setdefault(m["parent"], []).append(m["id"])
+            
+            while stack:
+                current_id = stack.pop()
+                if current_id != menu_id:  # 排除根节点自身
+                    children.append(next(m for m in all_menus if m["id"] == current_id))
+                stack.extend(parent_child_map.get(current_id, []))
+            
+            return children
+        else:
+            # 树形格式
+            menu_dict = {m["id"]: dict(m, children=[]) for m in all_menus}
+            
+            for m in all_menus:
+                if m["parent"] and m["parent"] in menu_dict:
+                    menu_dict[m["parent"]]["children"].append(menu_dict[m["id"]])
+            
+            return menu_dict.get(menu_id, {}).get("children", [])
+
+    @classmethod
+    def get_full_tree(cls, root_id: int = None) -> list:
+        """
+        获取完整的菜单树结构
+        :param root_id: 根节点ID（None表示所有顶级菜单）
+        :return: 树形结构列表
+        """
+        all_menus = Menu.objects.filter(status=True).order_by("sort")
+        menu_dict = {m.id: {"menu": m, "children": []} for m in all_menus}
+        
+        roots = []
+        for menu in all_menus:
+            if menu.parent_id == root_id:
+                roots.append(menu_dict[menu.id])
+            elif menu.parent_id in menu_dict:
+                menu_dict[menu.parent_id]["children"].append(menu_dict[menu.id])
+        
+        return [{"id": r["menu"].id, 
+                "name": r["menu"].name,
+                "children": r["children"]} 
+               for r in roots]
+
     class Meta:
         db_table = table_prefix + "menu"
         verbose_name = '菜单表'
         verbose_name_plural = verbose_name
         ordering = ('sort',)
 
+class MenuField(models.Model):
+    model = models.CharField(max_length=70, null=True, blank=True, verbose_name='表名')
+    menu = models.ForeignKey(to='Menu', on_delete=models.CASCADE, verbose_name='关联菜单', db_constraint=False)
+    field_name = models.CharField(max_length=64, verbose_name='模型表字段名')
+    title = models.CharField(max_length=64, verbose_name='字段显示名')
 
-class MenuButton(CoreModel):
+    class Meta:
+        db_table = table_prefix + "menu_field"
+        verbose_name = "菜单字段表"
+        verbose_name_plural = verbose_name
+        ordering = ("id",)
+
+class FieldPermission(models.Model):
+    role = models.ForeignKey(to='Role', on_delete=models.CASCADE, verbose_name='关联角色', db_constraint=False)
+    field = models.ForeignKey(to='MenuField', on_delete=models.CASCADE,related_name='menu_field', verbose_name='字段', db_constraint=False)
+    can_view = models.BooleanField(default=True, verbose_name='查看权限')
+    can_create = models.BooleanField(default=True, verbose_name='创建权限')
+    can_update = models.BooleanField(default=True, verbose_name='更新权限')
+
+    class Meta:
+        db_table = table_prefix + "field_permission"
+        verbose_name = "字段权限表"
+        verbose_name_plural = verbose_name
+        ordering = ("id",)
+
+class MenuButton(models.Model):
     menu = models.ForeignKey(to="Menu", db_constraint=False, related_name="menuPermission", on_delete=models.CASCADE,verbose_name="关联菜单", help_text='关联菜单')
     name = models.CharField(max_length=64, verbose_name="名称", help_text="名称")
     value = models.CharField(max_length=64, verbose_name="权限值", help_text="权限值")

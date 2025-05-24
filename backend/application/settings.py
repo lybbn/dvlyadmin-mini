@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'application.urls'
 
-FRONTEND_ROOT = os.path.join(BASE_DIR, "frontend","dist")
+FRONTEND_ROOT = os.path.join(BASE_DIR, "frontend","admin")
 
 TEMPLATES = [
     {
