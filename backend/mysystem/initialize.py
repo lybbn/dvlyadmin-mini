@@ -55,26 +55,26 @@ class Initialize:
     def init_dept(self):
         """初始化部门信息"""
         self.dept_data = [
-            {"id": "cae96ade-7483-4827-bb0d-d2bd63ec1cc4", "name": "财务部门", "sort": 1,
-             "parent_id": "d2c03bd9-dad0-4262-88ca-c3681d224fc3"},
-            {"id": "d2c03bd9-dad0-4262-88ca-c3681d224fc3", "name": "lyadmin团队", "sort": 1, "parent_id": None},
-            {"id": "fd8230ca-67bd-4347-8a9b-57eb19be5d9e", "name": "研发部门", "sort": 2,
-             "parent_id": "d2c03bd9-dad0-4262-88ca-c3681d224fc3"},
+            {"id": "1", "name": "lyadmin团队", "sort": 1, "parent_id": None},
+            {"id": "2", "name": "财务部门", "sort": 2,"parent_id": "1"},
+            {"id": "3", "name": "研发部门", "sort": 3,"parent_id": "1"},
         ]
         self.save(Dept, self.dept_data, "部门信息")
 
     def init_button(self):
         """初始化权限表标识"""
         self.button_data = [
-            {"id": "4547b93a-36b9-410d-987c-3c52a9b51156", "name": "编辑", "value": "Update"},
-            {"id": "4a410769-6b0a-4ed3-90f0-b5d89a6f802c", "name": "删除", "value": "Delete"},
-            {"id": "644e9c34-e3d6-4518-b795-a603a6e9a137", "name": "详情", "value": "Detail"},
-            {"id": "80cb145b-5035-4517-a28a-7d59426f73f8", "name": "新增", "value": "Create"},
-            {"id": "ccc3f35f-c80c-4929-b8cc-67531698f397", "name": "查询", "value": "Search"},
-            {"id": "83a9b774-4669-4d2f-b61d-8ee4944c2316", "name": "保存", "value": "Save"},
-            {"id": "2d763a6d6dcf409d87056efd06aace0a", "name": "修改密码", "value": "ChangePass"},
-            {"id": "6e0a41e5308c44a8b0d2785e05b2c07a", "name": "禁用", "value": "Disable"},
-            {"id": "09134d7643504804a6c7cc3d16e06684", "name": "日志", "value": "Logs"}
+            {"id": "1", "name": "编辑", "value": "Update"},
+            {"id": "2", "name": "删除", "value": "Delete"},
+            {"id": "3", "name": "详情", "value": "Detail"},
+            {"id": "4", "name": "新增", "value": "Create"},
+            {"id": "5", "name": "查询", "value": "Search"},
+            {"id": "6", "name": "保存", "value": "Save"},
+            {"id": "7", "name": "导出", "value": "Search"},
+            {"id": "8", "name": "导入", "value": "Search"},
+            {"id": "9", "name": "修改密码", "value": "ChangePass"},
+            {"id": "10", "name": "禁用", "value": "Disable"},
+            {"id": "11", "name": "日志", "value": "Logs"}
         ]
         self.save(Button, self.button_data, "权限表标识")
 
@@ -118,8 +118,8 @@ class Initialize:
     def init_role(self):
         """初始化角色表"""
         data = [
-            {"id": "36001d1a-1b3e-4413-bdfe-b3bc04375f46", "name": "管理员", "key": "admin", "sort": 1, "status": 1, "data_scope": 4},
-            {"id": "35b58d98-b506-4f93-be79-ed1e109da071", "name": "普通用户", "key": "public", "sort": 2, "status": 1, "data_scope": 0}
+            {"id": "1", "name": "管理员", "key": "admin", "sort": 1, "status": 1, "data_scope": 4},
+            {"id": "2", "name": "普通用户", "key": "public", "sort": 2, "status": 1, "data_scope": 0}
         ]
         self.save(Role, data, "角色表")
 
@@ -130,19 +130,19 @@ class Initialize:
                 "id": "0",
                 "password": "pbkdf2_sha256$260000$oE0tnjC7PRIV6aCEah0J1F$scZo6l2/kekoClW8jZ6bM4PmSXevb4qzqHLro8PvzLc=",
                 "is_superuser": 1, "is_staff": 1, "identity": 0,
-                "is_active": 1, "username": "superadmin", "name": "超级管理员",
-                "dept_id": "d2c03bd9-dad0-4262-88ca-c3681d224fc3",
+                "is_active": 1, "username": "superadmin", "name": "超级管理员", "nickname": "超级管理员",
+                "dept_id": "",
             },
             {
-                "id": "d1431450-5068-4461-b57e-7862c005a547",
+                "id": "1",
                 "password": "pbkdf2_sha256$260000$DO6dpT8e4Ls0yD51grncC8$KZfswxNJ8MILTWwy+bicRyU7Q3PKC4orn4SJbhIkN4Q=",
                 "is_superuser": 0, "is_staff": 1, "identity": 1,
-                "is_active": 1, "username": "admin", "name": "管理员",
-                "dept_id": "d2c03bd9-dad0-4262-88ca-c3681d224fc3",
-                "role": ["36001d1a-1b3e-4413-bdfe-b3bc04375f46"],
+                "is_active": 1, "username": "admin", "name": "管理员", "nickname": "管理员",
+                "dept_id": "2",
+                "role": ["1"],
             },
             {
-                "id": "244b28685cd14a39a383189981510d4a",
+                "id": "2",
                 "password": "pbkdf2_sha256$260000$oivECWOjB0GJyMjPsrqb3t$9FvnYtXtsNWDva2P3A/eIg6cRMLOp7kiIOuwfLKyDAY=",
                 "is_superuser": 0, "is_staff": 0, "identity": 2,
                 "is_active": 1, "username": "test", "name": "测试用户", "mobile": "18888888888", "nickname": "测试用户",

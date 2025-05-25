@@ -67,10 +67,10 @@
 					</div> -->
 				</div>
 			</div>
-			<div class="card-footer">
+			<!-- <div class="card-footer">
 				<span>没有账户？</span>
 				<el-link type="primary" :underline="false" @click="navigateToRegiter">立即注册</el-link>
-			</div>
+			</div> -->
 			<!-- 页脚 -->
 			<div class="login-footer">
 				<p class="copyright">© 2025 lybbn All rights reserved. <span class="version">v{{ config.APP_VER }}</span></p>

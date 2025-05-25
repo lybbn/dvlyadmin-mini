@@ -52,9 +52,6 @@ class UserSerializer(CustomModelSerializer):
         model = Users
         read_only_fields = ["id"]
         exclude = ['password']
-        extra_kwargs = {
-            'post': {'required': False},
-        }
 
 
 class UserCreateSerializer(CustomModelSerializer):
@@ -82,9 +79,6 @@ class UserCreateSerializer(CustomModelSerializer):
         model = Users
         fields = "__all__"
         read_only_fields = ["id"]
-        extra_kwargs = {
-            'post': {'required': False},
-        }
 
 
 class UserUpdateSerializer(CustomModelSerializer):
@@ -109,9 +103,6 @@ class UserUpdateSerializer(CustomModelSerializer):
         model = Users
         read_only_fields = ["id"]
         fields = "__all__"
-        extra_kwargs = {
-            'post': {'required': False, 'read_only': True},
-        }
 
 
 class UserViewSet(CustomModelViewSet):

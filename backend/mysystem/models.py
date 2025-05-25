@@ -32,7 +32,7 @@ class Users(AbstractBaseUser, CoreModel):
     identity = models.SmallIntegerField(choices=IDENTITY_CHOICES, verbose_name="身份标识", null=True, blank=True, default=2,help_text="身份标识")
     # balance = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='钱包余额')
     is_delete = models.BooleanField(default=False, verbose_name="是否逻辑删除", help_text="是否逻辑删除")
-
+    is_active = models.BooleanField(verbose_name="状态",default=True)
     is_staff = models.BooleanField(verbose_name="是否员工",default=False)
     is_superuser = models.BooleanField(verbose_name="是否超级管理员",default=False)
 
@@ -395,6 +395,8 @@ class LoginLog(CoreModel):
     os = models.CharField(max_length=150, verbose_name="操作系统", null=True, blank=True, help_text="操作系统")
     login_type = models.IntegerField(default=1, choices=LOGIN_TYPE_CHOICES, verbose_name="登录类型", help_text="登录类型")
     ip_area = models.CharField(max_length=100, verbose_name="IP归属地", null=True, blank=True, help_text="IP归属地")
+    msg = models.CharField(max_length=255,verbose_name="自定义内容", null=True, blank=True)
+    status = models.BooleanField(default=True, verbose_name="响应状态", help_text="响应状态")
 
     class Meta:
         db_table = table_prefix + 'login_log'

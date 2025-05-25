@@ -2,7 +2,7 @@ import pkg from '../../package.json'
 
 //版本号
 const APP_VER = pkg.version
-const API_HOST = import.meta.env.PROD ? window.location.host : "127.0.0.1:8080"
+const API_HOST = import.meta.env.PROD ? window.location.host : "127.0.0.1:8000"
 //lyadmin系统配置
 export default {
 
@@ -57,8 +57,8 @@ export default {
 	// 默认菜单是否折叠
 	IS_MENU_COLLAPSE: false,
 
-	//主题颜色 默认 #409EFF
-	COLOR: '#296dff',
+	//主题颜色 默认 #409EFF #296dff
+	COLOR: '#3A7BFF',
 
     //默认主题 'dark' 暗黑、'light' 正常
 	THEME: 'light',

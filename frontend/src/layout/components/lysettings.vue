@@ -1,13 +1,13 @@
 <template>
 	<el-form ref="form" label-width="120px" label-position="left" style="padding:0 20px;">
 		<el-divider></el-divider>
-		<!-- <el-form-item label="语言">
+		<el-form-item label="语言">
 			<el-select v-model="language" @change="changeLang">
 				<el-option label="简体中文" value="zh-cn"></el-option>
 				<el-option label="English" value="en"></el-option>
 			</el-select>
-		</el-form-item> -->
-		<!-- <el-divider></el-divider> -->
+		</el-form-item>
+		<el-divider></el-divider>
 		<el-form-item label="主题颜色">
 			<el-color-picker v-model="colorPrimary" :predefine="colorList"  @change="setColorPrimary"></el-color-picker>
 		</el-form-item>

@@ -233,7 +233,7 @@ CAPTCHA_LENGTH = 4  # 字符个数
 CAPTCHA_TIMEOUT = 1  # 超时(minutes)
 CAPTCHA_OUTPUT_FORMAT = '%(image)s %(text_field)s %(hidden_field)s '
 CAPTCHA_FONT_SIZE = 42  # 字体大小
-CAPTCHA_FOREGROUND_COLOR = '#296dff'  # 前景色
+CAPTCHA_FOREGROUND_COLOR = '#3A7BFF'  # 前景色
 CAPTCHA_BACKGROUND_COLOR = '#FFFFFF'  # 背景色
 CAPTCHA_NOISE_FUNCTIONS = (
     'captcha.helpers.noise_arcs', # 线

@@ -1,8 +1,8 @@
 <template>
 	<div class="user-bar">
-		<div class="panel-item hidden-sm-and-down" @click="searchFunc">
+		<!-- <div class="panel-item hidden-sm-and-down" @click="searchFunc">
 			<el-icon><Search /></el-icon>
-		</div>
+		</div> -->
 		<div class="screen panel-item hidden-sm-and-down" @click="screenFunc">
 			<el-icon><FullScreen /></el-icon>
 		</div>
@@ -58,7 +58,7 @@
 					<el-dropdown-item command="updateLogs"><el-icon><Share /></el-icon>更新日志</el-dropdown-item>
 					<el-dropdown-item command="checkUpdate"><el-icon><StarFilled /></el-icon>检查更新</el-dropdown-item>
 					<el-dropdown-item command="fixPanel"><el-icon><EditPen /></el-icon>修复面板</el-dropdown-item>
-                	<el-dropdown-item @click="handleBuJUClick"><el-icon><Tools /></el-icon>布局设置<el-icon color="#f7ba2a"><StarFilled /></el-icon></el-dropdown-item>
+                	<el-dropdown-item @click="handleBuJUClick"><el-icon><Tools /></el-icon>布局设置</el-dropdown-item>
 					<el-dropdown-item divided command="outLogin"><el-icon><CircleCloseFilled /></el-icon>退出登录</el-dropdown-item>
 				</el-dropdown-menu>
 			</template>
@@ -262,9 +262,7 @@
     }
 
 	function handleBuJUClick(){
-		if(userState.isProUserCheck()){
-			settingDialog.value=true
-		}
+		settingDialog.value=true
 	}
 
 	onMounted(()=>{
