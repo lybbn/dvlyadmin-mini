@@ -121,6 +121,7 @@ class UserViewSet(CustomModelViewSet):
         user = request.user
         if not user.identity in [0,1]:return ErrorResponse(msg="用户类型错误")
         result = {
+            "avatar":user.avatar,
             "nickname":user.nickname,
             "name":user.name,
             "mobile":user.mobile,

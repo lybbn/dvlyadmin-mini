@@ -47,17 +47,26 @@
 			<el-icon v-if="siteThemeStore.siteTheme == 'dark'"><Sunny /></el-icon>
 			<el-icon v-else><Moon /></el-icon>
 		</div>
-		<el-dropdown class="user panel-item" trigger="click" @command="handleInfo">
-			<div class="user-avatar">
-				<label>{{ userState.userInfo.name?userState.userInfo.name:"更多" }}</label>
-				<el-icon class="el-icon--right"><ArrowDown /></el-icon>
+		<el-dropdown class="user-profile" @command="handleInfo">
+			<div class="profile-content">
+				<el-avatar :size="30" :src="userState.userInfo.avatar || defaultAvatar" class="profile-avatar"/>
+				<div class="profile-info">
+					<div class="profile-name">{{ userState.userInfo.name || '更多' }}</div>
+				</div>
+				<el-icon class="profile-arrow"><ArrowDown /></el-icon>
 			</div>
 			<template #dropdown>
-				<el-dropdown-menu>
+				<el-dropdown-menu class="profile-menu">
 					<!-- <el-dropdown-item command="clearCache">清除缓存</el-dropdown-item> -->
-					<el-dropdown-item command="personCenter"><el-icon><Avatar /></el-icon>个人中心</el-dropdown-item>
-                	<el-dropdown-item @click="handleBuJUClick"><el-icon><Tools /></el-icon>布局设置</el-dropdown-item>
-					<el-dropdown-item divided command="outLogin"><el-icon><CircleCloseFilled /></el-icon>退出登录</el-dropdown-item>
+					<el-dropdown-item command="personCenter">
+						<el-icon><User /></el-icon>个人中心
+					</el-dropdown-item>
+					<el-dropdown-item  @click="handleBuJUClick">
+						<el-icon><Operation /></el-icon>布局设置
+					</el-dropdown-item>
+					<el-dropdown-item divided command="outLogin">
+						<el-icon><SwitchButton /></el-icon>退出登录
+					</el-dropdown-item>
 				</el-dropdown-menu>
 			</template>
 		</el-dropdown>
@@ -77,6 +86,7 @@
 	import { ElMessage,ElMessageBox } from 'element-plus'
 	import search from './search.vue'
 	import lysettings from './lysettings.vue';
+	import defaultAvatar from '@/assets/lybbn/imgs/avatar.jpg'
 	import {fullScreen,autoStorage} from "@/utils/util"
 	import {useSiteThemeStore} from "@/store/siteTheme";
 	import {useUserState} from "@/store/userState";
@@ -154,13 +164,11 @@
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	.user-bar {display: flex;align-items: center;height: 100%;}
 	.user-bar .panel-item {padding: 0 10px;cursor: pointer;height: 100%;display: flex;align-items: center;}
 	.user-bar .panel-item i {font-size: 16px;}
 	.user-bar .panel-item:hover {background: rgba(0, 0, 0, 0.1);}
-	.user-bar .user-avatar {height:49px;display: flex;align-items: center;}
-	.user-bar .user-avatar label {display: inline-block;margin-left:5px;font-size: 12px;cursor:pointer;}
 
 	.msg-list li {border-top:1px solid #eee;}
 	.msg-list li a {display: flex;padding:20px;}
@@ -174,4 +182,42 @@
 	.dark .msg-list__main h2 {color: #d0d0d0;}
 	.dark .msg-list li {border-top:1px solid #363636;}
 	.dark .msg-list li a:hover {background: #383838;}
+
+	.user-profile {
+		margin-left: auto;
+		cursor: pointer;
+		.profile-content {
+			display: flex;
+			align-items: center;
+			padding: 4px 8px;
+			border-radius: 18px;
+			transition: all 0.3s;
+		
+			&:hover {
+				background:rgba(255, 255, 255, 0.1) !important;
+				// background: var(--el-color-primary-light-9);
+			}
+			
+			.profile-avatar {
+				flex-shrink: 0;
+			}
+			
+			.profile-info {
+				margin: 0 12px;
+				
+				.profile-name {
+					font-size: 14px;
+					font-weight: 500;
+					color: #fff;
+					line-height: 1.2;
+				}
+			}
+			
+			.profile-arrow {
+				font-size: 14px;
+				color: #fff;
+				// color: var(--el-text-color-secondary);
+			}
+		}
+	}
 </style>
