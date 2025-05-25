@@ -19,7 +19,19 @@ export const dynamicRoutes = [
 					title: "首页",
 					requireAuth: true,
 					hidden:false,
-					icon:'House'
+					icon:'House',
+					affix: true//固定
+				}
+			},
+			{
+				path: "/home1",
+				name: 'home1',
+				component: () => import('@/views/system/home/index.vue'),
+				meta: {
+					title: "首页2",
+					requireAuth: true,
+					hidden:false,
+					icon:'House',
 				}
 			},
 		],

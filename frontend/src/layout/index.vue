@@ -28,6 +28,7 @@
 		</div>
 		<SideMobile v-if="ismobile"></SideMobile>
 		<div class="lybbn-panel-body el-container">
+			<TabsView v-if="ismultitabs" />
 			<div class="lybbn-panel-main" id="lybbn-panel-main">
 				<router-view v-slot="{ Component, route }">
 					<keep-alive :include="KeepAliveStore.keepAliveRoute">
@@ -61,6 +62,7 @@
 
 import { ref, onMounted, watch, computed, nextTick, onBeforeUnmount } from 'vue'
 
+import TabsView from './components/TabsView.vue'
 import SideMobile from './components/sideMobile.vue';
 import NavMenu from './components/NavMenu.vue';
 import userbar from './components/userbar.vue';
@@ -82,8 +84,6 @@ const siteThemeStore = useSiteThemeStore()
 const KeepAliveStore = useKeepAliveStore()
 const storesRoutesList = useRoutesList()
 const userState = useUserState()
-
-userState.getSystemConfig()
 
 // let menu = ref([])
 let active = ref("")
@@ -234,53 +234,11 @@ function openContextMenuItem(e,path){
 	})
 }
 
-function getLicenseInfo(){
-	Api.sysGetLicenses().then(res=>{
-		if(res.code ==2000) {
-			let tempdata = res.data
-			if(isEmpty(tempdata.expire)){
-				tempdata.expire = "长期"
-			}
-			licenseInfo.value = tempdata
-		}else{
-			ElMessage.warning(res.msg)
-		}
-	})
-}
-
-function getLicenseRole(type=""){
-	if(type == "pro"){
-		return "专业版"
-	}else if(type == "enterprise"){
-		return "企业版"
-	}
-	return "免费版"
-}
-
 let dataInfo = ref({
 	c_ver:userState.sysConfig.sysVersion,
 	can_update:false,
 	n_ver:"",
 })
-
-function getUpdateInfo(){
-	Api.sysGetSysUpdate().then(res=>{
-		if(res.code ==2000) {
-			dataInfo.value = res.data
-		}
-	})
-}
-
-function canUpgradeClick(){
-	ElMessageBox.alert('请点击右上角->【更多】->【检查更新】！！！', '提示', {
-		confirmButtonText: '确定',
-		cancelButtonText: '取消',
-		type: 'warning'
-	}).then(() => {
-	})
-	.catch(() => {
-	})
-}
 
 function filterUrl2(map) {
 	var newMap = []
@@ -312,12 +270,9 @@ onMounted(() => {
 	window.addEventListener('resize', onLayoutResize);
 	// menu.value = filterUrl(storesRoutesList.routesList);
 	showThis()
-	userState.getSystemTaskIngInfo()
 	router.afterEach(showThis);
 	// 监听点击事件
     document.addEventListener('click', handleClickOutside);
-	userState.getLicenseInfo()
-	getUpdateInfo()
 })
 
 onBeforeUnmount(() => {

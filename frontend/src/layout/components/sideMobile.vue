@@ -3,8 +3,9 @@
 
 	<el-drawer ref="mobileNavMenuBox" title="移动端菜单" :size="200" v-model="nav" direction="ltr" :with-header="false" destroy-on-close>
 		<el-container class="mobile-nav">
-			<el-header>
+			<el-header class="mobileheader">
 				<div class="logo-bar"><img class="logo" src="@/assets/lybbn/imgs/logo.png"></div>
+				<span class="headertitle">{{ config.APP_NAME }}</span>
 			</el-header>
 			<el-main>
 				<el-scrollbar class="lylybbnmobilenavside">
@@ -25,6 +26,7 @@
 	import {useRoutesList} from "@/store/routesList";
 	import { useRouter,useRoute } from 'vue-router'
 	import {useSiteThemeStore} from "@/store/siteTheme";
+	import config from '@/config'
 
 	const siteThemeStore = useSiteThemeStore()
 
@@ -75,7 +77,7 @@
 </script>
 
 <style scoped>
-	.mobile-nav-button {position: fixed;bottom:10px;left:10px;z-index: 10;width: 50px;height: 50px;background: var(--el-color-primary);box-shadow: 0 2px 12px 0 rgba(0, 128, 64, 1);border-radius: 50%;display: flex;align-items: center;justify-content: center;}
+	.mobile-nav-button {position: fixed;bottom:10px;left:10px;z-index: 10;width: 50px;height: 50px;background: var(--el-color-primary);box-shadow: 0 2px 12px 0 rgb(37, 4, 223);border-radius: 50%;display: flex;align-items: center;justify-content: center;}
 	.mobile-nav-button i {color: #fff;font-size: 20px;}
 
 	.mobile-nav {background: #272E39;}
@@ -93,5 +95,14 @@
 		height: 14px;
 		content: "";
 		background-color: var(--el-color-primary-light-3) !important;
+	}
+	.mobileheader{
+		display: flex;
+		align-items: center;
+	}
+	.headertitle{
+		font-size: 15px;
+    	font-weight: bold;
+		color: #fff;
 	}
 </style>
