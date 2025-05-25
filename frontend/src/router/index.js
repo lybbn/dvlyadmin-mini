@@ -1,7 +1,7 @@
 import {createRouter, createWebHashHistory} from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import {staticRoutes,NotFound,dynamicRoutes} from './routes';
+import {staticRoutes,NotFound,RedirectRoute,dynamicRoutes} from './routes';
 import config from "@/config/index";
 import {getToken,autoStorage} from '@/utils/util'
 import {storeToRefs} from 'pinia';
@@ -70,6 +70,7 @@ async function setAddRoute() {
     routeChildren.forEach((route) => {
 		router.addRoute(route);
 	});
+    router.addRoute(RedirectRoute);
     router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
     const storesRoutesList = useRoutesList();
 	storesRoutesList.setRoutesList(routeChildren[0].children);

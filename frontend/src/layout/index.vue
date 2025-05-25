@@ -3,7 +3,7 @@
 		<div class="lybbn-panel-header-left">
 			<div class="logo-bar">
 				<img class="logo" src="@/assets/lybbn/imgs/logo.png">
-				<span>{{ config.APP_NAME}}</span>
+				<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 			</div>
 		</div>
 		<div class="lybbn-panel-header-right">

@@ -192,9 +192,10 @@
         () => route.path,
         newPath => {
             const tab = {
-            path: newPath,
-            title: route.meta?.title || '未命名',
-            meta: route.meta
+                path: newPath,
+                title: route.meta?.title || '未命名',
+                meta: route.meta,
+                name:route.name
             }
             tabsStore.addTab(tab)
         },
@@ -241,7 +242,7 @@
         font-size: 13px;
         cursor: pointer;
         color: var(--el-text-color-regular);
-        background-color: var(--el-fill-color-light);
+        /* background-color: var(--el-fill-color-light); */
         border: 1px solid var(--el-border-color-light);
         border-bottom: none;
         border-radius: 4px 4px 0 0;

@@ -75,3 +75,27 @@ export const staticRoutes = [
 		}
 	},
 ]
+
+//重定向路由
+export const RedirectRoute = {
+	path: '/redirect',
+	component: () => import('@/layout/index.vue'),
+	name: 'RedirectTo',
+	meta: {
+		title: "Redirect",
+		requireAuth: true,
+		hidden: false,
+	},
+	children: [
+		{
+			path: '/redirect/:path(.*)',
+			name: "Redirect",
+			component: () => import('@/views/system/redirect/index.vue'),
+			meta: {
+				title: "Redirect",
+				requireAuth: true,
+				hidden: false,
+			},
+		},
+	],
+};
