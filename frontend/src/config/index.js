@@ -33,6 +33,9 @@ export default {
     //localStorageAES加密秘钥，位数建议填写8的倍数
 	LS_ENCRYPTION_KEY: 'LYBBNJUHUALYBBNLOVE889966',
 
+	//框架布局：default 经典、header 顶部、fenlan 分栏
+	FRAMELAYOUT:"default",
+
 	//语言 简体中文 zh-cn、 英文 en（此功能只是示例）
 	LANG: 'zh-cn',
 

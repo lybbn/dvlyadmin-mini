@@ -25,6 +25,7 @@ html.dark {
 	.lybbn-panel-main {background: var(--el-bg-color);}
 	.lybbn-panel-header-menu .el-menu {--el-menu-bg-color:var(--el-bg-color-overlay) !important;--el-menu-hover-bg-color: #171819 !important;}
 	.lybbn-panel-header-menu .el-menu .el-sub-menu__title {background-color:transparent !important;}
+	.lybbn-header-menu .el-menu {--el-menu-bg-color:var(--el-bg-color-overlay) !important;height: 48px;}
 	.lybbn-fullbg{background: var(--el-bg-color)}
 	.rymenu{background: var(--el-bg-color-overlay);border-color: var(--el-border-color-light);}
 

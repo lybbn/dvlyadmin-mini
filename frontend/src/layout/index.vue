@@ -1,44 +1,126 @@
 <template>
-	<header class="lybbn-panel-header">
-		<div class="lybbn-panel-header-left">
-			<div class="logo-bar">
-				<img class="logo" src="@/assets/lybbn/imgs/logo.png">
-				<span v-if="!ismobile">{{ config.APP_NAME}}</span>
+	<!-- 默认 -->
+	<template v-if="siteThemeStore.frameLayout=='default'">
+		<header class="lybbn-panel-header">
+			<div class="lybbn-panel-header-left">
+				<div class="logo-bar">
+					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
+				</div>
 			</div>
-		</div>
-		<div class="lybbn-panel-header-right">
-			<userbar></userbar>
-		</div>
-	</header>
-	<section class="lybbn-panel-wrapper">
-		<div v-if="!ismobile" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
-			<div class="lybbn-panel-side-scroll">
-				<el-scrollbar>
-					<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
-						<NavMenu :navMenus="menu" @contextmenuClick="openContextMenuItem"></NavMenu>
-					</el-menu>
-				</el-scrollbar>
+			<div class="lybbn-panel-header-right">
+				<userbar></userbar>
 			</div>
-			<div class="lybbn-panel-side-bottom" @click="setMenuCollapsed">
-				<el-icon>
-					<expand v-if="isMenuCollapse" />
-					<fold v-else />
-				</el-icon>
+		</header>
+		<section class="lybbn-panel-wrapper">
+			<div v-if="!ismobile" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
+				<div class="lybbn-panel-side-scroll">
+					<el-scrollbar>
+						<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
+							<NavMenu :navMenus="menu" @contextmenuClick="openContextMenuItem"></NavMenu>
+						</el-menu>
+					</el-scrollbar>
+				</div>
+				<div class="lybbn-panel-side-bottom" @click="setMenuCollapsed">
+					<el-icon>
+						<expand v-if="isMenuCollapse" />
+						<fold v-else />
+					</el-icon>
+				</div>
 			</div>
-		</div>
-		<SideMobile v-if="ismobile"></SideMobile>
-		<div class="lybbn-panel-body el-container">
-			<TabsView v-if="ismultitabs" />
-			<div class="lybbn-panel-main" id="lybbn-panel-main">
-				<router-view v-slot="{ Component, route }">
-					<keep-alive :include="KeepAliveStore.keepAliveRoute">
-						<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
-					</keep-alive>
-				</router-view>
-				<iframeView></iframeView>
+			<SideMobile v-if="ismobile"></SideMobile>
+			<div class="lybbn-panel-body el-container">
+				<TabsView v-if="ismultitabs" />
+				<div class="lybbn-panel-main" id="lybbn-panel-main">
+					<router-view v-slot="{ Component, route }">
+						<keep-alive :include="KeepAliveStore.keepAliveRoute">
+							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
+						</keep-alive>
+					</router-view>
+					<iframeView></iframeView>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+	</template>
+
+	<!-- 顶部 -->
+	<template v-else-if="siteThemeStore.frameLayout=='header'">
+		<header class="lybbn-panel-header">
+			<div class="lybbn-panel-header-left">
+				<div class="logo-bar">
+					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
+				</div>
+			</div>
+			<div v-if="!ismobile" class="lybbn-header-menu" style="margin-left: 20px;">
+				<el-menu mode="horizontal" :default-active="active" router background-color="var(--ly-header-bg)" text-color="#fff" active-text-color="var(--el-color-primary-light-1)">
+					<NavMenu :navMenus="menu"></NavMenu>
+				</el-menu>
+			</div>
+			<SideMobile v-if="ismobile"></SideMobile>
+			<div class="lybbn-panel-header-right">
+				<userbar></userbar>
+			</div>
+		</header>
+		<section class="lybbn-panel-wrapper">
+			<div class="lybbn-panel-body el-container">
+				<TabsView v-if="ismultitabs" />
+				<div class="lybbn-panel-main" id="lybbn-panel-main">
+					<router-view v-slot="{ Component, route }">
+						<keep-alive :include="KeepAliveStore.keepAliveRoute">
+							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
+						</keep-alive>
+					</router-view>
+					<iframeView></iframeView>
+				</div>
+			</div>
+		</section>
+	</template>
+
+	<!-- 分栏 -->
+	<template v-else-if="siteThemeStore.frameLayout=='fenlan'">
+		<header class="lybbn-panel-header">
+			<div class="lybbn-panel-header-left">
+				<div class="logo-bar">
+					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
+				</div>
+			</div>
+			<div class="lybbn-panel-header-right">
+				<userbar></userbar>
+			</div>
+		</header>
+		<section class="lybbn-panel-wrapper">
+			<div v-if="!ismobile" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
+				<div class="lybbn-panel-side-scroll">
+					<el-scrollbar>
+						<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
+							<NavMenu :navMenus="menu" @contextmenuClick="openContextMenuItem"></NavMenu>
+						</el-menu>
+					</el-scrollbar>
+				</div>
+				<div class="lybbn-panel-side-bottom" @click="setMenuCollapsed">
+					<el-icon>
+						<expand v-if="isMenuCollapse" />
+						<fold v-else />
+					</el-icon>
+				</div>
+			</div>
+			<SideMobile v-if="ismobile"></SideMobile>
+			<div class="lybbn-panel-body el-container">
+				<TabsView v-if="ismultitabs" />
+				<div class="lybbn-panel-main" id="lybbn-panel-main">
+					<router-view v-slot="{ Component, route }">
+						<keep-alive :include="KeepAliveStore.keepAliveRoute">
+							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
+						</keep-alive>
+					</router-view>
+					<iframeView></iframeView>
+				</div>
+			</div>
+		</section>
+	</template>
+	
 	<transition name="el-zoom-in-top">
 		<ul v-show="contextMenuVisible" :style="{ left: left + 'px', top: top + 'px' }" class="contextmenu"
 			id="lyleftMenuContext" ref="lyleftMenuContext">

@@ -21,11 +21,11 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 ::-webkit-scrollbar-track:hover {background-color: rgba(86, 85, 85, 0.2);}
 
 /* 头部 */
-.lybbn-panel-header {height: 48px;background: var(--ry-header-bg);color: #fff;display: flex;justify-content:space-between;}
-.lybbn-panel-header-left {display: flex;align-items: center;padding-left:20px;}
+.lybbn-panel-header {height: 48px;background: var(--ly-header-bg);color: #fff;display: flex;justify-content:space-between;}
+.lybbn-panel-header-left {display: flex;align-items: center;padding-left:20px;flex-shrink: 0;}
 .lybbn-panel-header-center {display: flex;align-items: center;}
 .lybbn-panel-header-center a{font-size: 12px;color: #b5afaf;text-decoration: none;letter-spacing: .5px;}
-.lybbn-panel-header-right {display: flex;align-items: center;}
+.lybbn-panel-header-right {display: flex;align-items: center;flex-shrink: 0;}
 .lybbn-panel-header .logo-bar {font-size: 20px;font-weight: bold;display: flex;align-items: center;}
 .lybbn-panel-header .logo-bar .logo {margin-right: 10px;width: 35px;height: 35px;}
 .lybbn-panel-header .nav {display: flex;height: 100%;margin-left: 40px;}
@@ -61,6 +61,10 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 .lybbn-panel-side-bottom i {font-size: 16px;}
 .lybbn-panel-side-bottom:hover {color: var(--el-color-primary);}
 .lybbn-panel-side.isCollapse {width: 65px;}
+.lybbn-header-menu {flex: 1;min-width: 0;overflow: hidden;}
+.lybbn-header-menu .el-menu {--el-menu-hover-bg-color: #171811 !important;height: 48px;}
+.lybbn-header-menu .el-menu .el-sub-menu__title {background-color:transparent !important;}
+.lybbn-header-menu .el-menu--horizontal>.el-menu-item.is-active {background-color:#171811 ;}
 .el-menu .menu-tag {position: absolute;height: 18px;line-height: 18px;background: var(--el-color-danger);font-size: 12px;color: #fff;right: 20px;border-radius:18px;padding:0 6px;}
 .el-menu .el-sub-menu__title .menu-tag {right: 40px;}
 .el-menu--horizontal > li .menu-tag {display: none;}

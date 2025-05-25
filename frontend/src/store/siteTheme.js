@@ -9,25 +9,26 @@ export const useSiteThemeStore = defineStore('siteTheme', {
             //是否移动端布局
 		    ismobile: false,
             //多标签
-            ismultitabs:autoStorage.get('ismultitabs') != null?autoStorage.get('ismultitabs'):config.ISMULTITABS,
+            ismultitabs:autoStorage.get('ismultitabs') || config.ISMULTITABS,
+            frameLayout:autoStorage.get('frameLayout') || config.FRAMELAYOUT,
             //菜单是否折叠
             isMenuCollapse:config.IS_MENU_COLLAPSE,
             //控制主题:light正常模式、dark暗黑模式
-            siteTheme:autoStorage.get('siteTheme') != null?autoStorage.get('siteTheme'):config.THEME,
+            siteTheme:autoStorage.get('siteTheme') || config.THEME,
             //主题色
-            colorPrimary:autoStorage.get('colorPrimary') != null?autoStorage.get('colorPrimary'):config.COLOR,
+            colorPrimary:autoStorage.get('colorPrimary') || config.COLOR,
             // elementplus 组件大小： small、default、large
-            elementSize:autoStorage.get('elementSize') != null?autoStorage.get('elementSize'):config.ELEMENT_SIZE,
+            elementSize:autoStorage.get('elementSize') || config.ELEMENT_SIZE,
             // elementplus 组件 zIndex
-            elementzIndex:autoStorage.get('elementzIndex') != null?autoStorage.get('elementzIndex'):config.ELEMENT_ZINDEX,
+            elementzIndex:autoStorage.get('elementzIndex') || config.ELEMENT_ZINDEX,
             // elementplus button组件 autoInsertSpace 是否自动在两个中文字符之间插入空格
-            elementButton:autoStorage.get('elementButton') != null?autoStorage.get('elementButton'):config.ELEMENT_BUTTON,
+            elementButton:autoStorage.get('elementButton') || config.ELEMENT_BUTTON,
             //菜单宽度
-            menuWidth:autoStorage.get('menuWidth') != null?autoStorage.get('menuWidth'):config.MENU_WIDTH,
+            menuWidth:autoStorage.get('menuWidth') || config.MENU_WIDTH,
             //顶部导航颜色
-            menuHeaderColor01:autoStorage.get('menuHeaderColor01') != null?autoStorage.get('menuHeaderColor01'):config.MENU_HEADER_COLOR01,
+            menuHeaderColor01:autoStorage.get('menuHeaderColor01') || config.MENU_HEADER_COLOR01,
             //左侧菜单颜色
-            menuHeaderColor02:autoStorage.get('menuHeaderColor02') != null?autoStorage.get('menuHeaderColor02'):config.MENU_HEADER_COLOR02,
+            menuHeaderColor02:autoStorage.get('menuHeaderColor02') || config.MENU_HEADER_COLOR02,
         }
     },
     getters:{
@@ -45,10 +46,10 @@ export const useSiteThemeStore = defineStore('siteTheme', {
             this.siteTheme = val;
             autoStorage.set('siteTheme',val);
             if (this.siteTheme === 'dark') {
-                document.documentElement.style.setProperty('--ry-header-bg', this.menuHeaderColor01);
+                document.documentElement.style.setProperty('--ly-header-bg', this.menuHeaderColor01);
                 document.documentElement.classList.add('dark')
             } else {
-                document.documentElement.style.setProperty('--ry-header-bg', this.menuHeaderColor01);
+                document.documentElement.style.setProperty('--ly-header-bg', this.menuHeaderColor01);
                 document.documentElement.classList.remove('dark')
             }
         },
@@ -88,7 +89,7 @@ export const useSiteThemeStore = defineStore('siteTheme', {
             this.menuHeaderColor01 = val
             autoStorage.set('menuHeaderColor01',val);
             if(this.menuHeaderColor01 && this.siteTheme === 'light'){
-                document.documentElement.style.setProperty('--ry-header-bg', this.menuHeaderColor01);
+                document.documentElement.style.setProperty('--ly-header-bg', this.menuHeaderColor01);
             }
         },
         setMenuHeaderColor02(val){
@@ -97,6 +98,10 @@ export const useSiteThemeStore = defineStore('siteTheme', {
             if(this.menuHeaderColor02 && this.siteTheme === 'light'){
                 document.documentElement.style.setProperty('--ry-menu-bg', this.menuHeaderColor02);
             }
+        },
+        setFrameLayout(val){
+            this.frameLayout = val
+            autoStorage.set('frameLayout',val);
         },
     },
 })
