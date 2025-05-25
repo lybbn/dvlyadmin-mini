@@ -30,9 +30,9 @@ urlpatterns = [
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),
     re_path('role_data/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'role_data'})),
     # path('menu/web_router/', MenuViewSet.as_view({'get': 'web_router'})),#已在视图的action装饰器中自动生成
-    path('user/user_info/',UserViewSet.as_view({'get':'user_info','put':'update_user_info'})),
-    re_path('user/change_password/(?P<pk>.*?)/',UserViewSet.as_view({'put':'change_password'})),
     re_path('operation_log/deletealllogs/',OperationLogViewSet.as_view({'delete':'deletealllogs'})),
 
+    path('user/user_info/',UserViewSet.as_view({'get':'user_info','put':'update_user_info'})),
+    re_path('user/change_password/(?P<pk>.*?)/',UserViewSet.as_view({'put':'change_password'})),
 ]
 urlpatterns += system_url.urls

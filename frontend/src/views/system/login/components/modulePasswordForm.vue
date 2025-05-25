@@ -79,28 +79,6 @@
 
 	let loginFormRef = ref(null)
 
-	// function submitLogin() {
-	// 	islogining.value = true
-	// 	loginFormRef.value.validate(obj=>{
-    //         if(obj) {
-    //             Api.getToken(formData.value).then(res => {
-	// 				islogining.value = false
-	// 				if (res.code === 2000) {
-	// 					setToken('logintoken',res.data.access)
-	// 					setRefreshToken('refreshtoken',res.data.refresh)
-	// 					userState.userInfo.username = formData.value.username
-	// 					loginSuccess()
-	// 				} else {
-	// 					getCaptchas()
-	// 					ElMessage.error(res.msg)
-	// 				}
-	// 			})
-                
-    //         }
-	// 		islogining.value = false
-    //     })
-	// }
-
 	const submitLogin = async () => {
 		if (islogining.value) return; // 防止重复提交
 
@@ -117,7 +95,6 @@
 				// 3. 登录成功处理
 				setToken('logintoken', res.data.access);
 				setRefreshToken('refreshtoken', res.data.refresh);
-				userState.userInfo.username = formData.value.username;
 				loginSuccess(); // 执行跳转等操作
 				ElMessage.success('登录成功');
 			} else {

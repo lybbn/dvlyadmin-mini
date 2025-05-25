@@ -10,7 +10,6 @@ from mysystem.models import Dept
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.constants import LOOKUP_SEP
 from django_filters import utils
-import six
 from django_filters.filters import CharFilter
 import operator
 from functools import reduce
@@ -60,23 +59,22 @@ class DataLevelPermissionsFilter(BaseFilterBackend):
             if not user_dept_id:
                 return queryset.none()
 
-            # 1. 判断过滤的数据是否有创建人所在部门 "dept_belong_id" 字段
-            if not getattr(queryset.model, 'dept_belong_id', None):
+            # 1. 判断过滤的数据是否有创建人所在部门 "dept_belong" 字段
+            if not getattr(queryset.model, 'dept_belong', None):
                 return queryset
 
             # 2. 如果用户没有关联角色则返回本部门数据
             if not hasattr(request.user, 'role'):
-                return queryset.filter(dept_belong_id=user_dept_id)
+                return queryset.filter(dept_belong=user_dept_id)
 
             # 3. 根据所有角色 获取所有权限范围
-            role_list = request.user.role.filter(status=1).values('admin', 'data_range')
+            role_list = request.user.role.filter(status=1).values('data_scope')
             dataScope_list = []
             for ele in role_list:
                 # 3.1 判断用户是否为超级管理员角色/如果有1(所有数据) 则返回所有数据
-                # if 3 == ele.get('data_range') or ele.get('admin') == True:
-                if 3 == ele.get('data_range'):
+                if 3 == ele.get('data_scope'):
                     return queryset
-                dataScope_list.append(ele.get('data_range'))
+                dataScope_list.append(ele.get('data_scope'))
             dataScope_list = list(set(dataScope_list))
 
             # 4. 只为仅本人数据权限时只返回过滤本人数据，并且部门为自己本部门(考虑到用户会变部门，只能看当前用户所在的部门数据)
@@ -108,17 +106,22 @@ class CustomDjangoFilterBackend(DjangoFilterBackend):
         '~': 'icontains'
     }
 
-    def construct_search(self, field_name):
+    def construct_search(self, field_name, lookup_expr=None):
         lookup = self.lookup_prefixes.get(field_name[0])
         if lookup:
             field_name = field_name[1:]
         else:
-            lookup = 'icontains'
-        return LOOKUP_SEP.join([field_name, lookup])
+            lookup = lookup_expr
+        if lookup:
+            if field_name.endswith(lookup):
+                return field_name
+            return LOOKUP_SEP.join([field_name, lookup])
+        return field_name
 
     def find_filter_lookups(self, orm_lookups, search_term_key):
         for lookup in orm_lookups:
-            if lookup.find(search_term_key) >= 0:
+            new_lookup = LOOKUP_SEP.join(lookup.split(LOOKUP_SEP)[:-1]) if len(lookup.split(LOOKUP_SEP)) > 1 else lookup
+            if new_lookup == search_term_key:
                 return lookup
         return None
 
@@ -126,22 +129,30 @@ class CustomDjangoFilterBackend(DjangoFilterBackend):
         filterset = self.get_filterset(request, queryset, view)
         if filterset is None:
             return queryset
-        if filterset.__class__.__name__ == 'AutoFilterSet':
+        if filterset.__class__.__name__ == "AutoFilterSet":
             queryset = filterset.queryset
-            orm_lookups = []
-            for search_field in filterset.filters:
-                if isinstance(filterset.filters[search_field],CharFilter):
-                    orm_lookups.append(self.construct_search(six.text_type(search_field)))
-                else:
-                    orm_lookups.append(search_field)
+            filter_fields = filterset.filters if self.filter_fields == "__all__" else self.filter_fields
+            orm_lookup_dict = dict(
+                zip(
+                    [field for field in filter_fields],
+                    [filterset.filters[lookup].lookup_expr for lookup in filterset.filters.keys()],
+                )
+            )
+            orm_lookups = [self.construct_search(lookup, lookup_expr) for lookup, lookup_expr in orm_lookup_dict.items()]
             conditions = []
             queries = []
             for search_term_key in filterset.data.keys():
                 orm_lookup = self.find_filter_lookups(orm_lookups, search_term_key)
-                if not orm_lookup:
+                if not orm_lookup or filterset.data.get(search_term_key) == '':
                     continue
-                query = Q(**{orm_lookup: filterset.data[search_term_key]})
-                queries.append(query)
+                filterset_data_len = len(filterset.data.getlist(search_term_key))
+                if filterset_data_len == 1:
+                    query = Q(**{orm_lookup: filterset.data[search_term_key]})
+                    queries.append(query)
+                elif filterset_data_len == 2:
+                    orm_lookup += '__range'
+                    query = Q(**{orm_lookup: filterset.data.getlist(search_term_key)})
+                    queries.append(query)
             if len(queries) > 0:
                 conditions.append(reduce(operator.and_, queries))
                 queryset = queryset.filter(reduce(operator.and_, conditions))

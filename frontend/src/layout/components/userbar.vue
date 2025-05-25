@@ -49,15 +49,13 @@
 		</div>
 		<el-dropdown class="user panel-item" trigger="click" @command="handleInfo">
 			<div class="user-avatar">
-				<label>{{ "更多" }}</label>
+				<label>{{ userState.userInfo.name?userState.userInfo.name:"更多" }}</label>
 				<el-icon class="el-icon--right"><ArrowDown /></el-icon>
 			</div>
 			<template #dropdown>
 				<el-dropdown-menu>
 					<!-- <el-dropdown-item command="clearCache">清除缓存</el-dropdown-item> -->
-					<el-dropdown-item command="updateLogs"><el-icon><Share /></el-icon>更新日志</el-dropdown-item>
-					<el-dropdown-item command="checkUpdate"><el-icon><StarFilled /></el-icon>检查更新</el-dropdown-item>
-					<el-dropdown-item command="fixPanel"><el-icon><EditPen /></el-icon>修复面板</el-dropdown-item>
+					<el-dropdown-item command="personCenter"><el-icon><Avatar /></el-icon>个人中心</el-dropdown-item>
                 	<el-dropdown-item @click="handleBuJUClick"><el-icon><Tools /></el-icon>布局设置</el-dropdown-item>
 					<el-dropdown-item divided command="outLogin"><el-icon><CircleCloseFilled /></el-icon>退出登录</el-dropdown-item>
 				</el-dropdown-menu>
@@ -68,10 +66,6 @@
 	<el-dialog v-model="searchVisible" :width="700"  title="搜索" center destroy-on-close>
 		<search @success="searchVisible=false"></search>
 	</el-dialog>
-	<el-dialog v-model="shutdownVisible" :width="300"  title="重启服务器或面板" destroy-on-close>
-		<shutdown></shutdown>
-	</el-dialog>
-	<shutdown v-if="onlyRestartVisiable" ref="onlyShudownRef"></shutdown>
 	<el-drawer title="布局设置" v-model="settingDialog" :size="400" append-to-body destroy-on-close>
 		<lysettings></lysettings>
 	</el-drawer>
@@ -95,11 +89,9 @@
     let settingDialog = ref(false)
 
 	let searchVisible = ref(false)
-	let shutdownVisible = ref(false)
 	let msg = ref(false)
 	let msgList = ref([])
 	let onlyRestartVisiable = ref(false)
-	let onlyShudownRef = ref(null)
 
 	//全屏
 	function screenFunc(){
@@ -134,14 +126,8 @@
 	function handleInfo(command) {
 		if(command == "clearCache"){
 		}
-		else if(command == "updateLogs"){
-			window.open("https://lybbn.lybbn.cn/doc/lybbn/update.html")
-		}
-		else if(command == "checkUpdate"){
-			checkUpdateInfo()
-		}
-		else if(command == "fixPanel"){
-			fixMessageBox()
+		else if(command == "personCenter"){
+			
 		}
 		else if(command == "outLogin"){
 			ElMessageBox.confirm('退出登录, 是否继续?', '提示', {
@@ -158,114 +144,12 @@
 		}
 	}
 
-	function checkUpdateInfo(){
-        userState.loadingInfo.isLoading = true
-        userState.loadingInfo.content = "获取中..."
-        Api.sysGetSysUpdate().then(res=>{
-            userState.loadingInfo.isLoading = false
-            userState.loadingInfo.content = ""
-            if(res.code ==2000) {
-                let tempdata = res.data
-				updateMessageBox(tempdata)
-            }else{
-                ElMessage.warning(res.msg)
-            }
-        })
-    }
-
-	function updateMessageBox(tempdata){
-		if(!tempdata.can_update){
-			ElMessage.success("当前已是最新版本")
-		}else{
-			let htmlcont = `<div style="font-size:15px;">发现新版本<span style="color:red;">【${tempdata.n_ver}】</span>,是否确定更新？<br/><a target="_blank" href="https://lybbn.lybbn.cn/doc/lybbn/update.html" style="color:#008040">查看更新日志</a><div>`
-			ElMessageBox({
-				title: '更新提示',
-				message: htmlcont,
-				dangerouslyUseHTMLString: true, // 允许 HTML 字符串
-				showCancelButton: true,
-				confirmButtonText: '确定',
-				cancelButtonText: '取消',
-				type: 'warning',
-				icon:'Download',
-				customClass:"lybbnMessageBoxClass",
-				beforeClose: (action, instance, done) => {
-					if (action === 'confirm') {
-						UpdateSysPack("update")
-					} else if (action === 'cancel') {
-						// console.log('取消');
-					}
-					done(); // 关闭 MessageBox 实例
-				}
-			}).then(action => {
-			}).catch(() => {
-			})
-		}
-	}
-
-	function UpdateSysPack(type="update"){
-        userState.loadingInfo.isLoading = true
-        userState.loadingInfo.content = "更新中..."
-        Api.sysStartSysUpdate({action:type}).then(res=>{
-            userState.loadingInfo.isLoading = false
-            userState.loadingInfo.content = ""
-            if(res.code ==2000) {
-                onlyRestartVisiable.value = true
-				nextTick(()=>{
-					onlyShudownRef.value.onlyRestartPanel()
-				})
-            }else{
-                ElMessage.warning(res.msg)
-            }
-        })
-    }
-
-	function fixMessageBox(){
-		let htmlcont = `<div style="font-size:15px;">该操作能修复使用中遇到的异常问题，是否确定执行修复面板操作？<div>`
-		ElMessageBox({
-			title: '修复面板提示',
-			message: htmlcont,
-			dangerouslyUseHTMLString: true, // 允许 HTML 字符串
-			showCancelButton: true,
-			confirmButtonText: '确定',
-			cancelButtonText: '取消',
-			type: 'warning',
-			icon:'EditPen',
-			customClass:"lybbnMessageBoxClass",
-			beforeClose: (action, instance, done) => {
-				if (action === 'confirm') {
-					fixSysPack("fix")
-				} else if (action === 'cancel') {
-					// console.log('取消');
-				}
-				done(); // 关闭 MessageBox 实例
-			}
-		}).then(action => {
-		}).catch(() => {
-		})
-	}
-
-	function fixSysPack(type="fix"){
-        userState.loadingInfo.isLoading = true
-        userState.loadingInfo.content = "修复中..."
-        Api.sysStartSysUpdate({action:type}).then(res=>{
-            userState.loadingInfo.isLoading = false
-            userState.loadingInfo.content = ""
-            if(res.code ==2000) {
-                onlyRestartVisiable.value = true
-				nextTick(()=>{
-					onlyShudownRef.value.onlyRestartPanel()
-				})
-            }else{
-                ElMessage.warning(res.msg)
-            }
-        })
-    }
-
 	function handleBuJUClick(){
 		settingDialog.value=true
 	}
 
 	onMounted(()=>{
+		userState.getSystemUserInfo()
 	})
 
 </script>

@@ -3,7 +3,7 @@
 		<div class="lybbn-panel-header-left">
 			<div class="logo-bar">
 				<img class="logo" src="@/assets/lybbn/imgs/logo.png">
-				<span @click="hiddenServerIP = !hiddenServerIP" style="cursor: pointer;">{{ !hiddenServerIP?userState.serverInfo.serverIp:hiddenIpAddress(userState.serverInfo.serverIp) }}</span>
+				<span>{{ config.APP_NAME}}</span>
 			</div>
 		</div>
 		<div class="lybbn-panel-header-right">
@@ -87,7 +87,6 @@ userState.getSystemConfig()
 
 // let menu = ref([])
 let active = ref("")
-let hiddenServerIP = ref(false)
 
 let contextMenuVisible = ref(false)
 let left = ref(0)
@@ -104,14 +103,6 @@ let ismultitabs = computed(() => {
 let isMenuCollapse = computed(() => {
 	return siteThemeStore.isMenuCollapse
 })
-
-function hiddenIpAddress(ip) {
-	const parts = ip.split('.');
-	if (parts.length === 4) {
-		return `${parts[0]}.${'*'.repeat(parts[1].length)}.${'*'.repeat(parts[2].length)}.${parts[3]}`;
-	}
-	return '';
-}
 
 function setIsmultitabs() {
 	siteThemeStore.setIsmultitabs(!ismultitabs.value)

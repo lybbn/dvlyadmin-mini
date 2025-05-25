@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from mysystem.models import Users,Role
-from utils.jsonResponse import SuccessResponse, ErrorResponse
+from utils.jsonResponse import SuccessResponse, ErrorResponse,DetailResponse
 from utils.permission import CustomPermission
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
@@ -119,24 +119,28 @@ class UserViewSet(CustomModelViewSet):
     def user_info(self,request):
         """获取当前用户信息"""
         user = request.user
+        if not user.identity in [0,1]:return ErrorResponse(msg="用户类型错误")
         result = {
+            "nickname":user.nickname,
             "name":user.name,
             "mobile":user.mobile,
             "gender":user.gender,
-            "email":user.email
+            "email":user.email,
         }
-        return SuccessResponse(data=result,msg="获取成功")
+        return DetailResponse(data=result,msg="获取成功")
 
     def update_user_info(self,request):
         """修改当前用户信息"""
         user = request.user
+        if not user.identity in [0,1]:return ErrorResponse(msg="用户类型错误")
         Users.objects.filter(id=user.id).update(**request.data)
-        return SuccessResponse(data=None, msg="修改成功")
+        return DetailResponse(data=None, msg="修改成功")
 
 
     def change_password(self,request,*args, **kwargs):
         """密码修改"""
         user = request.user
+        if not user.identity in [0,1]:return ErrorResponse(msg="用户类型错误")
         instance = Users.objects.filter(id=user.id,identity__in=[0,1]).first()
         data = request.data
         old_pwd = data.get('oldPassword')
@@ -148,7 +152,7 @@ class UserViewSet(CustomModelViewSet):
             elif instance.check_password(old_pwd):
                 instance.password = make_password(new_pwd)
                 instance.save()
-                return SuccessResponse(data=None, msg="修改成功")
+                return DetailResponse(data=None, msg="修改成功")
             else:
                 return ErrorResponse(msg="旧密码不正确")
         else:
