@@ -103,11 +103,11 @@
 					</el-scrollbar>
 				</div>
 			</div>
-			<div v-if="!ismobile" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
+			<div v-if="!ismobile && nextMenu.length>0 || !pmenu.component" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
 				<div class="lybbn-panel-side-scroll">
 					<el-scrollbar>
 						<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
-							<NavMenu :navMenus="pmenu" @contextmenuClick="openContextMenuItem"></NavMenu>
+							<NavMenu :navMenus="nextMenu" @contextmenuClick="openContextMenuItem"></NavMenu>
 						</el-menu>
 					</el-scrollbar>
 				</div>

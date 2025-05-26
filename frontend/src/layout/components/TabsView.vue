@@ -278,8 +278,8 @@
         content: "";
         background: var(--el-color-primary);
         display: inline-block;
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
         position: relative;
         margin-right: 5px;

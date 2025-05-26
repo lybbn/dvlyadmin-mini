@@ -1,7 +1,8 @@
 import {createRouter, createWebHashHistory} from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import {staticRoutes,NotFound,RedirectRoute,dynamicRoutes} from './routes';
+import {CustomStaticRoutes,staticRoutes,NotFound,RedirectRoute,dynamicRoutes} from './routes';
+import { withAutoBreadcrumb } from './autoBreadcrumb.js'
 import config from "@/config/index";
 import {getToken,autoStorage} from '@/utils/util'
 import {storeToRefs} from 'pinia';
@@ -79,7 +80,8 @@ async function setAddRoute() {
 //保留嵌套路由层级
 async function setFilterRoute() {
     let filterRoute = dynamicRoutes
-	filterRoute[0].children = [...filterRoute[0].children, ...NotFound];
+	filterRoute[0].children = [...filterRoute[0].children,...CustomStaticRoutes, ...NotFound];
+    filterRoute = withAutoBreadcrumb(filterRoute)
 	return filterRoute;
 }
 

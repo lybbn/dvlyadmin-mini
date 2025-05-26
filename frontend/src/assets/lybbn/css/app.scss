@@ -46,7 +46,7 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 .lybbn-panel-side-split li i {font-size: 18px;}
 .lybbn-panel-side-split li p {margin-top:5px;}
 .lybbn-panel-side-split li:hover {background: rgba(255, 255, 255, 0.1);}
-.lybbn-panel-side-split li.active {background: #409EFF;}
+.lybbn-panel-side-split li.active {background-color: var(--el-color-primary-light-1) !important;color: var(--el-color-primary-light-8);}
 
 .lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb {background-color: rgba(255, 255, 255, 0.4);border-radius:5px;}
 .lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb:hover {background-color: rgba(255, 255, 255, 0.5);}

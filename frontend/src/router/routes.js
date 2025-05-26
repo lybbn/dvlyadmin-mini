@@ -10,31 +10,34 @@ export const dynamicRoutes = [
 			isKeepAlive: false,
             requireAuth: false,
 		},
-		children: [
-			{
-				path: "/home",
-				name: 'home',
-				component: () => import('@/views/system/home/index.vue'),
-				meta: {
-					title: "首页",
-					requireAuth: true,
-					hidden:false,
-					icon:'House',
-					affix: true//固定
-				}
-			},
-			{
-				path: "/home1",
-				name: 'home1',
-				component: () => import('@/views/system/home/index.vue'),
-				meta: {
-					title: "天空五个",
-					requireAuth: true,
-					hidden:false,
-					icon:'House',
-				}
-			},
-		],
+		children: [],
+	},
+]
+
+//自定义layout的children的静态路由，优先级高于后台api的动态路由
+export const CustomStaticRoutes = [
+	{
+		path: "/home",
+		name: 'home',
+		component: () => import('@/views/system/home/index.vue'),
+		meta: {
+			title: "首页",
+			requireAuth: true,
+			hidden:false,
+			icon:'House',
+			affix: true//固定
+		}
+	},
+	{
+		path: "/home1",
+		name: 'home1',
+		component: () => import('@/views/system/home/index.vue'),
+		meta: {
+			title: "天空五个留个",
+			requireAuth: true,
+			hidden:false,
+			icon:'House',
+		}
 	},
 ]
 
