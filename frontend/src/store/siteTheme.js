@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import colorTool from '@/utils/color'
 import {autoStorage} from '@/utils/util'
 import config from "@/config"
+import i18n from '@/locales'
 
 export const useSiteThemeStore = defineStore('siteTheme', {
     state:() => {
@@ -29,6 +30,8 @@ export const useSiteThemeStore = defineStore('siteTheme', {
             menuHeaderColor01:autoStorage.get('menuHeaderColor01') || config.MENU_HEADER_COLOR01,
             //左侧菜单颜色
             menuHeaderColor02:autoStorage.get('menuHeaderColor02') || config.MENU_HEADER_COLOR02,
+            //语言
+            language:autoStorage.get('language') || config.LANG,
         }
     },
     getters:{
@@ -102,6 +105,11 @@ export const useSiteThemeStore = defineStore('siteTheme', {
         setFrameLayout(val){
             this.frameLayout = val
             autoStorage.set('frameLayout',val);
+        },
+        setLanguage(val){
+            i18n.global.locale.value = val;
+            this.language = val
+            autoStorage.set('language',val)
         },
     },
 })

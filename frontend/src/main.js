@@ -8,6 +8,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import lyIntall from './lycustom.js'
 import router from './router'
 import store from './store'
+import i18n from './locales/index.js'
 
 import App from './App.vue'
 const app = createApp(App);
@@ -25,6 +26,7 @@ app.use(Particles, {
 });
 
 app.use(ElementPlus);
+app.use(i18n)
 app.use(lyIntall);
 app.use(store)
 app.use(router);

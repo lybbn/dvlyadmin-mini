@@ -1,14 +1,14 @@
 <template>
 	<el-form ref="form" label-width="120px" label-position="left" style="padding:0 20px;">
 		<el-divider></el-divider>
-		<el-form-item label="语言">
+		<el-form-item :label="$t('frameSettings.language')">
 			<el-select v-model="language" @change="changeLang">
 				<el-option label="简体中文" value="zh-cn"></el-option>
 				<el-option label="English" value="en"></el-option>
 			</el-select>
 		</el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="框架布局">
+        <el-form-item :label="$t('frameSettings.framebuju')">
 			<!-- <el-select v-model="frameLayout" placeholder="请选择" @change="setFrameLayout">
 				<el-option label="经典" value="default"></el-option>
 				<el-option label="顶部" value="header"></el-option>
@@ -66,20 +66,20 @@
             </div>
 		</el-form-item>
 		<el-divider></el-divider>
-		<el-form-item label="主题颜色">
+		<el-form-item :label="$t('frameSettings.themecolor')">
 			<el-color-picker v-model="colorPrimary" :predefine="colorList"  @change="setColorPrimary"></el-color-picker>
 		</el-form-item>
-        <el-form-item label="头部颜色">
+        <el-form-item :label="$t('frameSettings.headercolor')">
 			<el-color-picker v-model="menuHeaderColor01" :predefine="menuColorList01"  @change="changeMenuHeaderColor01"></el-color-picker>
 		</el-form-item>
-        <el-form-item label="菜单颜色">
+        <el-form-item :label="$t('frameSettings.menucolor')">
 			<el-color-picker v-model="menuHeaderColor02" :predefine="menuColorList02"  @change="changeMenuHeaderColor02"></el-color-picker>
 		</el-form-item>
-        <el-form-item label="菜单宽度(px)">
+        <el-form-item :label="$t('frameSettings.menuwidth')+'(px)'">
 			<el-input-number v-model="menuWidth"  @change="changeMenuWidth" style="width: 100%"></el-input-number>
 		</el-form-item>
 		<el-divider></el-divider>
-        <el-form-item label="组件大小">
+        <el-form-item :label="$t('frameSettings.componentsize')">
 			<el-select v-model="size" placeholder="请选择" @change="changeSize">
 				<el-option label="默认" value="default"></el-option>
 				<el-option label="小" value="small"></el-option>
@@ -93,6 +93,9 @@
 <script setup>
 	import {ref, onMounted, reactive, watch, computed} from 'vue'
     import {useSiteThemeStore} from "@/store/siteTheme";
+	import { useI18n } from 'vue-i18n'
+
+	const { t } = useI18n()
 
     const siteThemeStore = useSiteThemeStore()
 
@@ -130,7 +133,7 @@
 
     let dark = ref(isdark())
 
-    let language = ref(siteThemeStore.language)
+    let language = ref(siteThemeStore.language || 'zh-cn')
 
     //设置语言
     function changeLang(val){
