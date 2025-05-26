@@ -91,11 +91,23 @@
 			</div>
 		</header>
 		<section class="lybbn-panel-wrapper">
+			<div v-if="!ismobile" class="lybbn-panel-side-split">
+				<div class="lybbn-panel-side-scroll">
+					<el-scrollbar>
+						<ul>
+							<li v-for="item in menu" :key="item" :class="pmenu.path==item.path?'active':''" @click="showMenu(item)">
+								<el-icon><component :is="item.meta.icon || 'menu'" /></el-icon>
+								<p>{{ item.meta.title }}</p>
+							</li>
+						</ul>
+					</el-scrollbar>
+				</div>
+			</div>
 			<div v-if="!ismobile" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
 				<div class="lybbn-panel-side-scroll">
 					<el-scrollbar>
 						<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
-							<NavMenu :navMenus="menu" @contextmenuClick="openContextMenuItem"></NavMenu>
+							<NavMenu :navMenus="pmenu" @contextmenuClick="openContextMenuItem"></NavMenu>
 						</el-menu>
 					</el-scrollbar>
 				</div>
@@ -119,6 +131,9 @@
 				</div>
 			</div>
 		</section>
+	</template>
+	<template v-else>
+		<span>内部布局错误</span>
 	</template>
 	
 	<transition name="el-zoom-in-top">
@@ -168,6 +183,8 @@ const storesRoutesList = useRoutesList()
 const userState = useUserState()
 
 // let menu = ref([])
+let pmenu = ref({})
+let nextMenu = ref([])
 let active = ref("")
 
 let contextMenuVisible = ref(false)
@@ -227,6 +244,8 @@ function filterUrl(map) {
 //路由监听高亮
 function showThis() {
 	nextTick(() => {
+		pmenu.value = route.meta.breadcrumb ? route.meta.breadcrumb[0] : {}
+		nextMenu.value = filterUrl2(pmenu.value.children)
 		//新增嵌套路由根据activeMenu决定高亮菜单
 		if(route.meta && route.meta.activeMenu){
 			active.value = route.meta.activeMenu;
@@ -234,6 +253,15 @@ function showThis() {
 			active.value = route.path;
 		}
 	})
+}
+
+//点击显示
+function showMenu(route) {
+	pmenu.value = route;
+	nextMenu.value = filterUrl2(route.children);
+	if((!route.children || route.children.length == 0) && route.component){
+		router.push({path: route.path})
+	}
 }
 
 function onLayoutResize() {

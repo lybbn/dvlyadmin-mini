@@ -28,7 +28,7 @@ export const dynamicRoutes = [
 				name: 'home1',
 				component: () => import('@/views/system/home/index.vue'),
 				meta: {
-					title: "首页2",
+					title: "天空五个",
 					requireAuth: true,
 					hidden:false,
 					icon:'House',

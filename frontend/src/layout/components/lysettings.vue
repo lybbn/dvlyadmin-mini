@@ -47,12 +47,14 @@
                     </div>
                 </div>
                 <div class="layout-drawer-content-item" @click="handleSetLayout('fenlan')">
-                    <section class="el-container el-circular" :class="{ 'drawer-layout-active': frameLayout === 'fenlan' }">
-                        <aside class="el-aside-dark" style="width: 10px"></aside>
-                        <aside class="el-aside" style="width: 20px"></aside>
+                    <section class="el-container" :class="{ 'drawer-layout-active': frameLayout === 'fenlan' }">
                         <section class="el-container is-vertical">
                             <header class="el-header" style="height: 10px"></header>
-                            <main class="el-main"></main>
+							<section class="el-container">
+								<aside class="el-aside-dark" style="width: 10px"></aside>
+                        		<aside class="el-aside" style="width: 20px"></aside>
+								<main class="el-main"></main>
+							</section>
                         </section>
                     </section>
                     <div class="layout-tips-warp" :class="{ 'layout-tips-warp-active': frameLayout === 'fenlan' }">

@@ -23,28 +23,28 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import SvgIcon from '@/components/icons/SvgIcon.vue'
-const props = defineProps({
-	navMenus: {
-		type: Array,
-		default: []
-	},
-})
+	import { computed } from 'vue'
+	import SvgIcon from '@/components/icons/SvgIcon.vue'
+	const props = defineProps({
+		navMenus: {
+			type: Array,
+			default: []
+		},
+	})
 
-const emits = defineEmits(['contextmenuClick'])
+	const emits = defineEmits(['contextmenuClick'])
 
-// function hasChildren(item) {
-// 	return item.children && !item.children.every(item => item.meta.hidden)
-// }
+	// function hasChildren(item) {
+	// 	return item.children && !item.children.every(item => item.meta.hidden)
+	// }
 
-const hasChildren = computed(() => {
-	return (item) => item.children && !item.children.every(item => item.meta.hidden)
-})
+	const hasChildren = computed(() => {
+		return (item) => item.children && !item.children.every(item => item.meta.hidden)
+	})
 
-function handleRightClick(e,path){
-	emits('contextmenuClick',e,path)
-}
+	function handleRightClick(e,path){
+		emits('contextmenuClick',e,path)
+	}
 </script>
 <style scoped>
 </style>
