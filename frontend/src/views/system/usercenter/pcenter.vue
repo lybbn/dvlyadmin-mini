@@ -133,7 +133,7 @@
         </el-card>
 
         <!-- 编辑资料对话框 -->
-        <el-dialog v-model="editDialogVisible" title="编辑资料" width="50%" :fullscreen="isMobile">
+        <el-dialog v-model="editDialogVisible" title="编辑资料" width="50%" :fullscreen="isMobile" :close-on-click-modal="false">
             <el-form :model="editForm" label-width="100px" :rules="editRules" ref="editFormRef">
                 <el-row :gutter="20">
                     <el-col :span="isMobile ? 24 : 12">
@@ -193,7 +193,7 @@
         </el-dialog>
 
         <!-- 修改密码对话框 -->
-        <el-dialog v-model="passwordDialogVisible" title="修改密码" width="50%" :fullscreen="isMobile">
+        <el-dialog v-model="passwordDialogVisible" title="修改密码" width="50%" :fullscreen="isMobile" :close-on-click-modal="false">
             <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="100px">
                 <el-form-item label="当前密码" prop="currentPassword">
                     <el-input v-model="passwordForm.currentPassword" type="password" show-password />
@@ -216,7 +216,7 @@
         </el-dialog>
 
         <!-- 更换头像对话框 -->
-        <el-dialog v-model="avatarDialogVisible" title="更换头像" width="50%" :fullscreen="isMobile">
+        <el-dialog v-model="avatarDialogVisible" title="更换头像" width="50%" :fullscreen="isMobile" :close-on-click-modal="false">
             <div class="avatar-edit-container">
                 <div class="avatar-preview">
                     <div class="preview-wrapper">
@@ -867,7 +867,7 @@
     }
 
     .default-avatar-item.active {
-        border-color: #409EFF;
+        border-color: var(--el-color-primary);
     }
 
     .default-avatar-item img {

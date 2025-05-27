@@ -1,12 +1,19 @@
 <template>
     <div class="menu-container">
-        <el-row :gutter="20" class="main-row">
+        <el-row :gutter="10" class="main-row">
             <!-- 左侧菜单树 -->
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" class="left-panel">
                 <el-card shadow="hover" class="glass-card menu-card">
                     <template #header>
                         <div class="card-header">
-                            <h3>菜单管理</h3>
+                            <h4>菜单管理 <el-tooltip
+                                class="item"
+                                effect="dark"
+                                content="支持拖拽菜单位置"
+                                placement="right">
+                                <el-icon><question-filled /></el-icon>
+                                </el-tooltip>
+                            </h4>
                             <el-button icon="Plus" circle @click="addMenu" type="primary" size="small" />
                         </div>
                     </template>
@@ -49,12 +56,12 @@
                 <transition name="fade" mode="out-in">
                     <el-card shadow="hover" class="glass-card permission-card" v-if="selectedMenu">
                         <template #header>
-                            <h3>权限配置 - {{ selectedMenu.label }}</h3>
+                            <h4>权限配置 - {{ selectedMenu.label }}</h4>
                         </template>
 
                         <el-tabs v-model="activeTab" :stretch="isMobile">
                             <!-- 按钮权限 -->
-                            <el-tab-pane label="按钮权限" name="button">
+                            <el-tab-pane label="按钮权限配置" name="button">
                                 <el-button type="primary" icon="Plus" @click="openButtonDialog">添加按钮权限</el-button>
                                 <el-table :data="selectedMenu.buttons" row-key="id" border stripe style="margin-top: 10px;">
                                     <el-table-column prop="name" label="按钮名称" width="150" />
@@ -74,7 +81,7 @@
                             </el-tab-pane>
 
                             <!-- 列权限 -->
-                            <el-tab-pane label="列权限" name="column">
+                            <el-tab-pane label="列权限配置" name="column">
                                 <el-button type="success" icon="Plus" @click="openColumnDialog">添加列权限</el-button>
                                 <el-table :data="selectedMenu.columns" row-key="id" border stripe style="margin-top: 10px;">
                                     <el-table-column prop="name" label="字段名称" width="150" />
@@ -103,14 +110,15 @@
                             </el-tab-pane>
                         </el-tabs>
                     </el-card>
-
-                    <el-empty description="请选择左侧菜单" v-else class="empty-state" />
+                    <el-card shadow="hover" class="glass-card permission-card" v-else>
+                        <el-empty description="请选择左侧菜单"/>
+                    </el-card>
                 </transition>
             </el-col>
         </el-row>
 
         <!-- 弹窗表单 -->
-        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="90%" :fullscreen="isMobile" center>
+        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%" :fullscreen="isMobile" :close-on-click-modal="false">
             <el-form ref="formRef" :model="formData" label-width="100px" v-if="currentForm === 'menu'">
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -120,7 +128,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                         <el-form-item label="图标">
-                            <el-input v-model="formData.icon" placeholder="如：HomeFilled" />
+                            <icon-selector v-model="formData.icon" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -217,6 +225,7 @@
 <script setup>
     import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
     import { ElMessage, ElMessageBox } from 'element-plus'
+    import IconSelector from '@/components/icons/IconSelector.vue'
 
     // 数据源
     const menus = ref([
@@ -579,7 +588,6 @@
 
     .left-panel, .right-panel {
         padding: 0 !important;
-        margin-bottom: 16px;
     }
 
     .card-header {
@@ -613,8 +621,8 @@
         &::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: -12px;
+            left: -9px;
+            top: -15px;
             bottom: 50%;
             width: 16px;
             border-left: 1px dashed #c0c4cc;
@@ -671,16 +679,6 @@
         &.permission-card {
             margin-left: 8px;
         }
-    }
-
-    .empty-state {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 300px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
 
     .fade-enter-active, .fade-leave-active {

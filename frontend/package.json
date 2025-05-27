@@ -40,9 +40,12 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.4",
+    "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.0",
     "sass": "^1.89.0",
     "terser": "^5.39.2",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-svg-icons": "^2.0.1",
+    "vite-svg-loader": "^5.1.0"
   }
 }

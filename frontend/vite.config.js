@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { resolve } from 'path';
 
 const pathResolve = (dir) => {
@@ -12,7 +13,11 @@ let alias = {
 
 export default defineConfig({
   plugins: [
-    vue()
+    vue(),
+    createSvgIconsPlugin({
+      iconDirs: [resolve(process.cwd(), 'src/components/icons/svg')], // 你的 SVG 目录
+      symbolId: 'icon-[name]', // 格式必须和 `iconName` 计算属性匹配
+    }),
   ],
   base: '/', // index.html文件所在位置
   root: './', // js导入的资源路径，src

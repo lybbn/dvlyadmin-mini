@@ -31,3 +31,13 @@ npm run build:backend
 ```
 
 注意：此命令会把打包后的静态文件复制到：```backend/frontend/admin``` 目录中，方面与后端集成部署
+
+## 疑问
+
+1. 怎么自定义的icon？
+
+答：把自定义的svg文件放入```src/compontnts/icons/svg```中即可
+
+2. 前端配置文件在哪？
+
+答：在```src/config/index.js```中，具体内容都有注释

@@ -9,6 +9,9 @@ import lyIntall from './lycustom.js'
 import router from './router'
 import store from './store'
 import i18n from './locales/index.js'
+import registerSvgIcon from '@/components/icons/index.js'
+//引入注册脚本
+import 'virtual:svg-icons-register';
 
 import App from './App.vue'
 const app = createApp(App);
@@ -24,6 +27,9 @@ app.use(Particles, {
         await loadSlim(engine);
     },
 });
+
+// 注册 SVG 图标组件
+registerSvgIcon(app)
 
 app.use(ElementPlus);
 app.use(i18n)
