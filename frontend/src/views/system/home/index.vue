@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted  } from 'vue'
+    import { ref, onMounted,nextTick } from 'vue'
     import * as echarts from 'echarts'
 
     // 图表类型
@@ -158,10 +158,6 @@
     // 初始化图表
     let visitChart = null
     let saleChart = null
-
-    onMounted(() => {
-        initCharts()
-    })
 
     const initCharts = () => {
         // 访问量图表
@@ -253,11 +249,20 @@
             saleChart && saleChart.resize()
         })
     }
+
+    onMounted(() => {
+        setTimeout(() => {
+            nextTick(()=>{
+                initCharts()
+            })
+        },300)
+    })
+    
 </script>
 
 <style scoped>
     .dashboard-container {
-        padding: 15px;
+        padding: 10px;
     }
 
     /* 信息卡片样式 */

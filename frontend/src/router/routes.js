@@ -29,14 +29,25 @@ export const CustomStaticRoutes = [
 		}
 	},
 	{
-		path: "/home1",
-		name: 'home1',
-		component: () => import('@/views/system/home/index.vue'),
+		path: "/PersonalCenter",
+		name: 'PersonalCenter',
+		component: () => import('@/views/system/usercenter/pcenter.vue'),
 		meta: {
-			title: "天空五个留个",
+			title: "个人中心",
 			requireAuth: true,
 			hidden:false,
-			icon:'House',
+			icon:'User',
+		}
+	},
+	{
+		path: "/menuManage",
+		name: 'menuManage',
+		component: () => import('@/views/system/menu/index.vue'),
+		meta: {
+			title: "菜单管理",
+			requireAuth: true,
+			hidden:false,
+			icon:'Collection',
 		}
 	},
 ]

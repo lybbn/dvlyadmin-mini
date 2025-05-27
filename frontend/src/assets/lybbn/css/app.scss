@@ -13,7 +13,7 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 
 /* 全局滚动条样式 */
 .scrollable {-webkit-overflow-scrolling: touch;}
-::-webkit-scrollbar {width: 10px;height: 10px;}
+::-webkit-scrollbar {width: 8px;height: 8px;}
 // ::-webkit-scrollbar-thumb {background-color: rgba(86, 85, 85, 0.3);} 
 ::-webkit-scrollbar-thumb {background-color: rgba(136, 132, 132, 0.3);};
 ::-webkit-scrollbar-thumb:hover {background-color: rgba(86, 85, 85, 0.6);}

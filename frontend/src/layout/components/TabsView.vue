@@ -224,6 +224,7 @@
 
     .tabscrollbar:deep(.el-scrollbar__view){
         height: 100%;
+        width: 100%;
     }
 
     .tabs-list {
@@ -248,6 +249,7 @@
         border-bottom: none;
         /* border-radius: 4px 4px 0 0; */
         transition: all 0.3s;
+        flex-shrink: 0;
     }
 
     .tabs-item:hover {
@@ -295,7 +297,7 @@
         color: var(--el-color-white);
         background-color: var(--el-color-primary-light-3);
         border-radius: 100%;
-        transform: scale(1.2);
+        transform: scale(1.1);
     }
 
     .tabs-extra {

@@ -50,4 +50,7 @@ html.dark {
 	//蒙层
 	.softmask {background-color: rgba(38, 37, 37,1) !important;}
 	.soft-ins-guide-dialog{background-color: rgba(38, 37, 37,1) !important;box-shadow: 0 0 10px 1px #161616;border: 1px solid #161616;}
+
+	//个人中心
+	.personal-center-container .profile-header{background: linear-gradient(135deg, #f6f9fc 0%, #2d5d81 100%);}
 }

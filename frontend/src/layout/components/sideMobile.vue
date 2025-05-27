@@ -9,7 +9,7 @@
 			</el-header>
 			<el-main>
 				<el-scrollbar class="lylybbnmobilenavside">
-					<el-menu :default-active="route.meta.active || route.fullPath" @select="select" router :background-color="siteThemeStore.siteTheme == 'dark'?'#141414':'#272E39'" text-color="#fff" active-text-color="#008040">
+					<el-menu :default-active="route.meta.active || route.fullPath" @select="select" router :background-color="siteThemeStore.siteTheme == 'dark'?'#141414':'#272E39'" text-color="#fff" active-text-color="var(--el-color-primary)">
 						<NavMenu :navMenus="menu"></NavMenu>
 					</el-menu>
 				</el-scrollbar>

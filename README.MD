@@ -17,3 +17,9 @@ js setup 语法
 1、页面简洁美观
 2、支持适配手机端
 
+## 疑问
+
+1. 能不能与django-vue-lyadmin完美契合
+
+不能，dvlyadmin-mini采用的是vite，且框架方面做了完全重构，不能完全替换。但使用方式大体一致
+
