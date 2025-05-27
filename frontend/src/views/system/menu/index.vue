@@ -118,27 +118,60 @@
         </el-row>
 
         <!-- 弹窗表单 -->
-        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%" :fullscreen="isMobile" :close-on-click-modal="false">
-            <el-form ref="formRef" :model="formData" label-width="100px" v-if="currentForm === 'menu'">
+        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="560px" :fullscreen="isMobile" :close-on-click-modal="false">
+            <el-form ref="formRef" :rules="menuRules" :model="formData" label-width="100px" v-if="currentForm === 'menu'">
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="菜单名称">
-                            <el-input v-model="formData.label" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="菜单类型" prop="type">
+                            <el-radio-group v-model="formData.type">
+                                <el-radio-button label="目录" :value="0" />
+                                <el-radio-button label="菜单" :value="1" />
+                                <el-radio-button label="Iframe" :value="2" />
+                                <el-radio-button label="外链" :value="3" />
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="父级菜单" prop="parent">
+                            <el-cascader
+                                style="width: 100%"
+                                :key="isResourceShow"
+                                :show-all-levels="false"
+                                :options="options"
+                                v-model="formData.parent"
+                                @change="handleChange"
+                                :props="{ checkStrictly: true ,label:'name',value:'id'}"
+                                clearable></el-cascader>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="菜单名称" prop="name">
+                            <el-input v-model="formData.name" />
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="图标">
+                        <el-form-item label="菜单图标" prop="icon">
                             <icon-selector v-model="formData.icon" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                        <el-form-item label="菜单排序" prop="sort">
+                            <el-input-number v-model="formData.sort" controls-position="right" />
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="路径">
-                            <el-input v-model="formData.path" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="路由地址" prop="web_path" :rules="formData?.type !=0?menuWebPathRule:[]">
+                            <el-input v-model="formData.web_path" />
                         </el-form-item>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="组件名称" prop="component_name">
+                            <el-input v-model="formData.component_name" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="组件路径">
                             <el-input v-model="formData.component" />
                         </el-form-item>
@@ -146,13 +179,18 @@
                 </el-row>
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="排序">
-                            <el-input-number v-model="formData.sort" controls-position="right" />
+                        <el-form-item label="侧边可见" prop="visible">
+                            <el-switch v-model="formData.visible" inline-prompt active-text="是" inactive-text="否"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="是否隐藏">
-                            <el-switch v-model="formData.hidden" />
+                        <el-form-item label="是否缓存" prop="cache">
+                            <el-switch v-model="formData.cache" inline-prompt active-text="是" inactive-text="否"/>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                        <el-form-item label="菜单状态" prop="status">
+                            <el-switch v-model="formData.status" inline-prompt active-text="启用" inactive-text="禁用"/>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -295,6 +333,32 @@
         ]
     )
 
+    let menuRules = {
+        /* parent: [
+            {required: true, message: '请选择父级菜单',trigger: 'blur'}
+        ],*/
+        name: [
+            {required: true, message: '请输入菜单名称',trigger: 'blur'}
+        ],
+        sort: [
+            {required: true, message: '请输入排序',trigger: 'blur'}
+        ],
+        // icon: [
+        //     {required: true, message: '请填充图标',trigger: 'blur'}
+        // ],
+        // web_path: [
+        //     {required: true, message: '请输入路由地址',trigger: 'blur'}
+        // ],
+    }
+
+    let menuWebPathRule = [
+        {
+          required: true,
+          message: '请输入路由地址',
+          trigger: 'blur',
+        },
+    ]
+
     // 响应式变量
     const selectedMenu = ref(null)
     const searchQuery = ref('')
@@ -355,14 +419,19 @@
         currentForm.value = 'menu'
         dialogTitle.value = '新增菜单'
         formData.value = {
-            id: Date.now(),
-            parentId: selectedMenu.value ? selectedMenu.value.id : 0,
-            label: '',
+            id: "",
+            parent: selectedMenu.value ? selectedMenu.value.id : 0,
+            name: '',
             icon: '',
-            path: '',
+            web_path: '',
             component: '',
+            component_name: '',
+            link_url:'',
+            type:0,
             sort: 0,
-            hidden: false,
+            cache: false,
+            status: true,
+            visible:true,
             buttons: [],
             columns: []
         }

@@ -1,4 +1,4 @@
-const svgModules = import.meta.glob('./svg/*.svg', { eager: true })
+const svgModules = import.meta.glob('/src/assets/lybbn/icons/svg/*.svg', { eager: true })
 
 function getIconList() {
     let iconList = []

@@ -1,26 +1,48 @@
-## 简介
+# dvlyadmin-mini 精简版介绍
 
-dvlyadmin-mini是专为追求页面极致效果的小伙伴设计的一套django-vue-lyadmin的精简版，大量重构架构，去除无用冗余代码做到小而精，前端采用vite+vue3+elementplus，支持适配手机端，助力快速开发项目及提升项目质量！！！
+## 🌟 简介
 
-## 技术
+**dvlyadmin-mini** 是专为追求页面极致效果的开发者设计的一套 **django-vue-lyadmin** 的精简版。我们通过大量重构架构，去除了无用冗余代码，力求做到小而精。前端采用 **Vite + Vue 3 + Element Plus**，支持适配手机端，助力快速开发项目及提升项目质量！
 
-前端：
+### 主要特性：
 
-vite
-vue3
-elementplus
-js setup 语法
+- 💻 **前端技术栈**：Vue 3 + Setup JS + Pinia + Element Plus
+- 🖥️ **后端技术栈**：Python 语言 Django 框架以及强大的 [Django REST Framework](https://pypi.org/project/djangorestframework)
+- 🔒 **认证系统**：使用 [Django REST Framework SimpleJWT](https://pypi.org/project/djangorestframework-simplejwt)，支持多终端认证系统
+- ⚙️ **权限管理**：支持加载动态权限菜单，提供多种方式轻松实现权限控制
+- 📊 **列权限管控**：全新的列权限管理机制，粒度细化到每一列
 
+---
 
-## 优势
+## 💻 技术栈
 
-1、页面简洁美观
-2、支持适配手机端
-3、代码精简，开发项目基本无需再删减代码
+### 前端
 
-## 疑问
+- **构建工具**：[Vite](https://vitejs.dev/)
+- **框架**：[Vue 3](https://vuejs.org/)
+- **UI 组件库**：[Element Plus](https://element-plus.org/)
+- **编程模式**：JavaScript Setup 语法
 
-1. 能不能与django-vue-lyadmin完美契合
+---
 
-不能，dvlyadmin-mini采用的是vite，且框架方面做了完全重构，不能完全替换。但使用方式大体一致
+## 💪 优势
 
+1. **页面简洁美观** - 极致的设计理念，带来清爽的视觉体验。
+2. **响应式设计** - 完美适配手机端，随时随地高效工作。
+3. **代码精简高效** - 开发项目时基本无需再删减代码，专注于业务逻辑。
+
+---
+
+## ❓ 常见问题解答
+
+### 能否与 django-vue-lyadmin 完美契合？
+
+**答**：虽然 dvlyadmin-mini 在设计理念上与 django-vue-lyadmin 相似，但由于它采用了 **Vite** 进行构建，并且在框架方面进行了完全重构，因此不能直接替换原有的 django-vue-lyadmin。不过，两者在使用方式上有很大的相似性，如果你熟悉 django-vue-lyadmin，那么过渡到 dvlyadmin-mini 将会非常顺畅。
+
+---
+
+### 额外提示
+
+- 如果你希望进一步定制或扩展你的应用，dvlyadmin_pro 提供了更丰富的功能，确保你能快速上手并进行个性化调整。
+
+---

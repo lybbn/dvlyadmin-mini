@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [
     vue(),
     createSvgIconsPlugin({
-      iconDirs: [resolve(process.cwd(), 'src/components/icons/svg')], // 你的 SVG 目录
+      iconDirs: [resolve(process.cwd(), 'src/assets/lybbn/icons/svg')], // 你的 SVG 目录
       symbolId: 'icon-[name]', // 格式必须和 `iconName` 计算属性匹配
     }),
   ],

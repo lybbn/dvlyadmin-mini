@@ -36,7 +36,7 @@ npm run build:backend
 
 1. 怎么自定义的icon？
 
-答：把自定义的svg文件放入```src/compontnts/icons/svg```中即可
+答：把自定义的svg文件放入```src/assets/lybbn/icons/svg```中即可
 
 2. 前端配置文件在哪？
 
