@@ -7,6 +7,8 @@ Api.getCaptcha = params => ajaxGet({url: `/api/captcha/`,params})
 Api.getToken = params => ajaxPost({url: `/api/token/`,params})
 // 刷新登录token
 Api.refreshToken = params => ajaxPost({url: `/api/token/refresh/`,params})
+// 获取菜单
+Api.apiSystemWebRouter = params => ajaxGet({url: `/api/system/menu/web_router/`,params})
 
 /**
  *个人中心
@@ -17,5 +19,19 @@ Api.systemUserUserInfo= params => ajaxGet({url: `/api/system/user/user_info/`,pa
 Api.systemUserUserInfoEdit= params => ajaxPut({url: `/api/system/user/user_info/`,params})
 // 用户重置个人密码
 Api.systemUserChangePassword= params => ajaxPut({url: `/api/system/user/change_password/`,params})
+
+/**
+ *菜单管理
+ * */
+// 菜单管理列表
+Api.apiSystemMenu = params => ajaxGet({url: `/api/system/menu/`,params})
+// 菜单管理列表 -- 新增菜单
+Api.apiSystemMenuAdd = params => ajaxPost({url: `/api/system/menu/`,params})
+// 菜单管理列表 -- 编辑菜单
+Api.apiSystemMenuEdit = params => ajaxPut({url: `/api/system/menu/`,params})
+// 菜单管理列表 -- 删除菜单
+Api.apiSystemMenuDelete = params => ajaxDelete({url: `/api/system/menu/`,params})
+// 菜单管理列表 -- 新增菜单
+Api.apiSystemMenuUpdateSort = params => ajaxPost({url: `/api/system/menu/update_sort/`,params})
 
 export default Api

@@ -3,13 +3,14 @@
         <el-row :gutter="10" class="main-row">
             <!-- 左侧菜单树 -->
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" class="left-panel">
-                <el-card shadow="hover" class="glass-card menu-card">
+                <el-card shadow="hover" class="glass-card menu-card" v-loading="loadingMenuPage">
                     <template #header>
                         <div class="card-header">
                             <h4>菜单管理 <el-tooltip
                                 class="item"
                                 effect="dark"
-                                content="支持拖拽菜单位置"
+                                raw-content
+                                content="<div>1、支持拖拽菜单排序。</div><div>2、只有类型为【菜单】才能做【权限配置】。</div><div>3、配置sort时尽量间隔数值大一些。</div>"
                                 placement="right">
                                 <el-icon><question-filled /></el-icon>
                                 </el-tooltip>
@@ -26,6 +27,7 @@
                             :data="filteredMenus"
                             node-key="id"
                             default-expand-all
+                            :expand-on-click-node="false"
                             draggable
                             :allow-drop="allowDrop"
                             :props="defaultProps"
@@ -35,13 +37,14 @@
                             <template #default="{ node, data }">
                                 <span class="tree-node" :class="'level-' + getLevel(data)">
                                     <span class="tree-node-content">
-                                    <el-icon><component :is="data.icon || 'Document'" /></el-icon>
+                                    <el-icon><component :is="data.icon || 'Menu'" /></el-icon>
                                     <span class="node-label">{{ node.label }}</span>
                                     <div class="actions">
+                                        <el-button link type="info" size="small" @click.stop="">排序({{ data.sort }})</el-button>
                                         <el-button link type="primary" size="small" @click.stop="editMenu(data)">编辑</el-button>
                                         <el-button link type="danger" size="small" @click.stop="deleteMenu(data)">删除</el-button>
-                                        <el-button link type="info" size="small" @click.stop="moveUp(data)">上移</el-button>
-                                        <el-button link type="info" size="small" @click.stop="moveDown(data)">下移</el-button>
+                                        <el-button link type="primary" size="small" @click.stop="moveUp(data)">上移</el-button>
+                                        <el-button link type="primary" size="small" @click.stop="moveDown(data)">下移</el-button>
                                     </div>
                                     </span>
                                 </span>
@@ -54,9 +57,9 @@
             <!-- 右侧权限配置 -->
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16" class="right-panel">
                 <transition name="fade" mode="out-in">
-                    <el-card shadow="hover" class="glass-card permission-card" v-if="selectedMenu">
+                    <el-card shadow="hover" class="glass-card permission-card" v-if="selectedMenu && selectedMenu.type === 1">
                         <template #header>
-                            <h4>权限配置 - {{ selectedMenu.label }}</h4>
+                            <h4>权限配置 - {{ selectedMenu.name }}</h4>
                         </template>
 
                         <el-tabs v-model="activeTab" :stretch="isMobile">
@@ -65,6 +68,7 @@
                                 <el-button type="primary" icon="Plus" @click="openButtonDialog">添加按钮权限</el-button>
                                 <el-table :data="selectedMenu.buttons" row-key="id" border stripe style="margin-top: 10px;">
                                     <el-table-column prop="name" label="按钮名称" width="150" />
+                                    <el-table-column prop="value" label="权限值" width="150" />
                                     <el-table-column prop="api" label="接口地址" />
                                     <el-table-column prop="method" label="请求方法" width="120">
                                         <template #default="{ row }">
@@ -111,7 +115,7 @@
                         </el-tabs>
                     </el-card>
                     <el-card shadow="hover" class="glass-card permission-card" v-else>
-                        <el-empty description="请选择左侧菜单"/>
+                        <el-empty description="请选择左侧菜单、类型为【菜单】才允许配置权限"/>
                     </el-card>
                 </transition>
             </el-col>
@@ -119,7 +123,7 @@
 
         <!-- 弹窗表单 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="560px" :fullscreen="isMobile" :close-on-click-modal="false">
-            <el-form ref="formRef" :rules="menuRules" :model="formData" label-width="100px" v-if="currentForm === 'menu'">
+            <el-form ref="formRefm" :rules="menuRules" :model="formData" label-width="100px" v-if="currentForm === 'menu'">
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="菜单类型" prop="type">
@@ -133,15 +137,14 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="父级菜单" prop="parent">
-                            <el-cascader
-                                style="width: 100%"
-                                :key="isResourceShow"
-                                :show-all-levels="false"
-                                :options="options"
-                                v-model="formData.parent"
-                                @change="handleChange"
-                                :props="{ checkStrictly: true ,label:'name',value:'id'}"
-                                clearable></el-cascader>
+                            <el-tree-select v-model="formData.parent" node-key="id" :data="menus"
+                                            check-strictly filterable clearable :render-after-expand="false"
+                                            :props="{label:'name',value: 'id'}"
+                                            style="width: 100%" placeholder="请选择/为空则为顶级" >
+                                <template #default="{ data: { name,sort } }">
+                                    {{ name }}<span style="float: right;color: gray;font-size: 12px;">排序({{ sort }})</span>
+                                </template>
+                            </el-tree-select>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -161,19 +164,24 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                        <el-form-item label="路由地址" prop="web_path" :rules="formData?.type !=0?menuWebPathRule:[]">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===0 || formData?.type ===1">
+                        <el-form-item label="路由地址" prop="web_path" :rules="formData?.type ===1?menuWebPathRule:[]">
                             <el-input v-model="formData.web_path" />
                         </el-form-item>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===1">
                         <el-form-item label="组件名称" prop="component_name">
                             <el-input v-model="formData.component_name" />
                         </el-form-item>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===1">
                         <el-form-item label="组件路径">
                             <el-input v-model="formData.component" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===2 || formData?.type ===3">
+                        <el-form-item label="链接地址" :rules="formData?.type ===2|| formData?.type ===3?menuLinkurlRule:[]">
+                            <el-input v-model="formData.link_url" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -183,9 +191,9 @@
                             <el-switch v-model="formData.visible" inline-prompt active-text="是" inactive-text="否"/>
                         </el-form-item>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" v-if="formData?.type ===1">
                         <el-form-item label="是否缓存" prop="cache">
-                            <el-switch v-model="formData.cache" inline-prompt active-text="是" inactive-text="否"/>
+                            <el-switch v-model="formData.cache" inline-prompt active-text="是" inactive-text="否" />
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -196,34 +204,55 @@
                 </el-row>
             </el-form>
 
-            <el-form ref="formRef" :model="formData" label-width="100px" v-if="currentForm === 'button'">
+            <el-form ref="formRefb" :model="formData" label-width="100px" v-if="currentForm === 'button'">
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="按钮名称">
-                            <el-input v-model="formData.name" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="接口地址">
-                            <el-input v-model="formData.api" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="请求方法">
-                            <el-select v-model="formData.method" placeholder="请选择" style="width: 100%">
-                                <el-option label="GET" value="GET" />
-                                <el-option label="POST" value="POST" />
-                                <el-option label="PUT" value="PUT" />
-                                <el-option label="DELETE" value="DELETE" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="按钮名称" prop="name">
+                            <el-select v-model="formData.name" allow-create filterable placeholder="请选择" :size="size" style="width: 360px" @change="getName">
+                                <el-option
+                                    v-for="item in buttonList"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.name">
+                                </el-option>
                             </el-select>
+                            <el-button type="primary" circle style="margin-left: 20px" :size="size"  @click="onLinkBtn"><el-icon><circle-plus /></el-icon></el-button>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="权限值" prop="value">
+                            <el-input v-model="formData.value" />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="请求方法" prop="method">
+                            <el-select v-model="formData.method" placeholder="请选择" style="width: 100%">
+                                <el-option label="GET" :value="0" />
+                                <el-option label="POST" :value="1" />
+                                <el-option label="PUT" :value="2" />
+                                <el-option label="DELETE" :value="3" />
+                                <el-option label="OPTIONS" :value="4" />
+                                <el-option label="WS" :value="5" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="接口地址：" prop="api">
+                            <el-select  v-model.trim="formData.api" :size="size" filterable clearable  allow-create style="margin-bottom: 5px;width: 100%;" placeholder="请选择或手动输入">
+                                <el-option
+                                    v-for="item in apiList"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                            <el-alert title="请正确填写(或选择)，以免请求时被拦截。匹配编辑/详情/删除使用正则,如:/api/xxx/{id}/" type="info" show-icon/>
                         </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
 
-            <el-form ref="formRef" :model="formData" label-width="100px" v-if="currentForm === 'column'">
+            <el-form ref="formRefc" :model="formData" label-width="100px" v-if="currentForm === 'column'">
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                         <el-form-item label="字段名称">
@@ -261,16 +290,23 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+    import { ref, computed, watch, onMounted, onBeforeUnmount,nextTick } from 'vue'
     import { ElMessage, ElMessageBox } from 'element-plus'
     import IconSelector from '@/components/icons/IconSelector.vue'
+    import Api from "@/api/api.js"
+    import {deepClone} from "@/utils/util.js"
+    import XEUtils from "xe-utils";
+
+    let formRefm = ref(null)
+    let formRefb = ref(null)
+    let formRefmc = ref(null)
 
     // 数据源
     const menus = ref([
         {
-            id: 1,
-            parentId: 0,
-            label: '仪表盘',
+            id: "1",
+            parent: null,
+            name: '仪表盘',
             icon: 'HomeFilled',
             path: '/dashboard',
             component: 'Dashboard',
@@ -280,9 +316,9 @@
             columns: []
         },
         {
-            id: 2,
-            parentId: 0,
-            label: '系统管理',
+            id: "2",
+            parent: null,
+            name: '系统管理',
             icon: 'Setting',
             path: '/system',
             component: 'Layout',
@@ -290,9 +326,9 @@
             hidden: false,
             children: [
             {
-                id: 3,
-                parentId: 2,
-                label: '用户管理',
+                id: "3",
+                parent: "2",
+                name: '用户管理',
                 icon: 'User',
                 path: 'user',
                 component: 'System/User',
@@ -309,9 +345,9 @@
                 ]
             },
             {
-                id: 4,
-                parentId: 2,
-                label: '角色管理',
+                id: "4",
+                parent: "2",
+                name: '角色管理',
                 icon: 'Avatar',
                 path: 'role',
                 component: 'System/Role',
@@ -332,7 +368,7 @@
         
         ]
     )
-
+    let buttonList = ref([])
     let menuRules = {
         /* parent: [
             {required: true, message: '请选择父级菜单',trigger: 'blur'}
@@ -359,12 +395,21 @@
         },
     ]
 
+    let menuLinkurlRule = [
+        {
+          required: true,
+          message: '请输入链接地址',
+          trigger: 'blur',
+        },
+    ]
+
     // 响应式变量
     const selectedMenu = ref(null)
     const searchQuery = ref('')
     const dialogVisible = ref(false)
     const dialogTitle = ref('新增')
     const currentForm = ref('menu')
+    let currentSaveMode = ref('add')
     const formData = ref({})
     const activeTab = ref('button')
     const menuTree = ref(null)
@@ -373,20 +418,20 @@
     // 默认属性
     const defaultProps = {
         children: 'children',
-        label: 'label'
+        label: 'name'
     }
 
     // 计算属性
     const filteredMenus = computed(() => {
     if (!searchQuery.value) return menus.value
         const key = searchQuery.value.toLowerCase()
-        return filterNodes(JSON.parse(JSON.stringify(menus.value)), key)
+        return filterNodes(deepClone(menus.value), key)
     })
 
     // 方法
     function filterNodes(nodes, key) {
         return nodes.filter(node => {
-            const match = node.label.toLowerCase().includes(key)
+            const match = node.name.toLowerCase().includes(key)
             if (node.children) {
                 node.children = filterNodes(node.children, key)
             }
@@ -396,10 +441,10 @@
 
     function getLevel(node) {
         let level = 0
-        let parent = findParent(menus.value, node.parentId)
+        let parent = findParent(menus.value, node.parent)
         while (parent) {
             level++
-            parent = findParent(menus.value, parent.parentId)
+            parent = findParent(menus.value, parent.parent)
         }
         return level
     }
@@ -417,10 +462,11 @@
 
     function addMenu() {
         currentForm.value = 'menu'
+        currentSaveMode.value = 'add'
         dialogTitle.value = '新增菜单'
         formData.value = {
             id: "",
-            parent: selectedMenu.value ? selectedMenu.value.id : 0,
+            parent: selectedMenu.value ? selectedMenu.value.id : "",
             name: '',
             icon: '',
             web_path: '',
@@ -440,8 +486,9 @@
 
     function editMenu(data) {
         currentForm.value = 'menu'
+        currentSaveMode.value = 'edit'
         dialogTitle.value = '编辑菜单'
-        formData.value = JSON.parse(JSON.stringify(data))
+        formData.value = deepClone(data)
         dialogVisible.value = true
     }
 
@@ -451,9 +498,17 @@
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() => {
-            removeNode(menus.value, data.id)
-            selectedMenu.value = null
-            ElMessage.success('删除成功')
+            Api.apiSystemMenuDelete().then(res=>{
+                if(res.code === 2000){
+                    removeNode(menus.value, data.id)
+                    selectedMenu.value = null
+                    ElMessage.success('删除成功')
+                    getMenuData()
+                }else{
+                    ElMessage.warning(res.msg)
+                }
+            })
+            
         })
     }
 
@@ -472,29 +527,74 @@
         return false
     }
 
+    function updateSortToServer(nodes){
+        const payload = {
+            menus: nodes.map(node => ({
+                id: node.id,
+                sort: node.sort,
+                parent:node.parent
+            }))
+        }
+        Api.apiSystemMenuUpdateSort(payload).then(res=>{
+            if(res.code === 2000){
+                getMenuData()
+                ElMessage.success(res.msg)
+            }else{
+                getMenuData()
+                ElMessage.warning(res.msg)
+            }
+        })
+    }
+
     function moveUp(data) {
-        const parent = findParent(menus.value, data.parentId)
+        const parent = findParent(menus.value, data.parent)
         const list = parent ? parent.children : menus.value
         const index = list.findIndex(i => i.id === data.id)
         if (index > 0) {
-            [list[index], list[index - 1]] = [list[index - 1], list[index]]
-            refreshTree()
+            // 先定义变量
+            const currentNode = list[index]
+            const prevNode = list[index - 1]
+
+            // 交换位置
+            list[index] = prevNode
+            list[index - 1] = currentNode
+
+            // 交换排序值
+            const tempSort = currentNode.sort
+            currentNode.sort = prevNode.sort
+            prevNode.sort = tempSort
+
+            // 提交排序到后端
+            updateSortToServer([currentNode, prevNode])
         }
     }
 
     function moveDown(data) {
-        const parent = findParent(menus.value, data.parentId)
-        const list = parent ? parent.children : menus.value
-        const index = list.findIndex(i => i.id === data.id)
+        const parent = findParent(menus.value, data.parent);
+        const list = parent ? parent.children : menus.value;
+        const index = list.findIndex(i => i.id === data.id);
+        
         if (index < list.length - 1) {
-            [list[index], list[index + 1]] = [list[index + 1], list[index]]
-            refreshTree()
+            // 先定义变量（避免解构赋值的顺序问题）
+            const currentNode = list[index];
+            const nextNode = list[index + 1];
+
+            // 交换位置（直接赋值，不使用解构）
+            list[index] = nextNode;
+            list[index + 1] = currentNode;
+
+            // 交换排序值
+            const tempSort = currentNode.sort;
+            currentNode.sort = nextNode.sort;
+            nextNode.sort = tempSort;
+
+            updateSortToServer([currentNode, nextNode]);
         }
     }
 
     function refreshTree() {
         // 强制刷新树组件
-        const data = JSON.parse(JSON.stringify(menus.value))
+        const data = deepClone(menus.value)
         menus.value = []
         nextTick(() => {
             menus.value = data
@@ -520,19 +620,73 @@
     }
 
     function onDrop(draggingNode, dropNode, type) {
-        // 更新父节点ID和排序
-        const node = draggingNode.data
-        if (type === 'inner') {
-            node.parentId = dropNode.data.id
-        } else {
-            node.parentId = dropNode.data.parentId
+        console.log(menus.value,111)
+        //draggingNode 拖拽的节点 、dropNode拖拽的目标节点、type 拖拽放置的类型（相对拖拽后的目标节点）
+        let currentNode = draggingNode.data
+        let tmpcsort = currentNode.sort
+        let targetData = dropNode.data;
+        let tmptsort = targetData.sort
+        let yxIndex;//受影响的上一个或下一个节点索引
+
+        // 获取新父级 & 新兄弟节点
+        let newParent = findParent(menus.value, targetData.parent);
+        let newSiblings = newParent ? newParent.children : menus.value;
+        let targetIndex = newSiblings.findIndex(item => item.id === dropNode.data.id);
+
+        let modifyDataArr = []
+        let mustUpdateSameLevelSort = false //是否更新同级的所有sort
+        // 使用固定步长重新分配 sort 值（基于当前 index）
+        const baseSort = 10;
+        if (type === 'before') {
+            // 插入到 dropNode 前面
+            currentNode.parent = dropNode.data.parent
+            yxIndex = targetIndex - 2
+            currentNode.sort = tmptsort-1
+        } else if (type === 'after') {
+            // 插入到 dropNode 后面
+            currentNode.parent = dropNode.data.parent
+            yxIndex = targetIndex + 2
+            currentNode.sort = tmptsort+1
+        } else if (type === 'inner') {
+            // 成为 dropNode 的子节点
+            currentNode.parent = dropNode.data.id
+            yxIndex = newSiblings.length;
+        }
+
+        let yxdata = newSiblings[yxIndex] || null
+        if(yxdata && yxdata.sort == currentNode.sort){
+            mustUpdateSameLevelSort = true
+            newSiblings.forEach((item, index)=>{
+                item.sort = (index + 1) * baseSort
+                modifyDataArr.push(item)
+            })
+        }else{
+            modifyDataArr.push(currentNode)
         }
         
+        updateSortToServer(modifyDataArr);
         // 更新排序
-        const parent = findParent(menus.value, node.parentId)
-        const list = parent ? parent.children : menus.value
-        list.forEach((item, index) => {
-            item.sort = index + 1
+        // const parent = findParent(menus.value, currentNode.parent)
+        // let list = parent ? parent.children : menus.value
+        // list.forEach((item, index) => {
+        //     item.sort = index + 1
+        // })
+        // refreshTree();
+    }
+
+    let loadingMenuPage = ref(false)
+    function getMenuData(){
+        loadingMenuPage.value = true
+        let params = {
+            page:1,
+            limit:999
+        }
+        Api.apiSystemMenu(params).then(res=>{
+            loadingMenuPage.value = false
+            if(res.code === 2000){
+                // 将列表数据转换为树形数据
+                menus.value = XEUtils.toArrayTree(res.data.data, { parentKey: 'parent' })
+            }
         })
     }
 
@@ -542,10 +696,11 @@
 
     function openButtonDialog() {
         currentForm.value = 'button'
+        currentSaveMode.value = 'add'
         dialogTitle.value = '新增按钮权限'
         formData.value = {
-            id: Date.now(),
-            name: '',
+            name:'',
+            value: '',
             api: '',
             method: 'GET'
         }
@@ -554,6 +709,7 @@
 
     function editButton(index) {
         currentForm.value = 'button'
+        currentSaveMode.value = 'edit'
         dialogTitle.value = '编辑按钮权限'
         formData.value = JSON.parse(JSON.stringify(selectedMenu.value.buttons[index]))
         dialogVisible.value = true
@@ -566,6 +722,7 @@
 
     function openColumnDialog() {
         currentForm.value = 'column'
+        currentSaveMode.value = 'add'
         dialogTitle.value = '新增列权限'
         formData.value = {
             id: Date.now(),
@@ -579,6 +736,7 @@
 
     function editColumn(index) {
         currentForm.value = 'column'
+        currentSaveMode.value = 'edit'
         dialogTitle.value = '编辑列权限'
         formData.value = JSON.parse(JSON.stringify(selectedMenu.value.columns[index]))
         dialogVisible.value = true
@@ -589,15 +747,33 @@
         ElMessage.success('删除成功')
     }
 
-    function saveData() {
+    async function saveData() {
         if (currentForm.value === 'menu') {
-            const targetList = formData.value.parentId === 0 ? menus.value : findParent(menus.value, formData.value.parentId)?.children || []
-            const idx = targetList.findIndex(i => i.id === formData.value.id)
-            if (idx !== -1) {
-                targetList.splice(idx, 1, { ...formData.value })
-            } else {
-                targetList.push({ ...formData.value })
+            try {
+                await formRefm.value.validate()
+                loadingMenuPage.value=true
+                let param = {
+                    ...formData.value
+                }
+                let apiObj = Api.apiSystemMenuAdd
+                if(currentSaveMode.value == 'edit'){
+                    apiObj = Api.apiSystemMenuEdit
+                }
+                apiObj(param).then(res=>{
+                    loadingMenuPage.value=false
+                    if(res.code ==2000) {
+                        getMenuData()
+                    } else {
+                        ElMessage.warning(res.msg)
+                        return
+                    }
+                })
+                
+            } catch (error) {
+                // console.log('表单验证失败！', error)
+                return
             }
+            
         } else if (currentForm.value === 'button') {
             const idx = selectedMenu.value.buttons.findIndex(i => i.id === formData.value.id)
             if (idx !== -1) {
@@ -636,6 +812,7 @@
     onMounted(() => {
         checkMobile()
         window.addEventListener('resize', checkMobile)
+        getMenuData()
     })
 
     onBeforeUnmount(() => {
@@ -679,6 +856,10 @@
         &::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 3px;
+        }
+
+        :deep(.el-tree-node__content>.el-tree-node__expand-icon) {
+            padding: unset;
         }
     }
 

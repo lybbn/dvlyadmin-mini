@@ -7,9 +7,10 @@ from rest_framework import serializers
 
 from mysystem.models import Menu, MenuButton, Button
 from mysystem.views.menu_button import MenuButtonSerializer
-from utils.jsonResponse import SuccessResponse
+from utils.jsonResponse import SuccessResponse,DetailResponse,ErrorResponse
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
+from utils.common import get_parameter_dic,ast_convert
 from django.db.models import Q
 from rest_framework.decorators import action
 
@@ -20,14 +21,6 @@ class MenuSerializer(CustomModelSerializer):
     """
     菜单表的简单序列化器
     """
-    menuPermission = serializers.SerializerMethodField(read_only=True)
-
-    def get_menuPermission(self, instance):
-        queryset = MenuButton.objects.filter(menu=instance.id).order_by('-name').values_list('name', flat=True)
-        if queryset:
-            return queryset
-        else:
-            return None
 
     class Meta:
         model = Menu
@@ -82,29 +75,11 @@ class WebRouterSerializer(CustomModelSerializer):
     """
     前端菜单路由的简单序列化器
     """
-    path = serializers.CharField(source="web_path")
-    title = serializers.CharField(source="name")
-    menuPermission = serializers.SerializerMethodField(read_only=True)
-
-    def get_menuPermission(self, instance):
-        # 判断是否是超级管理员
-        if self.request.user.is_superuser:
-            return instance.menuPermission.values_list('value', flat=True)
-        else:
-            # 根据当前角色获取权限按钮id集合
-            permissionIds = list(self.request.user.role.values_list('permission', flat=True))
-            #获取当前菜单的按钮权限vlaue
-            queryset = instance.menuPermission.filter(id__in=permissionIds, menu=instance.id).values_list('value', flat=True)
-            if queryset:
-                return queryset
-            else:
-                return None
 
     class Meta:
         model = Menu
-        fields = "__all__"
+        fields = ('id', 'parent', 'icon', 'sort', 'web_path', 'name', 'type','link_url', 'component','component_name', 'cache', 'visible', 'status')
         read_only_fields = ["id"]
-
 
 class MenuViewSet(CustomModelViewSet):
     """
@@ -112,7 +87,7 @@ class MenuViewSet(CustomModelViewSet):
     list:查询
     create:新增
     update:修改
-    retrieve:单例
+    retrieve:详情
     destroy:删除
     """
     queryset = Menu.objects.all().order_by('sort')
@@ -122,19 +97,48 @@ class MenuViewSet(CustomModelViewSet):
     filterset_fields = ['name', 'status','visible']
     search_fields = ['name','web_path']
 
+    def update_sort(self,request):
+        """菜单排序（上移、下移、拖拽）"""
+        reqData = get_parameter_dic(request)
+        menu_list = ast_convert(reqData.get("menus", []))
+        if not menu_list:return ErrorResponse(msg="没有提供数据")
+        menu_ids = [item['id'] for item in menu_list]
+        if not menu_ids:return ErrorResponse(msg="参数错误")
+        menus = Menu.objects.filter(id__in=menu_ids)
+        menu_dict = {menu.id: menu for menu in menus}
+
+        # 更新 sort 字段
+        updated_menus = []
+        for item in menu_list:
+            menu_id = item['id']
+            sort_value = item['sort']
+            parent_value = item['parent'] if item['parent'] else None
+            if menu_id in menu_dict:
+                menu_dict[menu_id].sort = sort_value
+                menu_dict[menu_id].parent_id = parent_value
+                updated_menus.append(menu_dict[menu_id])
+
+        if not updated_menus:
+            return ErrorResponse(msg="无此菜单") 
+
+        Menu.objects.bulk_update(updated_menus, ['sort','parent_id'])
+
+        return DetailResponse(msg="操作成功")
+
     def menu_tree(self, request):
         """用于菜单添加修改中获取父级菜单"""
         queryset = Menu.objects.filter(parent=None)
         serializer = MenuTreeSerializer(queryset, many=True)
         return SuccessResponse(data=serializer.data, msg="获取成功")
 
-    @action(methods=['get'],extra_filter_backends=[],detail=False)#会自动生成/api/system/menu/web_router/的路由
+    # @action(methods=['get'],extra_filter_backends=[],detail=False)#会自动生成/api/system/menu/web_router/的路由
     def web_router(self, request):
         """用于前端获取当前角色的路由"""
         user = request.user
-        queryset = self.filter_queryset(self.queryset).filter(status=1)
-        if not user.is_superuser:
+        if user.is_superuser:
+            queryset = self.queryset.filter(status=True).order_by("sort")
+        else:
             menuIds = user.role.values_list('menu__id', flat=True)
-            queryset = self.filter_queryset(Menu.objects.filter(id__in=menuIds, status=1))
+            queryset = self.filter_queryset(Menu.objects.filter(id__in=menuIds, status=True))
         serializer = WebRouterSerializer(queryset, many=True, request=request)
         return SuccessResponse(data=serializer.data, msg="获取成功")
