@@ -67,6 +67,7 @@ class LoginView(CustomAPIView):
     """
     authentication_classes = []
     permission_classes = []
+    serializer_class = LoginSerializer  # 显式声明序列化器
 
     #删除验证码
     def delete_expire_captcha(self):

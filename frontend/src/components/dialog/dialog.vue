@@ -1,11 +1,11 @@
 <!--
  * @Descripttion: 弹窗扩展组件
- * @version: 1.0
+ * @version: 1.1
  * @program: django-vue-lyadmin mini
  * @Author: lybbn
  * @Email：1042594286@qq.com
  * @Date: 2024.01.11
- * @EditDate: 2024.01.11
+ * @EditDate: 2025.05.22
 -->
 <template>
   <div class="ly-dialog">
@@ -15,7 +15,7 @@
       :title="title"
       :width="width"
       :top="top"
-      :fullscreen="screeFull"
+      :fullscreen="ismobile?true:screeFull"
       :center="center"
       :before-close="beforeClose"
       :append-to-body="appendToBody"
@@ -52,10 +52,12 @@
 </template>
   
 <script setup>
-    import { ref,watch,onMounted } from 'vue';
+    import { ref,watch,onMounted,computed } from 'vue';
+    import { useSiteThemeStore } from "@/store/siteTheme";
     import 'element-plus/es/components/dialog/style/css'
     const emits = defineEmits(['closed','onChangeFullScreen'])
 
+    const siteThemeStore = useSiteThemeStore()
     let lyDialogRef = ref(null)
     let visible = ref(false)
     let screeFull = ref(false)
@@ -111,7 +113,10 @@
       },
       beforeClose:Function// 关闭回调函数
     });
-    
+
+    let ismobile = computed(() => {
+      return siteThemeStore.ismobile
+    })
     function openDialog() {
       visible.value = true
     }

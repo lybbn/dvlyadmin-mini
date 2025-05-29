@@ -70,8 +70,8 @@ class Initialize:
             {"id": "4", "name": "新增", "value": "Create"},
             {"id": "5", "name": "查询", "value": "Search"},
             {"id": "6", "name": "保存", "value": "Save"},
-            {"id": "7", "name": "导出", "value": "Search"},
-            {"id": "8", "name": "导入", "value": "Search"},
+            {"id": "7", "name": "导出", "value": "Export"},
+            {"id": "8", "name": "导入", "value": "Import"},
             {"id": "9", "name": "修改密码", "value": "ChangePass"},
             {"id": "10", "name": "禁用", "value": "Disable"},
             {"id": "11", "name": "日志", "value": "Logs"}

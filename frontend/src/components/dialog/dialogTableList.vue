@@ -99,6 +99,10 @@ export default {
                     }
                 })
             }
+        },
+        refresh(params){
+            this.formData = Object.assign(this.formData, params)
+            this.getData()
         }
     }
 }

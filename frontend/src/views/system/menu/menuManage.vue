@@ -66,19 +66,25 @@
                             <!-- 按钮权限 -->
                             <el-tab-pane label="按钮权限配置" name="button">
                                 <el-button type="primary" icon="Plus" @click="openButtonDialog">添加按钮权限</el-button>
-                                <el-table :data="selectedMenu.buttons" row-key="id" border stripe style="margin-top: 10px;">
-                                    <el-table-column prop="name" label="按钮名称" width="150" />
-                                    <el-table-column prop="value" label="权限值" width="150" />
-                                    <el-table-column prop="api" label="接口地址" />
-                                    <el-table-column prop="method" label="请求方法" width="120">
+                                <el-button type="primary" @click="buttonBatchCreate">批量生成</el-button>
+                                <el-table :data="menuButtonList" row-key="id" border stripe style="margin-top: 10px;" v-loading="isMenuButtonListLoading">
+                                    <el-table-column type="index" width="60" label="序号">
+                                        <template #default="scope">
+                                            <span v-text="scope.$index+1"></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="name" label="按钮名称" width="120" />
+                                    <el-table-column prop="value" label="权限值" min-width="150" />
+                                    <el-table-column prop="api" label="接口地址" min-width="170"/>
+                                    <el-table-column prop="method" label="请求方法" width="100">
                                         <template #default="{ row }">
-                                            <el-tag :type="getMethodTagType(row.method)">{{ row.method }}</el-tag>
+                                            <el-tag :type="getMethodTagType(row.method)">{{ getMethodName(row.method) }}</el-tag>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="操作" width="150">
-                                        <template #default="{ $index }">
-                                            <el-button link type="primary" @click="editButton($index)">编辑</el-button>
-                                            <el-button link type="danger" @click="deleteButton($index)">删除</el-button>
+                                        <template #default="scope">
+                                            <el-button link type="primary" @click="editButton(scope.row)">编辑</el-button>
+                                            <el-button link type="danger" @click="deleteButton(scope.row)">删除</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -164,8 +170,8 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===0 || formData?.type ===1">
-                        <el-form-item label="路由地址" prop="web_path" :rules="formData?.type ===1?menuWebPathRule:[]">
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="路由地址" prop="web_path" :rules="menuWebPathRule">
                             <el-input v-model="formData.web_path" placeholder="输入路由地址：/home，相当于前端route的path属性" @input="handleWebPathInput"/>
                         </el-form-item>
                     </el-col>
@@ -204,11 +210,11 @@
                 </el-row>
             </el-form>
 
-            <el-form ref="formRefb" :model="formData" label-width="100px" v-if="currentForm === 'button'">
+            <el-form ref="formRefb" :model="formData" :rules="buttonRules" label-width="100px" v-if="currentForm === 'button'">
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="按钮名称" prop="name">
-                            <el-select v-model="formData.name" allow-create filterable placeholder="请选择" style="width: 80%">
+                            <el-select v-model="formData.name" allow-create filterable placeholder="请选择" style="width: 80%" @change="getApiButtonCode">
                                 <el-option
                                     v-for="item in buttonList"
                                     :key="item.value"
@@ -216,12 +222,12 @@
                                     :value="item.name">
                                 </el-option>
                             </el-select>
-                            <el-button type="primary" circle style="margin-left: 20px"  @click="onLinkBtn"><el-icon><circle-plus /></el-icon></el-button>
+                            <el-button type="primary" circle style="margin-left: 20px"  @click="addMenuButtonTemplateTable"><el-icon><circle-plus /></el-icon></el-button>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="权限值" prop="value">
-                            <el-input v-model="formData.value" />
+                            <el-input v-model="formData.value" placeholder="组件名:按钮权限值  需唯一"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -237,7 +243,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                        <el-form-item label="接口地址：" prop="api">
+                        <el-form-item label="接口地址" prop="api">
                             <el-select  v-model.trim="formData.api" filterable clearable  allow-create style="margin-bottom: 5px;width: 100%;" placeholder="请选择或手动输入">
                                 <el-option
                                     v-for="item in apiList"
@@ -286,6 +292,24 @@
                 </span>
             </template>
         </el-dialog>
+        <moduleMenuButton ref="moduleMenuButtonFlag" @refreshData="handleRefreshMenuButtonTData" v-if="isDialogMenuButtonVisible" @closed="isDialogMenuButtonVisible = false"></moduleMenuButton>
+        <DialogTableList ref="moduleMenuButtonTableFlag" :apiObj="Api.apiSystemButtonTemplate" width="680px" :tableIndex="true" v-if="isDialogMenuButtonTableVisible" @closed="isDialogMenuButtonTableVisible = false;getButtonTemplateData()">
+            <template v-slot:search>
+                <el-form>
+                    <el-form-item label="">
+                        <el-button type="primary" @click="handleMenuButtonTemplateAdd">新增</el-button>
+                    </el-form-item>
+                </el-form>
+            </template>
+            <el-table-column min-width="150" prop="name" label="按钮名称"></el-table-column>
+            <el-table-column min-width="150" prop="value" label="权限值"></el-table-column>
+            <el-table-column :fixed="isMobile?false:'right'" label="操作" width="120">
+                <template #default="scope">
+                    <el-button link type="primary" @click="handleMenuButtonTemplateOp(scope.row,'edit')">编辑</el-button>
+                    <el-button link type="primary" @click ="handleMenuButtonTemplateOp(scope.row,'del')">删除</el-button>
+                </template>
+            </el-table-column>
+        </DialogTableList>
     </div>
 </template>
 
@@ -296,12 +320,15 @@
     import Api from "@/api/api.js"
     import {deepClone} from "@/utils/util.js"
     import XEUtils from "xe-utils";
+    import moduleMenuButton from "./components/moduleMenuButton.vue";
+    import DialogTableList from "@/components/dialog/dialogTableList.vue"
 
     let formRefm = ref(null)
     let formRefb = ref(null)
-    let formRefmc = ref(null)
+    let formRefc = ref(null)
 
     let apiList = ref([])
+    let isMenuButtonListLoading = ref(false)
 
     // 数据源
     const menus = ref([
@@ -314,7 +341,6 @@
             component: 'Dashboard',
             sort: 1,
             hidden: false,
-            buttons: [],
             columns: []
         },
         {
@@ -336,10 +362,6 @@
                 component: 'System/User',
                 sort: 1,
                 hidden: false,
-                buttons: [
-                { id: 1, name: '新增用户', api: '/api/user', method: 'POST' },
-                { id: 2, name: '导出用户', api: '/api/user/export', method: 'GET' }
-                ],
                 columns: [
                 { id: 1, name: '用户名', query: true, create: true, edit: true },
                 { id: 2, name: '邮箱', query: true, create: true, edit: true },
@@ -355,22 +377,19 @@
                 component: 'System/Role',
                 sort: 2,
                 hidden: false,
-                buttons: [
-                { id: 3, name: '分配权限', api: '/api/role/assign', method: 'POST' }
-                ],
                 columns: [
                 { id: 4, name: '角色名称', query: true, create: true, edit: true },
                 { id: 5, name: '权限列表', query: true, create: true, edit: false }
                 ]
             }
             ],
-            buttons: [],
             columns: []
         }
         
         ]
     )
     let buttonList = ref([])
+    let menuButtonList = ref([])
     let menuRules = {
         /* parent: [
             {required: true, message: '请选择父级菜单',trigger: 'blur'}
@@ -387,6 +406,21 @@
         // web_path: [
         //     {required: true, message: '请输入路由地址',trigger: 'blur'}
         // ],
+    }
+
+    let buttonRules = {
+        name: [
+            {required: true, message: '请输入/选择按钮名称',trigger: 'blur'}
+        ],
+        value: [
+            {required: true, message: '请输入权限值',trigger: 'blur'}
+        ],
+        api: [
+            {required: true, message: '请输入接口地址',trigger: 'blur'}
+        ],
+        method: [
+            {required: true, message: '请选择接口方法',trigger: 'blur'}
+        ],
     }
 
     let menuWebPathRule = [
@@ -693,8 +727,10 @@
     }
 
     function handleNodeClick(data) {
+        menuButtonList.value = []
         selectedMenu.value = data
         activeTab.value = 'button'
+        getMenuButtonList()
     }
 
     function openButtonDialog() {
@@ -705,23 +741,47 @@
             name:'',
             value: '',
             api: '',
-            method: 'GET'
+            method: 0
         }
         dialogVisible.value = true
         getSchemeJson()
+        getButtonTemplateData()
     }
 
-    function editButton(index) {
+    function editButton(row) {
         currentForm.value = 'button'
         currentSaveMode.value = 'edit'
         dialogTitle.value = '编辑按钮权限'
-        formData.value = JSON.parse(JSON.stringify(selectedMenu.value.buttons[index]))
+        formData.value = deepClone(row)
         dialogVisible.value = true
     }
 
-    function deleteButton(index) {
-        selectedMenu.value.buttons.splice(index, 1)
-        ElMessage.success('删除成功')
+    function deleteButton(row) {
+        ElMessageBox.confirm('确定要删除该条数据吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+                Api.apiSystemMenuButtonDelete({id:row.id}).then(res=>{
+                if(res.code === 2000){
+                    getMenuButtonList()
+                }else{
+                    ElMessage.warning(res.msg)
+                }
+            })
+        })
+        .catch(() => {
+        })
+    }
+
+    function getMenuButtonList(){
+        isMenuButtonListLoading.value = true
+        Api.apiSystemMenuButton({page:1,limit:999}).then(res=>{
+            isMenuButtonListLoading.value = false
+            if(res.code === 2000){
+                menuButtonList.value = res.data.data
+            }
+        })
     }
 
     function openColumnDialog() {
@@ -779,12 +839,34 @@
             }
             
         } else if (currentForm.value === 'button') {
-            const idx = selectedMenu.value.buttons.findIndex(i => i.id === formData.value.id)
-            if (idx !== -1) {
-                selectedMenu.value.buttons.splice(idx, 1, { ...formData.value })
-            } else {
-                selectedMenu.value.buttons.push({ ...formData.value })
+            try {
+                await formRefb.value.validate()
+                isMenuButtonListLoading.value=true
+                let param = {
+                    ...formData.value
+                }
+                let apiObj;
+                if(currentSaveMode.value == 'edit'){
+                    apiObj = Api.apiSystemMenuButtonEdit
+                }else{
+                    apiObj = Api.apiSystemMenuButtonAdd
+                    param['menu'] = selectedMenu.value.id
+                }
+                apiObj(param).then(res=>{
+                    isMenuButtonListLoading.value=false
+                    if(res.code ==2000) {
+                        getMenuButtonList()
+                    } else {
+                        ElMessage.warning(res.msg)
+                        return
+                    }
+                })
+                
+            } catch (error) {
+                // console.log('表单验证失败！', error)
+                return
             }
+
         } else if (currentForm.value === 'column') {
             const idx = selectedMenu.value.columns.findIndex(i => i.id === formData.value.id)
             if (idx !== -1) {
@@ -800,10 +882,22 @@
 
     function getMethodTagType(method) {
         switch (method) {
-            case 'GET': return 'success'
-            case 'POST': return 'primary'
-            case 'PUT': return 'warning'
-            case 'DELETE': return 'danger'
+            case 0: return 'success'
+            case 1: return 'primary'
+            case 2: return 'warning'
+            case 3: return 'danger'
+            default: return ''
+        }
+    }
+
+    function getMethodName(method) {
+        switch (method) {
+            case 0: return 'GET'
+            case 1: return 'POST'
+            case 2: return 'PUT'
+            case 3: return 'DELETE'
+            case 4: return 'OPTIONS'
+            case 5: return 'WS'
             default: return ''
         }
     }
@@ -830,6 +924,90 @@
             }
             apiList.value = data
         })
+    }
+
+    let moduleMenuButtonTableFlag = ref(null)
+    let isDialogMenuButtonTableVisible = ref(false)
+    function addMenuButtonTemplateTable(){
+        isDialogMenuButtonTableVisible.value = true
+        nextTick(() => {
+            moduleMenuButtonTableFlag.value.handleOpen(null, "按钮模板")
+        })
+    }
+
+    let moduleMenuButtonFlag = ref(null)
+    let isDialogMenuButtonVisible = ref(false)
+    function handleMenuButtonTemplateAdd(){
+        isDialogMenuButtonVisible.value = true
+        nextTick(() => {
+            moduleMenuButtonFlag.value.handleOpen(null, "新增按钮模板")
+        })
+    }
+
+    function handleRefreshMenuButtonTData(){
+        moduleMenuButtonTableFlag.value.refresh()
+    }
+
+    function handleMenuButtonTemplateOp(row,op){
+        if(op === 'edit'){
+            isDialogMenuButtonVisible.value = true
+            nextTick(() => {
+                moduleMenuButtonFlag.value.handleOpen(row, "编辑按钮模板")
+            })
+        }else if(op === 'del'){
+            ElMessageBox.confirm('确定要删除该条数据吗?', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning'
+			}).then(() => {
+				 Api.apiSystemButtonTemplateDelete({id:row.id}).then(res=>{
+                    if(res.code === 2000){
+                        handleRefreshMenuButtonTData()
+                    }else{
+                        ElMessage.warning(res.msg)
+                    }
+                })
+			})
+			.catch(() => {
+			})
+        }
+    }
+
+    function getButtonTemplateData(){
+        Api.apiSystemButtonTemplate({page:1,limit:999}).then(res=>{
+            if(res.code === 2000){
+                buttonList.value = res.data.data
+            }
+        })
+    }
+
+    function getApiButtonCode(val){
+        // 根据 val 找到对应的完整 item
+        const selectedItem = buttonList.value.find(item => item.name === val);
+        if(selectedItem){
+            formData.value.value = selectedMenu.value.component_name+":"+selectedItem.value
+        }
+    }
+
+    function buttonBatchCreate(){
+        if(selectedMenu.value && selectedMenu.value.type === 1){
+            ElMessageBox.prompt('', '请输入RESTful接口前缀', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputPlaceholder:'如：/api/system/menu/'
+            })
+            .then(({ value }) => {
+                Api.apiSystemMenuButtonBatchGenerate({'menu':selectedMenu.value.id,'baseapi':value}).then(res=>{
+                    if(res.code === 2000){
+                        getMenuButtonList()
+                    }else{
+                        ElMessage.warning(res.msg)
+                    }
+                })
+            })
+            .catch(() => {
+            })
+        }
     }
 
     // 生命周期钩子

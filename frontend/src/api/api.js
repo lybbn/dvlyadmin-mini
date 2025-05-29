@@ -36,4 +36,24 @@ Api.apiSystemMenuDelete = params => ajaxDelete({url: `/api/system/menu/`,params}
 // 菜单管理列表 -- 新增菜单
 Api.apiSystemMenuUpdateSort = params => ajaxPost({url: `/api/system/menu/update_sort/`,params})
 
+// 获取菜单按钮模板
+Api.apiSystemButtonTemplate = params => ajaxGet({url: `/api/system/button/`,params})
+// 菜单按钮模板 -- 新增
+Api.apiSystemButtonTemplateAdd = params => ajaxPost({url: `/api/system/button/`,params})
+// 菜单按钮模板 -- 编辑
+Api.apiSystemButtonTemplateEdit = params => ajaxPut({url: `/api/system/button/`,params})
+// 菜单按钮模板 -- 删除
+Api.apiSystemButtonTemplateDelete = params => ajaxDelete({url: `/api/system/button/`,params})
+
+// 获取菜单按钮API
+Api.apiSystemMenuButton = params => ajaxGet({url: `/api/system/menu_button/`,params})
+// 菜单按钮API -- 新增
+Api.apiSystemMenuButtonAdd = params => ajaxPost({url: `/api/system/menu_button/`,params})
+// 菜单按钮API -- 编辑
+Api.apiSystemMenuButtonEdit = params => ajaxPut({url: `/api/system/menu_button/`,params})
+// 菜单按钮API -- 删除
+Api.apiSystemMenuButtonDelete = params => ajaxDelete({url: `/api/system/menu_button/`,params})
+// 菜单按钮API -- 批量生成
+Api.apiSystemMenuButtonBatchGenerate = params => ajaxPost({url: `/api/system/menu_button/batch_generate/`,params})
+
 export default Api
