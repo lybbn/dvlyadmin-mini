@@ -25,19 +25,19 @@ export const useUserState = defineStore('userState', {
             // 扁平化权限集合 (用于快速权限检查)
             permissions: {
                 menus: [],    // 可访问的菜单路径
-                buttons: {},  // {menuPath: [buttonCode1, buttonCode2]}
-                columns: {}   // {tableName: {columnName: permissionType}}
+                buttons: [],  // {menuName: [buttonCode1, buttonCode2]}  menuName 菜单组件名 有唯一性
+                columns: []   // {tableName: {columnName: permissionType}}
             }
         }
     },
 	getters:{
         // 检查是否有菜单权限
-        hasMenuPermission: (state) => (menuPath) => {
-            return state.permissions.menus.includes(menuPath)
+        hasMenuPermission: (state) => (menuName) => {
+            return state.permissions.menus.includes(menuName)
         },
         // 检查是否有按钮权限
-        hasButtonPermission: (state) => (menuPath, buttonCode) => {
-            return state.permissions.buttons[menuPath]?.includes(buttonCode) || false
+        hasButtonPermission: (state) => (menuName, buttonCode) => {
+            return state.permissions.buttons[menuName]?.includes(buttonCode) || false
         },
         // 获取列权限
         getColumnPermission: (state) => (tableName, columnName) => {

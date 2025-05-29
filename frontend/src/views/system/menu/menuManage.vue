@@ -149,7 +149,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="菜单名称" prop="name">
-                            <el-input v-model="formData.name" />
+                            <el-input v-model="formData.name" placeholder="输入菜单的名称，如：用户管理"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
@@ -166,17 +166,17 @@
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===0 || formData?.type ===1">
                         <el-form-item label="路由地址" prop="web_path" :rules="formData?.type ===1?menuWebPathRule:[]">
-                            <el-input v-model="formData.web_path" />
+                            <el-input v-model="formData.web_path" placeholder="输入路由地址：/home，相当于前端route的path属性" @input="handleWebPathInput"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===1">
                         <el-form-item label="组件名称" prop="component_name">
-                            <el-input v-model="formData.component_name" />
+                            <el-input v-model="formData.component_name" placeholder="输入组件名，相当于前端route的name属性"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===1">
                         <el-form-item label="组件路径">
-                            <el-input v-model="formData.component" />
+                            <el-input v-model="formData.component" placeholder="输入前端页面组件的位置路径"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===2 || formData?.type ===3">
@@ -208,7 +208,7 @@
                 <el-row :gutter="10">
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="按钮名称" prop="name">
-                            <el-select v-model="formData.name" allow-create filterable placeholder="请选择" :size="size" style="width: 360px" @change="getName">
+                            <el-select v-model="formData.name" allow-create filterable placeholder="请选择" style="width: 80%">
                                 <el-option
                                     v-for="item in buttonList"
                                     :key="item.value"
@@ -216,7 +216,7 @@
                                     :value="item.name">
                                 </el-option>
                             </el-select>
-                            <el-button type="primary" circle style="margin-left: 20px" :size="size"  @click="onLinkBtn"><el-icon><circle-plus /></el-icon></el-button>
+                            <el-button type="primary" circle style="margin-left: 20px"  @click="onLinkBtn"><el-icon><circle-plus /></el-icon></el-button>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
@@ -238,7 +238,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                         <el-form-item label="接口地址：" prop="api">
-                            <el-select  v-model.trim="formData.api" :size="size" filterable clearable  allow-create style="margin-bottom: 5px;width: 100%;" placeholder="请选择或手动输入">
+                            <el-select  v-model.trim="formData.api" filterable clearable  allow-create style="margin-bottom: 5px;width: 100%;" placeholder="请选择或手动输入">
                                 <el-option
                                     v-for="item in apiList"
                                     :key="item.value"
@@ -300,6 +300,8 @@
     let formRefm = ref(null)
     let formRefb = ref(null)
     let formRefmc = ref(null)
+
+    let apiList = ref([])
 
     // 数据源
     const menus = ref([
@@ -692,6 +694,7 @@
 
     function handleNodeClick(data) {
         selectedMenu.value = data
+        activeTab.value = 'button'
     }
 
     function openButtonDialog() {
@@ -705,6 +708,7 @@
             method: 'GET'
         }
         dialogVisible.value = true
+        getSchemeJson()
     }
 
     function editButton(index) {
@@ -806,6 +810,26 @@
 
     function checkMobile() {
         isMobile.value = window.innerWidth < 768
+    }
+
+    function handleWebPathInput(e){
+        if(formData.value.type === 1){
+            formData.value.component_name = e.replace(/[\/:：]/g, '')
+        }
+    }
+
+    function getSchemeJson(){
+        Api.apiSchemeJson().then(res=>{
+            var result = Object.keys(res.paths)
+            var data = []
+            for (const item of result) {
+                const obj = {}
+                obj.label = item
+                obj.value = item
+                data.push(obj)
+            }
+            apiList.value = data
+        })
     }
 
     // 生命周期钩子

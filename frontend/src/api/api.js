@@ -9,6 +9,8 @@ Api.getToken = params => ajaxPost({url: `/api/token/`,params})
 Api.refreshToken = params => ajaxPost({url: `/api/token/refresh/`,params})
 // 获取菜单
 Api.apiSystemWebRouter = params => ajaxGet({url: `/api/system/menu/web_router/`,params})
+// 获取路由json
+Api.apiSchemeJson = params => ajaxGet({url: `/api/schema/lyjson/`,params})
 
 /**
  *个人中心

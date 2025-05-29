@@ -31,7 +31,7 @@ export const CustomStaticRoutes = [
 	{
 		path: "/PersonalCenter",
 		name: 'PersonalCenter',
-		component: () => import('@/views/system/usercenter/pcenter.vue'),
+		component: () => import('@/views/system/usercenter/PersonalCenter.vue'),
 		meta: {
 			title: "个人中心",
 			requireAuth: true,
@@ -40,9 +40,20 @@ export const CustomStaticRoutes = [
 		}
 	},
 	{
+		path: "/PersonalCenters",
+		name: 'PersonalCenters',
+		component: () => import('@/views/system/usercenter/PersonalCenters.vue'),
+		meta: {
+			title: "个人中心简版",
+			requireAuth: true,
+			hidden:false,
+			icon:'User',
+		}
+	},
+	{
 		path: "/menuManage",
 		name: 'menuManage',
-		component: () => import('@/views/system/menu/index.vue'),
+		component: () => import('@/views/system/menu/menuManage.vue'),
 		meta: {
 			title: "菜单管理",
 			requireAuth: true,
