@@ -13,11 +13,13 @@ from mysystem.views.menu_button import MenuButtonViewSet
 from mysystem.views.operation_log import OperationLogViewSet
 from mysystem.views.role import RoleViewSet,PermissionViewSet
 from mysystem.views.user import UserViewSet
+from mysystem.views.menu_field import MenuFieldViewSet
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
 system_url.register(r'button', ButtonViewSet)
 system_url.register(r'menu_button', MenuButtonViewSet)
+system_url.register(r'menu_field', MenuFieldViewSet)
 system_url.register(r'role', RoleViewSet)
 system_url.register(r'permission', PermissionViewSet,basename='permission')
 system_url.register(r'dept', DeptViewSet)
@@ -28,6 +30,8 @@ urlpatterns = [
     re_path('menu/update_sort/', MenuViewSet.as_view({'post': 'update_sort'})),
     re_path('menu_tree/', MenuViewSet.as_view({'get': 'menu_tree'})),
     re_path('menu_button/batch_generate/', MenuButtonViewSet.as_view({'post': 'batch_generate'})),
+    re_path('menu_field/get_models/', MenuFieldViewSet.as_view({'get': 'get_models'})),
+    re_path('menu_field/auto_create/', MenuFieldViewSet.as_view({'post': 'auto_create'})),
     re_path('menu/web_router/', MenuViewSet.as_view({'get': 'web_router'})),#也可以在视图的action装饰器中自动生成
     re_path('dept_tree/', DeptViewSet.as_view({'get': 'dept_tree'})),
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),

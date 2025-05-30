@@ -62,11 +62,12 @@
                             <h4>权限配置 - {{ selectedMenu.name }}</h4>
                         </template>
 
-                        <el-tabs v-model="activeTab" :stretch="isMobile">
+                        <el-tabs v-model="activeTab" :stretch="isMobile" @tab-change="handlePMChage">
                             <!-- 按钮权限 -->
                             <el-tab-pane label="按钮权限配置" name="button">
                                 <el-button type="primary" icon="Plus" @click="openButtonDialog">添加按钮权限</el-button>
                                 <el-button type="primary" @click="buttonBatchCreate">批量生成</el-button>
+                                <el-button @click="getMenuButtonList" circle icon="refresh"></el-button>
                                 <el-table :data="menuButtonList" row-key="id" border stripe style="margin-top: 10px;" v-loading="isMenuButtonListLoading">
                                     <el-table-column type="index" width="60" label="序号">
                                         <template #default="scope">
@@ -92,28 +93,22 @@
 
                             <!-- 列权限 -->
                             <el-tab-pane label="列权限配置" name="column">
-                                <el-button type="success" icon="Plus" @click="openColumnDialog">添加列权限</el-button>
-                                <el-table :data="selectedMenu.columns" row-key="id" border stripe style="margin-top: 10px;">
-                                    <el-table-column prop="name" label="字段名称" width="150" />
-                                    <el-table-column label="查询权限" width="120">
-                                        <template #default="{ row }">
-                                            <el-switch v-model="row.query" active-color="#13ce66" />
+                                <el-button type="primary" icon="Plus" @click="openColumnDialog">添加列权限</el-button>
+                                <el-button type="primary" @click="FeildBatchCreate">自动生成</el-button>
+                                <el-button @click="getMenuFieldList" circle icon="refresh"></el-button>
+                                <el-table :data="menuFieldList" row-key="id" border stripe style="margin-top: 10px;" v-loading="loadingMenuField">
+                                    <el-table-column type="index" width="60" label="序号">
+                                        <template #default="scope">
+                                            <span v-text="scope.$index+1"></span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="新增权限" width="120">
-                                        <template #default="{ row }">
-                                            <el-switch v-model="row.create" active-color="#13ce66" />
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="编辑权限" width="120">
-                                        <template #default="{ row }">
-                                            <el-switch v-model="row.edit" active-color="#13ce66" />
-                                        </template>
-                                    </el-table-column>
+                                    <el-table-column prop="model" label="所属模型" width="150" />
+                                    <el-table-column prop="field_name" label="字段名" min-width="150" />
+                                    <el-table-column prop="title" label="字段显示名" min-width="150" />
                                     <el-table-column label="操作" width="150">
-                                        <template #default="{ $index }">
-                                            <el-button link type="primary" @click="editColumn($index)">编辑</el-button>
-                                            <el-button link type="danger" @click="deleteColumn($index)">删除</el-button>
+                                        <template #default="scope">
+                                            <el-button link type="primary" @click="editColumn(scope.row)">编辑</el-button>
+                                            <el-button link type="danger" @click="deleteColumn(scope.row)">删除</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -258,28 +253,38 @@
                 </el-row>
             </el-form>
 
-            <el-form ref="formRefc" :model="formData" label-width="100px" v-if="currentForm === 'column'">
+            <el-form ref="formRefc" :model="formData" :rules="feildRules" label-width="100px" v-if="currentForm === 'column'">
                 <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                        <el-form-item label="字段名称">
-                            <el-input v-model="formData.name" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="所属模型" prop="model">
+                            <el-select v-model="formData.model" allow-create filterable placeholder="请选择" style="width: 100%">
+                                <el-option
+                                    v-for="item in allCustomModels"
+                                    :key="item.model"
+                                    :label="item.title"
+                                    :value="item.model">
+                                    <span style="float: left">{{ item.title }}</span>
+                                    <span
+                                        style="
+                                        float: right;
+                                        color: var(--el-text-color-secondary);
+                                        font-size: 13px;
+                                        "
+                                    >
+                                        {{ item.model }}
+                                    </span>
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                     </el-col>
-                </el-row>
-                <el-row :gutter="10">
-                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                        <el-form-item label="查询权限">
-                            <el-switch v-model="formData.query" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="显示名" prop="title">
+                            <el-input v-model="formData.title" placeholder="如：用户名"/>
                         </el-form-item>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                        <el-form-item label="新增权限">
-                            <el-switch v-model="formData.create" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-                        <el-form-item label="编辑权限">
-                            <el-switch v-model="formData.edit" />
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                        <el-form-item label="字段名" prop="field_name">
+                            <el-input v-model="formData.field_name" placeholder="如：username"/>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -289,6 +294,32 @@
                 <span class="dialog-footer">
                     <el-button @click="dialogVisible = false">取消</el-button>
                     <el-button type="primary" @click="saveData">保存</el-button>
+                </span>
+            </template>
+        </el-dialog>
+        <el-dialog v-model="dialogAutoCreateFieldVisible" title="所属模型" width="500px" :fullscreen="isMobile" :close-on-click-modal="false">
+            <el-select v-model="customMenuFeildModel" allow-create filterable placeholder="请选择所属模型" style="width: 100%">
+                <el-option
+                    v-for="item in allCustomModels"
+                    :key="item.model"
+                    :label="item.title"
+                    :value="item.model">
+                    <span style="float: left">{{ item.title }}</span>
+                    <span
+                        style="
+                        float: right;
+                        color: var(--el-text-color-secondary);
+                        font-size: 13px;
+                        "
+                    >
+                        {{ item.model }}
+                    </span>
+                </el-option>
+            </el-select>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="dialogAutoCreateFieldVisible = false">取消</el-button>
+                    <el-button type="primary" @click="saveFeildBatchCreate">提交</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -329,6 +360,8 @@
 
     let apiList = ref([])
     let isMenuButtonListLoading = ref(false)
+    let dialogAutoCreateFieldVisible = ref(false)
+    let customMenuFeildModel = ref("")
 
     // 数据源
     const menus = ref([
@@ -390,6 +423,8 @@
     )
     let buttonList = ref([])
     let menuButtonList = ref([])
+    let menuFieldList = ref([])
+    let allCustomModels = ref([])
     let menuRules = {
         /* parent: [
             {required: true, message: '请选择父级菜单',trigger: 'blur'}
@@ -421,6 +456,18 @@
         method: [
             {required: true, message: '请选择接口方法',trigger: 'blur'}
         ],
+    }
+
+    let feildRules = {
+        model: [
+            {required: true, message: '请选择所属表',trigger: 'blur'}
+        ],
+        field_name: [
+            {required: true, message: '请输入字段名',trigger: 'blur'}
+        ],
+        title: [
+            {required: true, message: '请输入字段显示名',trigger: 'blur'}
+        ]
     }
 
     let menuWebPathRule = [
@@ -789,26 +836,40 @@
         currentSaveMode.value = 'add'
         dialogTitle.value = '新增列权限'
         formData.value = {
-            id: Date.now(),
-            name: '',
-            query: true,
-            create: true,
-            edit: true
+            title: '',
+            model: '',
+            menu:null,
+            field_name: ''
         }
         dialogVisible.value = true
+        getAllCustomModels()
     }
 
-    function editColumn(index) {
+    function editColumn(row) {
         currentForm.value = 'column'
         currentSaveMode.value = 'edit'
         dialogTitle.value = '编辑列权限'
-        formData.value = JSON.parse(JSON.stringify(selectedMenu.value.columns[index]))
+        formData.value = deepClone(row)
         dialogVisible.value = true
+        getAllCustomModels()
     }
 
-    function deleteColumn(index) {
-        selectedMenu.value.columns.splice(index, 1)
-        ElMessage.success('删除成功')
+    function deleteColumn(row) {
+        ElMessageBox.confirm('确定要删除该条数据吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+                Api.apiSystemMenuFieldDelete({id:row.id}).then(res=>{
+                if(res.code === 2000){
+                    getMenuFieldList()
+                }else{
+                    ElMessage.warning(res.msg)
+                }
+            })
+        })
+        .catch(() => {
+        })
     }
 
     async function saveData() {
@@ -868,11 +929,32 @@
             }
 
         } else if (currentForm.value === 'column') {
-            const idx = selectedMenu.value.columns.findIndex(i => i.id === formData.value.id)
-            if (idx !== -1) {
-                selectedMenu.value.columns.splice(idx, 1, { ...formData.value })
-            } else {
-                selectedMenu.value.columns.push({ ...formData.value })
+            try {
+                await formRefc.value.validate()
+                loadingMenuField.value=true
+                let param = {
+                    ...formData.value
+                }
+                let apiObj;
+                if(currentSaveMode.value == 'edit'){
+                    apiObj = Api.apiSystemMenuFieldEdit
+                }else{
+                    apiObj = Api.apiSystemMenuFieldAdd
+                    param['menu'] = selectedMenu.value.id
+                }
+                apiObj(param).then(res=>{
+                    loadingMenuField.value=false
+                    if(res.code ==2000) {
+                        getMenuFieldList()
+                    } else {
+                        ElMessage.warning(res.msg)
+                        return
+                    }
+                })
+                
+            } catch (error) {
+                // console.log('表单验证失败！', error)
+                return
             }
         }
 
@@ -1009,6 +1091,58 @@
             })
         }
     }
+
+    let loadingMenuField = ref(false)
+    function getMenuFieldList(){
+        loadingMenuField.value = true
+        menuFieldList.value = []
+        Api.apiSystemMenuField({page:1,limit:999}).then(res=>{
+            loadingMenuField.value = false
+            if(res.code === 2000){
+                menuFieldList.value = res.data.data
+            }
+        })
+    }
+
+    function FeildBatchCreate(){
+        customMenuFeildModel.value = ""
+        dialogAutoCreateFieldVisible.value = true
+        getAllCustomModels()
+    }
+
+    function saveFeildBatchCreate(){
+        if(selectedMenu.value && selectedMenu.value.type === 1){
+            if(!customMenuFeildModel.value){
+                ElMessage.warning("请提供模型名")
+                return
+            }
+            Api.apiSystemMenuFieldAutoCreate({'menu':selectedMenu.value.id,'model':customMenuFeildModel.value}).then(res=>{
+                if(res.code === 2000){
+                    ElMessage.success(res.msg)
+                    getMenuFieldList()
+                    dialogAutoCreateFieldVisible.value = false
+                }else{
+                    ElMessage.warning(res.msg)
+                }
+            })
+        }
+    }
+
+    function getAllCustomModels(){
+        Api.apiSystemMenuFieldGetModels().then(res=>{
+            if(res.code === 2000){
+                allCustomModels.value = res.data
+            }
+        })
+    }
+
+    function handlePMChage(e){
+        if(e === 'column'){
+            getMenuFieldList()
+        }else{
+            getMenuButtonList()
+        }
+    }   
 
     // 生命周期钩子
     onMounted(() => {

@@ -11,6 +11,8 @@ from django.db import models
 
 from application import settings
 
+from importlib import import_module
+
 table_prefix = "lyadmin_"  # 数据库表名前缀
 
 
@@ -50,32 +52,178 @@ class BaseModel(models.Model):
         verbose_name = '基本模型'
         verbose_name_plural = verbose_name
 
-def get_all_models_objects(model_name=None):
+def get_all_models_objects(model_name= None,exclude_modules= None,include_fields = True):
     """
-    获取所有 models 对象
-    :return: {}
+    获取所有模型对象信息（带缓存和灵活过滤）
+    
+    Args:
+        model_name: 指定模型名时返回单个模型，否则返回全部
+        exclude_modules: 自定义排除的模块路径（覆盖默认配置）
+        include_fields: 是否包含字段信息（大型模型可关闭提升性能）
+    
+    Returns:
+        Dict: {
+            "ModelName": {
+                "table": {
+                    "table_name": "verbose_name",
+                    "db_table": "db_table_name",
+                    "class_name": "ModelName",
+                    "tableFields": [{"name": "field1", "type": "CharField",title:"verbose_name"}, ...],
+                    "import_path": "from app.models import ModelName"
+                },
+                "object": <ModelClass>
+            }
+        }
     """
-    #排除不需要的django内置models
-    exclude_list = ['django.contrib.admin.models','django.contrib.sessions.models','django.contrib.auth.models','django.contrib.contenttypes.models','captcha.models','django_celery_results.models','django_celery_beat.models']
-    settings.ALL_MODELS_OBJECTS = {}
+    # 默认排除的模块（可被参数覆盖）
+    DEFAULT_EXCLUDE_MODULES = [
+        'django.contrib.admin.models',
+        'django.contrib.sessions.models',
+        'django.contrib.auth.models',
+        'django.contrib.contenttypes.models',
+        'captcha.models',
+        'django_celery_results.models',
+        'django_celery_beat.models'
+    ]
+    
+    # 使用缓存避免重复查询
+    if not hasattr(settings, 'ALL_MODELS_OBJECTS'):
+        settings.ALL_MODELS_OBJECTS = {}
+    
+    # 仅当缓存为空时重新加载
     if not settings.ALL_MODELS_OBJECTS:
+        exclude_modules = exclude_modules or DEFAULT_EXCLUDE_MODULES
         all_models = apps.get_models()
-        for item in list(all_models):
-            if not item.__module__ in exclude_list:
-                table = {
-                    "table_name": item._meta.verbose_name,
-                    "db_table": item._meta.db_table,
-                    "class_name": item.__name__,
-                    "tableFields": [],
-                    "import_path":"from %s import %s"%(item.__module__,item.__name__)
-                }
-                settings.ALL_MODELS_OBJECTS.setdefault(item.__name__, {"table": table, "object": item})
+        
+        for model in all_models:
+            module_path = model.__module__
+            
+            if any(module_path.startswith(excluded) for excluded in exclude_modules):
+                continue
+                
+            model_info = {
+                "table_name": model._meta.verbose_name,
+                "db_table": model._meta.db_table,
+                "class_name": model.__name__,
+                "import_path": f"from {module_path} import {model.__name__}",
+                "tableFields": []
+            }
+            
+            if include_fields:
+                for field in model._meta.fields:
+                    fields = {"title": getattr(field, 'verbose_name', ''), "name": field.name,"type":field.get_internal_type()}
+                    model_info['tableFields'].append(fields)
+            
+            settings.ALL_MODELS_OBJECTS[model.__name__] = {
+                "table": model_info,
+                "object": model
+            }
+    
+    # 返回指定模型或全部
     if model_name:
+        return settings.ALL_MODELS_OBJECTS.get(model_name, {})
+    return settings.ALL_MODELS_OBJECTS.copy()  # 返回副本防止外部修改
+
+def get_model_info_by_app(app_name,include_fields = True):
+    """
+    获取指定app下的所有模型及其字段信息
+    
+    Args:
+        app_name: Django应用名（如'mysystem'）
+        include_fields: 是否包含字段信息（大型模型可关闭提升性能）
+    
+    Returns:
+        List[Dict]: 模型信息列表，每个模型包含：
+            - app: 应用名
+            - verbose: 模型verbose_name
+            - model: 模型类名
+            - object: 模型类
+            - fields: 字段列表（包含verbose_name, name, field_object）
+    
+    Raises:
+        ImportError: 当models.py不存在时
+    """
+    try:
+        model_module = import_module(f'{app_name}.models')
+    except ImportError as e:
+        return []
+
+    exclude_models = getattr(model_module, 'exclude_models', [])
+    
+    # 使用更精确的模型过滤
+    model_classes = [
+        cls for cls in model_module.__dict__.values()
+        if isinstance(cls, type) 
+        and issubclass(cls, models.Model)
+        and cls.__name__ not in exclude_models
+        and cls.__name__ != 'CoreModel'
+        and not cls._meta.abstract  # 排除抽象模型
+    ]
+
+    result = []
+    for model in model_classes:
+        fields = []
+        if include_fields:
+            fields = [
+                {
+                    'title': getattr(field, 'verbose_name', ''),
+                    'name': field.name,
+                    'type': field.get_internal_type(),
+                    'object': field
+                }
+                for field in model._meta.fields
+                if hasattr(field, 'name')  # 基础字段（排除反向关联字段等）
+            ]
+            
+        result.append({
+            'app': app_name,
+            'verbose': model._meta.verbose_name,
+            'model': model.__name__,
+            'object': model,
+            'fields': fields
+        })
+    
+    return result
+
+def get_project_app_models(app_name = None,exclude_apps= None,include_fields = True):
+    """
+    获取项目用户所有自定义app的模型（排除django内置app和三方django依赖app）
+    
+    Args:
+        app_name: 可选，指定单个app时只返回该app的模型
+        exclude_apps: 自定义排除的模块名（覆盖默认配置）
+        include_fields: 是否包含字段信息（大型模型可关闭提升性能）
+    
+    Returns:
+        List[Dict]: 同get_model_info_by_app返回值
+    """
+    if app_name:
+        return get_model_info_by_app(app_name,include_fields = include_fields)
+    
+    result = []
+    DEFAULT_EXCLUDE_APPS = [
+        'corsheaders',
+        'rest_framework',
+        'channels',
+        'captcha',
+        'drf_spectacular',
+        'drf_spectacular_sidecar'
+    ]
+    exclude_apps = exclude_apps or DEFAULT_EXCLUDE_APPS
+    for app_config in apps.get_app_configs():
+        if (
+            app_config.name.startswith('django') or
+            app_config.name in exclude_apps
+        ):
+            continue
+        
         try:
-            return settings.ALL_MODELS_OBJECTS[model_name] or {}
-        except:
-            return {}
-    return settings.ALL_MODELS_OBJECTS or {}
+            models = get_model_info_by_app(app_config.name,include_fields = include_fields)
+            result.extend(models)
+        except Exception as e:
+            pass
+    
+    return result
 
 def is_table_exists(table_name):
     """

@@ -304,7 +304,7 @@ class Menu(CoreModel):
         ordering = ('sort',)
 
 class MenuField(models.Model):
-    model = models.CharField(max_length=70, null=True, blank=True, verbose_name='表名')
+    model = models.CharField(max_length=70, null=True, blank=True, verbose_name='所属模型Model')
     menu = models.ForeignKey(to='Menu', on_delete=models.CASCADE, verbose_name='关联菜单', db_constraint=False)
     field_name = models.CharField(max_length=64, verbose_name='模型表字段名')
     title = models.CharField(max_length=64, verbose_name='字段显示名')

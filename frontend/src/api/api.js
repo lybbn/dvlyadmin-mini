@@ -56,4 +56,17 @@ Api.apiSystemMenuButtonDelete = params => ajaxDelete({url: `/api/system/menu_but
 // 菜单按钮API -- 批量生成
 Api.apiSystemMenuButtonBatchGenerate = params => ajaxPost({url: `/api/system/menu_button/batch_generate/`,params})
 
+// 获取菜单列
+Api.apiSystemMenuField = params => ajaxGet({url: `/api/system/menu_field/`,params})
+// 获取菜单列 -- 新增
+Api.apiSystemMenuFieldAdd = params => ajaxPost({url: `/api/system/menu_field/`,params})
+// 获取菜单列 -- 编辑
+Api.apiSystemMenuFieldEdit = params => ajaxPut({url: `/api/system/menu_field/`,params})
+// 获取菜单列 -- 删除
+Api.apiSystemMenuFieldDelete = params => ajaxDelete({url: `/api/system/menu_field/`,params})
+// 获取所有自定义modles信息
+Api.apiSystemMenuFieldGetModels = params => ajaxGet({url: `/api/system/menu_field/get_models/`,params})
+// 自动生成列
+Api.apiSystemMenuFieldAutoCreate = params => ajaxPost({url: `/api/system/menu_field/auto_create/`,params})
+
 export default Api
