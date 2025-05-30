@@ -1,5 +1,5 @@
 <template>
-	<div v-if="usercolumn.length>0" class="setting-column" v-loading="isSave">
+	<div v-if="usercolumn.length > 0" class="setting-column" v-loading="isSave">
 		<div class="setting-column__title">
 			<span class="move_b"></span>
 			<span class="show_b">显示</span>
@@ -12,7 +12,11 @@
 			<ul>
 				<li v-for="item in usercolumn" :key="item.prop">
 					<span class="move_b">
-						<el-tag class="move" style="cursor: move;"><el-icon style="width: 1em; height: 1em;"><DCaret /></el-icon></el-tag>
+						<el-tag class="move" style="cursor: move;">
+							<el-icon style="width: 1em; height: 1em;cursor: move;">
+								<DCaret />
+							</el-icon>
+						</el-tag>
 					</span>
 					<span class="show_b">
 						<el-switch v-model="item.hide" :active-value="false" :inactive-value="true"></el-switch>
@@ -38,76 +42,81 @@
 	<el-empty v-else description="暂无可配置的列" :image-size="80"></el-empty>
 </template>
 
-<script>
+<script setup>
+	import { ref, reactive, watchEffect, onMounted } from 'vue'
 	import Sortable from 'sortablejs'
+	import { DCaret } from '@element-plus/icons-vue'
 
-	export default {
-		components: {
-			Sortable
-		},
-		props: {
-			column: { type: Array, default: () => ([]) },
-		},
-		data() {
-			return {
-				isSave: false,
-				usercolumn: JSON.parse(JSON.stringify(this.column||[]))
-			}
-		},
-		watch:{
-			usercolumn: {
-				handler(){
-					this.$emit('userChange', this.usercolumn)
-				},
-				deep: true
-			}
-		},
-		mounted() {
-			this.usercolumn.length>0 && this.rowDrop()
-		},
-		methods: {
-			rowDrop(){
-				const _this = this
-				const tbody = this.$refs.list.querySelector('ul')
-				Sortable.create(tbody, {
-					handle: ".move",
-					animation: 300,
-					ghostClass: "ghost",
-					onEnd({ newIndex, oldIndex }) {
-						const tableData = _this.usercolumn
-						const currRow = tableData.splice(oldIndex, 1)[0]
-						tableData.splice(newIndex, 0, currRow)
-					}
-				})
-			},
-			backDefaul(){
-				this.$emit('back', this.usercolumn)
-			},
-			save(){
-				this.$emit('save', this.usercolumn)
-			}
+	// Props
+	const props = defineProps({
+		column: {
+			type: Array,
+			default: () => []
 		}
+	})
+
+	// Emits
+	const emit = defineEmits(['userChange', 'back', 'save'])
+
+	// Data
+	const isSave = ref(false)
+	const usercolumn = ref(JSON.parse(JSON.stringify(props.column || [])))
+
+	// Watcher for usercolumn changes
+	watchEffect(() => {
+		emit('userChange', usercolumn.value)
+	})
+
+	// Mounted
+	onMounted(() => {
+		if (usercolumn.value.length > 0) {
+			rowDrop()
+		}
+	})
+
+	// Methods
+	function rowDrop() {
+		const tbody = list.value.querySelector('ul')
+		Sortable.create(tbody, {
+			handle: '.move',
+			animation: 300,
+			ghostClass: 'ghost',
+			onEnd({ newIndex, oldIndex }) {
+				const tableData = usercolumn.value
+				const currRow = tableData.splice(oldIndex, 1)[0]
+				tableData.splice(newIndex, 0, currRow)
+			}
+		})
 	}
+
+	function backDefaul() {
+		emit('back', usercolumn.value)
+	}
+
+	function save() {
+		emit('save', usercolumn.value)
+	}
+
+	const list = ref(null)
 </script>
 
 <style scoped>
 	.setting-column {
-
 	}
 
 	.setting-column__title {
-		border-bottom: 1px solid #EBEEF5;
-		padding-bottom:15px;
+		border-bottom: 1px solid #eb eef5;
+		padding-bottom: 15px;
 	}
 	.setting-column__title span {
-		display: inline-block;
 		font-weight: bold;
 		color: #909399;
 		font-size: 12px;
+		display: inline-block;
 	}
 	.setting-column__title span.move_b {
 		width: 40px;
-		margin-right:15px;
+		margin-right: 15px;
 	}
 	.setting-column__title span.show_b {
 		width: 60px;
@@ -117,7 +126,7 @@
 	}
 	.setting-column__title span.width_b {
 		width: 60px;
-		margin-right:15px;
+		margin-right: 15px;
 	}
 	.setting-column__title span.sortable_b {
 		width: 60px;
@@ -127,22 +136,22 @@
 	}
 
 	.setting-column__list {
-		max-height:314px;
+		max-height: 314px;
 		overflow: auto;
 	}
 	.setting-column__list li {
 		list-style: none;
-		margin:10px 0;
+		margin: 10px 0;
 		display: flex;
 		align-items: center;
 	}
-	.setting-column__list li>span {
+	.setting-column__list li > span {
 		display: inline-block;
 		font-size: 12px;
 	}
 	.setting-column__list li span.move_b {
 		width: 40px;
-		margin-right:15px;
+		margin-right: 15px;
 	}
 	.setting-column__list li span.show_b {
 		width: 60px;
@@ -152,11 +161,11 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
-		cursor:default;
+		cursor: default;
 	}
 	.setting-column__list li span.width_b {
 		width: 60px;
-		margin-right:15px;
+		margin-right: 15px;
 	}
 	.setting-column__list li span.sortable_b {
 		width: 60px;
@@ -169,11 +178,11 @@
 	}
 
 	.setting-column__bottom {
-		border-top: 1px solid #EBEEF5;
-		padding-top:15px;
+		border-top: 1px solid #eb eef5;
+		padding-top: 15px;
 		text-align: right;
 	}
-	
+
 	.dark .setting-column__title {
 		border-color: var(--el-border-color-light);
 	}

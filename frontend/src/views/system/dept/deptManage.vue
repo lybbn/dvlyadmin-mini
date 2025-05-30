@@ -1,40 +1,21 @@
 <template>
-  <div :class="{'ly-is-full':isFull}">
-        <div class="tableSelect" ref="tableSelect">
+    <div :class="{'ly-is-full':isFull}" class="lycontainer">
+        <el-card class="tableSelect" ref="tableSelect" shadow="hover">
             <el-form :inline="true" :model="formInline" label-position="left">
-                <el-form-item label="用户昵称：">
-                    <el-input v-model.trim="formInline.nickname" maxlength="60"  clearable placeholder="用户昵称" @change="search" style="width:160px"></el-input>
+                <el-form-item label="部门名称：">
+                    <el-input v-model.trim="formInline.name" maxlength="60"  clearable placeholder="部门名称" @change="search" style="width:160px"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号：">
-                    <el-input v-model.trim="formInline.mobile" maxlength="60"  clearable placeholder="手机号" @change="search" style="width:160px"></el-input>
-                </el-form-item>
-                <el-form-item label="创建时间：">
-                    <el-date-picker
-                            style="width:350px"
-                            v-model="timers"
-                            type="datetimerange"
-                            @change="timeChange"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label=""><el-button  @click="search" type="primary" icon="Search" v-show="hasPermission(this.$route.name,'Search')">查询</el-button></el-form-item>
+                <el-form-item label=""><el-button  @click="search" type="primary" icon="Search" v-show="hasPermission(route.name,'Search')">查询</el-button></el-form-item>
                 <el-form-item label=""><el-button  @click="handleEdit('','reset')" icon="Refresh">重置</el-button></el-form-item>
-                <el-form-item label=""><el-button  @click="handleAddClick" type="primary" icon="Plus" v-show="hasPermission(this.$route.name,'Create')">新增</el-button></el-form-item>
-                <el-form-item label=""><el-button  @click="exportDataBackend" type="primary">导出</el-button></el-form-item>
+                <el-form-item label=""><el-button  @click="handleAddClick" type="primary" icon="Plus" v-show="hasPermission(route.name,'Create')">新增</el-button></el-form-item>
             </el-form>
-        </div>
+        </el-card>
 
-        <div class="table">
-            <ly-table tableName="userManageTable" :height="tableHeight" :pageSize="10" :apiObj="Api.apiSystemMenu" :params="formInline" ref="tableref" :column="column" showSequence>
+        <el-card class="lytable" shadow="hover">
+            <ly-table tableName="deptManageTable" :pageSize="10" :apiObj="Api.apiSystemMenu" :params="formInline" ref="tableref" :column="column" showSequence>
                 <template #avatar="scope">
                     <el-image  :src="scope.row.avatar ? scope.row.avatar : defaultImg" :preview-src-list="[scope.row.avatar]" style="width: 30px;height: 30px" preview-teleported></el-image>
                 </template>
-                <!-- <template #is_active="scope">
-                    <el-tag v-if="scope.row.is_active">正常</el-tag>
-                    <el-tag v-else type="danger">禁用</el-tag>
-                </template> -->
                 <template #is_active="scope">
                     <el-switch v-model="scope.row.is_active" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)"></el-switch>
                 </template>
@@ -44,23 +25,19 @@
                             <div>操作</div>
                             <div @click="setFull">
                                 <el-tooltip content="全屏" placement="bottom">
-                                    <el-icon ><full-screen /></el-icon>
+                                    <el-icon style="cursor: pointer;"><full-screen /></el-icon>
                                 </el-tooltip>
                             </div>
                         </div>
                     </template>
                     <template #default="scope">
-                        <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-show="hasPermission(this.$route.name,'Update')">编辑</span>
-                        <span class="table-operate-btn" @click="handleEdit(scope.row,'detail')" v-show="hasPermission(this.$route.name,'Retrieve')">详情</span>
-                        <span class="table-operate-btn" @click="handleEdit(scope.row,'delete')" v-show="hasPermission(this.$route.name,'Delete')">删除</span>
-                        <!-- <span class="table-operate-btn" @click="handleEdit(scope.row,'disable')" v-show="hasPermission(this.$route.name,'Update')">
-                            <span v-if="scope.row.is_active">禁用</span>
-                            <span v-else>启用</span>
-                        </span> -->
+                        <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-show="hasPermission(route.name,'Update')">编辑</span>
+                        <span class="table-operate-btn" @click="handleEdit(scope.row,'detail')" v-show="hasPermission(route.name,'Retrieve')">详情</span>
+                        <span class="table-operate-btn" @click="handleEdit(scope.row,'delete')" v-show="hasPermission(route.name,'Delete')">删除</span>
                     </template>
                 </el-table-column>
             </ly-table>
-        </div>
+        </el-card>
         <addUser ref="addUserFlag" @refreshData="getData" v-if="isDialogVisible" @closed="isDialogVisible = false"></addUser>
         <userDetail ref="userDetailFlag" v-if="isDetailDialogVisible" @closed="isDetailDialogVisible = false"></userDetail>
     </div>
@@ -71,7 +48,6 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { FullScreen } from '@element-plus/icons-vue'
-import { dateFormat, getTableHeight } from "@/utils/util"
 import Api from '@/api/api'
 import addUser from "./components/moduleCreateUpdate.vue"
 import userDetail from "./components/moduleCreateUpdate.vue"
@@ -80,7 +56,6 @@ const route = useRoute()
 
 // 状态管理
 const isFull = ref(false)
-const tableHeight = ref(500)
 const isDetailDialogVisible = ref(false)
 const isDialogVisible = ref(false)
 const formInline = ref({})
@@ -232,39 +207,10 @@ const getData = () => {
   tableref.value.getData()
 }
 
-const timeChange = (val) => {
-  if (val) {
-    formInline.value.beginAt = dateFormat(val[0], 'yyyy-MM-dd hh:mm:ss')
-    formInline.value.endAt = dateFormat(val[1], 'yyyy-MM-dd hh:mm:ss')
-  } else {
-    formInline.value.beginAt = null
-    formInline.value.endAt = null
-  }
-  search()
-}
-
-const getTheTableHeight = () => {
-  let tabSelectHeight = tableSelect.value ? tableSelect.value.offsetHeight : 0
-  tabSelectHeight = isFull.value ? tabSelectHeight - 110 : tabSelectHeight
-  tableHeight.value = getTableHeight(tabSelectHeight, false) - 125
-}
-
-const listenResize = () => {
-  nextTick(() => {
-    getTheTableHeight()
-  })
-}
-
-// 生命周期
 onMounted(() => {
-  window.addEventListener('resize', listenResize)
-  nextTick(() => {
-    getTheTableHeight()
-  })
 })
 
 onUnmounted(() => {
-  window.removeEventListener("resize", listenResize)
 })
 
 // 权限检查函数
@@ -273,7 +219,3 @@ const hasPermission = (routeName, action) => {
   return true
 }
 </script>
-
-<style scoped>
-/* 样式保持不变 */
-</style>

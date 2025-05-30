@@ -173,3 +173,60 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 .lyicon-loading{
 	animation: rotating 2s linear infinite;
 }
+
+.ly-is-full{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    background:var(--el-bg-color);
+}
+
+.tableSelect{
+	margin-bottom: 10px;
+	flex-shrink: 0; /* 防止搜索区域被压缩 */
+	.el-form{
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	.el-form-item{
+		margin: 5px !important;
+	}
+	.el-card__body{
+		padding: 10px;
+	}
+}
+
+.table-operate-btn{
+	color: var(--el-color-primary);
+	cursor: pointer;
+	margin-right: 10px;
+	text-wrap: nowrap;
+	white-space: nowrap;
+	//font-size: 14px;
+	&.color99{
+		color: #999999;
+		cursor: default;
+	}
+}
+.lycontainer{
+	padding:10px;
+	display: flex;
+    flex-direction: column;
+	height: 100%;
+    width: 100%;
+}
+.lytable{
+	flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.lytable .el-table__body-wrapper {
+    background: unset !important;
+}
+.lytable .el-card__body{
+	padding: 10px;
+}
