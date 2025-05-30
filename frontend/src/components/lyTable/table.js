@@ -1,6 +1,6 @@
 //el-table数据表格配置
 
-import {setStorage,getStorage,removeStorage} from '@/utils/util'
+import {autoStorage} from '@/utils/util.js'
 
 export default {
 	successCode: 2000,												//请求完成代码
@@ -21,7 +21,7 @@ export default {
 	columnSettingSave: function (tableName, column) {
 		return new Promise((resolve) => {
 			setTimeout(()=>{
-				setStorage(tableName,JSON.stringify(column))
+				autoStorage.set(tableName,JSON.stringify(column))
 				resolve(true)
 			},500)
 		})
@@ -33,7 +33,7 @@ export default {
 	 */
 	columnSettingGet: function (tableName, column) {
 		return new Promise((resolve) => {
-			const userColumn = JSON.parse(getStorage(tableName)) || []
+			const userColumn = JSON.parse(autoStorage.get(tableName)) || []
 			if(userColumn){
 				resolve(userColumn)
 			}else{
@@ -49,7 +49,7 @@ export default {
 	columnSettingReset: function (tableName, column) {
 		return new Promise((resolve) => {
 			setTimeout(()=>{
-				removeStorage(tableName)
+				autoStorage.remove(tableName)
 				resolve(column)
 			},500)
 		})

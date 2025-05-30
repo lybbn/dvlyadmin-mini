@@ -51,16 +51,40 @@ export const CustomStaticRoutes = [
 		}
 	},
 	{
-		path: "/menuManage",
-		name: 'menuManage',
-		component: () => import('@/views/system/menu/menuManage.vue'),
+		path: "/system",
+		name: 'system',
 		meta: {
-			title: "菜单管理",
+			title: "系统管理",
 			requireAuth: true,
 			hidden:false,
-			icon:'Collection',
-		}
+			icon:'setting',
+		},
+		children:[
+			{
+				path: "/deptManage",
+				name: 'deptManage',
+				component: () => import('@/views/system/dept/deptManage.vue'),
+				meta: {
+					title: "部门管理",
+					requireAuth: true,
+					hidden:false,
+					icon:'OfficeBuilding',
+				}
+			},
+			{
+				path: "/menuManage",
+				name: 'menuManage',
+				component: () => import('@/views/system/menu/menuManage.vue'),
+				meta: {
+					title: "菜单管理",
+					requireAuth: true,
+					hidden:false,
+					icon:'Collection',
+				}
+			},
+		]
 	},
+	
 ]
 
 //404路由

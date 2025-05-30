@@ -536,3 +536,19 @@ export function convertToBeijingTime(utcString) {
 export function isNull(value) {
 	return (value === null) || (value === undefined);
 }
+
+export function getTableHeight(tableSelectHeight,allowPage=true){
+    var pagination_height = allowPage?176:0;
+    let height = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - tableSelectHeight;
+    var ua = navigator.userAgent;
+    //获取当前设备类型（安卓或苹果）
+    if (ua && /Android/.test(ua)) {
+        return 700
+    }
+    else if (ua && /iPhone|ipad|ipod|ios/.test(ua)){
+        return 700
+    }
+    else {
+        return height - pagination_height
+    }
+}

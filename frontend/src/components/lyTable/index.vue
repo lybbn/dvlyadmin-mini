@@ -1,9 +1,10 @@
 <!--
  * @Descripttion: 封装数据表格组件table
- * @version: 1.1
+ * @version: 1.2
  * @Author: lybbn
  * @Date: 2023-11-02
- * @program: django-vue-lyadmin 专业版
+*  @Date: 2025-05-30
+ * @program: dvlyadmin-mini
 -->
 
 <template>

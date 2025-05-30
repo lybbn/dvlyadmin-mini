@@ -10,7 +10,7 @@
                                 class="item"
                                 effect="dark"
                                 raw-content
-                                content="<div>1、支持拖拽菜单排序。</div><div>2、只有类型为【菜单】才能做【权限配置】。</div><div>3、配置sort时尽量间隔数值大一些。</div>"
+                                content="<div>1、支持拖拽菜单排序。</div><div>2、只有类型为【菜单】才能做【权限配置】。</div><div>3、配置sort时尽量间隔数值大一些。</div><div>4、类型为【菜单】的【组件名称】用于按钮权限值的匹配。</div>"
                                 placement="right">
                                 <el-icon><question-filled /></el-icon>
                                 </el-tooltip>
@@ -1241,7 +1241,7 @@
         .actions {
             display: flex;
             margin-left: 8px;
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.3s;
             
             .el-button {
@@ -1249,9 +1249,9 @@
             }
         }
     
-        &:hover .actions {
-            opacity: 1;
-        }
+        // &:hover .actions {
+        //     opacity: 1;
+        // }
     }
 
     .glass-card {

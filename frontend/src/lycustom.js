@@ -3,6 +3,7 @@ import config from "./config"
 import api from "@/api/api"
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { directive } from './directives';
+import lyTable from "@/components/lyTable/index.vue";
 
 export default {
     install(app) {
@@ -13,5 +14,6 @@ export default {
             app.component(key, component)
         }
         directive(app)
+        app.component("ly-table", lyTable);
     }
 }
