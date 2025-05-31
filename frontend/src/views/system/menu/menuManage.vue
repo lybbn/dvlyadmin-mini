@@ -775,6 +775,7 @@
 
     function handleNodeClick(data) {
         menuButtonList.value = []
+        menuFieldList.value = []
         selectedMenu.value = data
         activeTab.value = 'button'
         getMenuButtonList()
@@ -823,7 +824,7 @@
 
     function getMenuButtonList(){
         isMenuButtonListLoading.value = true
-        Api.apiSystemMenuButton({page:1,limit:999}).then(res=>{
+        Api.apiSystemMenuButton({page:1,limit:999,menu:selectedMenu.value.id}).then(res=>{
             isMenuButtonListLoading.value = false
             if(res.code === 2000){
                 menuButtonList.value = res.data.data
@@ -1096,7 +1097,7 @@
     function getMenuFieldList(){
         loadingMenuField.value = true
         menuFieldList.value = []
-        Api.apiSystemMenuField({page:1,limit:999}).then(res=>{
+        Api.apiSystemMenuField({page:1,limit:999,menu:selectedMenu.value.id}).then(res=>{
             loadingMenuField.value = false
             if(res.code === 2000){
                 menuFieldList.value = res.data.data
