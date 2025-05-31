@@ -33,7 +33,7 @@
                     <template #default="scope">
                         <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-show="hasPermission(route.name,'Update')">编辑</span>
                         <span class="table-operate-btn" @click="handleEdit(scope.row,'detail')" v-show="hasPermission(route.name,'Retrieve')">详情</span>
-                        <span class="table-operate-btn" @click="handleEdit(scope.row,'delete')" v-show="hasPermission(route.name,'Delete')">删除</span>
+                        <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-show="hasPermission(route.name,'Delete')">删除</span>
                     </template>
                 </el-table-column>
             </ly-table>

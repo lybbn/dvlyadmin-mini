@@ -69,8 +69,7 @@
 				</template>
 			</el-table>
 		</div>
-		<div
-			class="lyTable-page"
+		<div class="lyTable-page"
 			:class="{
 				'lyTable-page-bk': paginationColorBackground,
 				'lyTable-page-border': config.border
@@ -163,36 +162,36 @@
 	import ColumnSetting from './columnSetting.vue'
 
 	const props = defineProps({
-	tableName: { type: String, default: "lyTable" },
-	successCode: { type: Number, default: 2000 },
-	apiObj: { type: Function, default: null },
-	params: { type: Object, default: () => ({}) },
-	data: { type: Array, default: () => [] },
-	height: { type: [String, Number], default: "100%" },
-	size: { type: String, default: "default" },
-	border: { type: Boolean, default: false },
-	stripe: { type: Boolean, default: false },
-	showSelectable: { type: Boolean, default: false },
-	showSequence: { type: Boolean, default: false },
-	pageSize: { type: Number, default: tableConfig.pageSize },
-	pageSizes: { type: Array, default: tableConfig.pageSizes },
-	rowKey: { type: String, default: "id" },
-	summaryMethod: { type: Function, default: null },
-	column: { type: Array, default: () => [] },
-	remoteSort: { type: Boolean, default: false },
-	remoteFilter: { type: Boolean, default: false },
-	remoteSummary: { type: Boolean, default: false },
-	hidePagination: { type: Boolean, default: false },
-	hideDo: { type: Boolean, default: false },
-	hideRefresh: { type: Boolean, default: false },
-	hideSetting: { type: Boolean, default: false },
-	paginationLayout: { type: String, default: tableConfig.paginationLayout },
-	paginationSmall: { type: Boolean, default: true },
-	paginationBackground: { type: Boolean, default: true },
-	paginationDisabled: { type: Boolean, default: false },
-	paginationColorBackground: { type: Boolean, default: true },
-	emptyImage: { type: String, default: "" },
-	emptyImageSize: { type: Number, default: 150 },
+		tableName: { type: String, default: "lyTable" },
+		successCode: { type: Number, default: 2000 },
+		apiObj: { type: Function, default: null },
+		params: { type: Object, default: () => ({}) },
+		data: { type: Array, default: () => [] },
+		height: { type: [String, Number], default: "100%" },
+		size: { type: String, default: "default" },
+		border: { type: Boolean, default: false },
+		stripe: { type: Boolean, default: false },
+		showSelectable: { type: Boolean, default: false },
+		showSequence: { type: Boolean, default: false },
+		pageSize: { type: Number, default: tableConfig.pageSize },
+		pageSizes: { type: Array, default: tableConfig.pageSizes },
+		rowKey: { type: String, default: "id" },
+		summaryMethod: { type: Function, default: null },
+		column: { type: Array, default: () => [] },
+		remoteSort: { type: Boolean, default: false },
+		remoteFilter: { type: Boolean, default: false },
+		remoteSummary: { type: Boolean, default: false },
+		hidePagination: { type: Boolean, default: false },
+		hideDo: { type: Boolean, default: false },
+		hideRefresh: { type: Boolean, default: false },
+		hideSetting: { type: Boolean, default: false },
+		paginationLayout: { type: String, default: tableConfig.paginationLayout },
+		paginationSmall: { type: Boolean, default: true },
+		paginationBackground: { type: Boolean, default: true },
+		paginationDisabled: { type: Boolean, default: false },
+		paginationColorBackground: { type: Boolean, default: true },
+		emptyImage: { type: String, default: "" },
+		emptyImageSize: { type: Number, default: 150 },
 	})
 
 	const emit = defineEmits(['dataChange', 'selectionChange'])
@@ -566,7 +565,7 @@
 	}
 
 	.lyTable-table {
-		height: calc(100% - 50px);
+		height:100%;
 	}
 
 	.lyTable-page {

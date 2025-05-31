@@ -200,18 +200,59 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 	}
 }
 
-.table-operate-btn{
+.table-operate-btn {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 8px;
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
 	color: var(--el-color-primary);
-	cursor: pointer;
-	margin-right: 10px;
-	text-wrap: nowrap;
-	white-space: nowrap;
-	//font-size: 14px;
-	&.color99{
-		color: #999999;
-		cursor: default;
-	}
+    
+    &:last-child {
+        margin-right: 0;
+    }
+    
+    &:hover {
+        background-color: rgba(64, 158, 255, 0.08);
+    }
+    
+    &.edit {
+        color: var(--el-color-primary);
+        
+        &:hover {
+            color: var(--el-color-primary-light-1);
+        }
+    }
+    
+    &.detail {
+        color: var(--el-text-color-regular);
+        
+        &:hover {
+            color: var(--el-text-color-primary);
+        }
+    }
+    
+    &.delete {
+        color: var(--el-color-danger);
+        
+        &:hover {
+            
+        }
+    }
+    
+    &.color99 {
+        color: #999999;
+        cursor: default;
+        
+        &:hover {
+            background-color: transparent;
+        }
+    }
 }
+
 .lycontainer{
 	padding:10px;
 	display: flex;
@@ -229,4 +270,5 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 }
 .lytable .el-card__body{
 	padding: 10px;
+	height: 100%;
 }

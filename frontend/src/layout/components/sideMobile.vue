@@ -1,5 +1,5 @@
 <template>
-	<div ref="" class="mobile-nav-button" @click="showMobileNav($event)" v-drag><el-icon><Menu /></el-icon></div>
+	<div ref="mobileDraggableButton" class="mobile-nav-button" @click="showMobileNav($event)" v-drag><el-icon><Menu /></el-icon></div>
 
 	<el-drawer ref="mobileNavMenuBox" title="移动端菜单" :size="200" v-model="nav" direction="ltr" :with-header="false" destroy-on-close>
 		<el-container class="mobile-nav">
@@ -36,6 +36,7 @@
 
 	let nav = ref(false)
 	let menu = ref([])
+	let mobileDraggableButton = ref(null)
 
 	//转换外部链接的路由
 	function filterUrl(map){
