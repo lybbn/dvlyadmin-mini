@@ -265,6 +265,11 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
     display: flex;
     flex-direction: column;
 }
+.lytopaction{
+	padding: 0 !important;
+	height: 50px;
+	border-bottom: unset !important;
+}
 .lytable .el-table__body-wrapper {
     background: unset !important;
 }

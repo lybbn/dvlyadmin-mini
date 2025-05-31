@@ -25,17 +25,17 @@
 				@selection-change="handleSelectionChange"
 			>
 				<el-table-column
-				type="selection"
-				width="60"
-				align="center"
-				v-if="showSelectable"
-				></el-table-column>
+					type="selection"
+					width="60"
+					align="center"
+					v-if="showSelectable"
+					></el-table-column>
 				<el-table-column
-				type="index"
-				width="60"
-				align="center"
-				label="序号"
-				v-if="showSequence"
+					type="index"
+					width="60"
+					align="center"
+					label="序号"
+					v-if="showSequence"
 				>
 					<template #default="scope">
 						<span v-text="getTableIndex(scope.$index)"></span>
@@ -74,24 +74,39 @@
 				'lyTable-page-bk': paginationColorBackground,
 				'lyTable-page-border': config.border
 			}"
-			v-if="!hidePagination || !hideDo"
+			v-if="!hidePagination || (!hideDo && doPositionBottom)"
 		>
 			<div class="lyTable-pagination lyPagination-page">
 				<el-pagination
-				v-if="!hidePagination"
-				:disabled="paginationDisabled"
-				:background="paginationBackground"
-				:size="paginationSmall ? 'small' : 'default'"
-				:layout="paginationLayout"
-				:total="total"
-				:page-size="lyPageSize"
-				:page-sizes="pageSizes"
-				v-model:current-page="currentPage"
-				@current-change="paginationChange"
-				@update:page-size="pageSizeChange"
+					v-if="!hidePagination"
+					:disabled="paginationDisabled"
+					:background="paginationBackground"
+					:size="paginationSmall ? 'small' : 'default'"
+					:layout="paginationLayout"
+					:total="total"
+					:page-size="lyPageSize"
+					:page-sizes="pageSizes"
+					v-model:current-page="currentPage"
+					@current-change="paginationChange"
+					@update:page-size="pageSizeChange"
 				></el-pagination>
 			</div>
-			<div class="lyTable-do" v-if="!hideDo">
+			<TableActions
+				v-if="!hideDo && doPositionBottom"
+				:hide-refresh="hideRefresh"
+				:hide-setting="hideSetting"
+				:user-column="userColumn"
+				:column="column"
+				:config="config"
+				@refresh="refreshData"
+				@column-change="columnSettingChange"
+				@column-save="columnSettingSave"
+				@column-back="columnSettingBack"
+				@size-change="configSizeChange"
+				@border-change="val => config.border = val"
+				@stripe-change="val => config.stripe = val"
+			/>
+			<!-- <div class="lyTable-do" v-if="!hideDo && doPositionBottom">
 				<el-button
 				v-if="!hideRefresh"
 				@click="refreshData"
@@ -150,7 +165,7 @@
 						</el-form-item>
 					</el-form>
 				</el-popover>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </template>
@@ -159,21 +174,22 @@
 	import { ref, watch, computed, onMounted, onActivated, onDeactivated } from 'vue'
 	import { ElMessage } from 'element-plus'
 	import tableConfig from "./table.js"
-	import ColumnSetting from './columnSetting.vue'
+	// import ColumnSetting from './columnSetting.vue'
+	import TableActions from './TableActions.vue'
 
 	const props = defineProps({
 		tableName: { type: String, default: "lyTable" },
 		successCode: { type: Number, default: 2000 },
-		apiObj: { type: Function, default: null },
+		apiObj: { type: Function, default: null },//api接口
 		params: { type: Object, default: () => ({}) },
 		data: { type: Array, default: () => [] },
 		height: { type: [String, Number], default: "100%" },
 		size: { type: String, default: "default" },
 		border: { type: Boolean, default: false },
 		stripe: { type: Boolean, default: false },
-		showSelectable: { type: Boolean, default: false },
-		showSequence: { type: Boolean, default: false },
-		pageSize: { type: Number, default: tableConfig.pageSize },
+		showSelectable: { type: Boolean, default: false },//显示复选框
+		showSequence: { type: Boolean, default: false },//显示索引
+		pageSize: { type: Number, default: tableConfig.pageSize },//显示一页几行数据
 		pageSizes: { type: Array, default: tableConfig.pageSizes },
 		rowKey: { type: String, default: "id" },
 		summaryMethod: { type: Function, default: null },
@@ -181,10 +197,11 @@
 		remoteSort: { type: Boolean, default: false },
 		remoteFilter: { type: Boolean, default: false },
 		remoteSummary: { type: Boolean, default: false },
-		hidePagination: { type: Boolean, default: false },
-		hideDo: { type: Boolean, default: false },
-		hideRefresh: { type: Boolean, default: false },
-		hideSetting: { type: Boolean, default: false },
+		doPositionBottom:{ type: Boolean, default: true },//操作栏是否在底部
+		hidePagination: { type: Boolean, default: false },//隐藏分页
+		hideDo: { type: Boolean, default: false },//隐藏底部操作栏
+		hideRefresh: { type: Boolean, default: false },//隐藏刷新
+		hideSetting: { type: Boolean, default: false },//隐藏设置
 		paginationLayout: { type: String, default: tableConfig.paginationLayout },
 		paginationSmall: { type: Boolean, default: true },
 		paginationBackground: { type: Boolean, default: true },
@@ -202,7 +219,7 @@
 
 	// Computed properties
 	const _height = computed(() => Number(props.height) ? `${Number(props.height)}px` : props.height)
-	const _table_height = computed(() => props.hidePagination && props.hideDo ? "100%" : "calc(100% - 50px)")
+	const _table_height = computed(() => props.hidePagination && (props.hideDo || !props.doPositionBottom) ? "100%" : "calc(100% - 50px)")
 
 	// Reactive state
 	const lyPageSize = ref(props.pageSize)
