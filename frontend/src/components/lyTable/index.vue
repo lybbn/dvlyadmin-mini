@@ -8,6 +8,9 @@
 -->
 <template>
 	<div class="lyTable" :style="{ height: _height }" ref="lyTableMain" v-loading="loading">
+		<div class="lytopaction">
+			<slot name="table-top-bar"></slot>
+		</div>
 		<div class="lyTable-table" :style="{ height: _table_height }">
 			<el-table
 				v-bind="$attrs"
@@ -212,7 +215,7 @@
 	})
 
 	const emit = defineEmits(['dataChange', 'selectionChange'])
-
+	
 	const lyTableMain = ref(null)
 	const lyTable = ref(null)
 	const lyColumnSetting = ref(null)
@@ -591,6 +594,7 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 0 15px;
+		flex-shrink: 0; /* 禁止收缩 */
 	}
 
 	.lyTable-page-bk {

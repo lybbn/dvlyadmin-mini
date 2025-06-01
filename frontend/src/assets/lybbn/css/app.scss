@@ -266,9 +266,13 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
     flex-direction: column;
 }
 .lytopaction{
+	display: flex;
 	padding: 0 !important;
 	height: 50px;
 	border-bottom: unset !important;
+	flex-shrink: 0; /* 禁止收缩 */
+	.left-panel {display: flex;align-items: center;}
+	.right-panel {display: flex;align-items: center;}
 }
 .lytable .el-table__body-wrapper {
     background: unset !important;
