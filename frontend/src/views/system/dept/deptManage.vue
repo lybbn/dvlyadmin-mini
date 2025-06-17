@@ -12,7 +12,7 @@
             </el-form>
         </el-card>
         <el-card class="lytable" shadow="hover">
-            <ly-table tableName="deptManageTable" showSelectable row-key="id" :default-expand-all="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept" :params="formInline" ref="tableref" :column="column" hidePagination :showSequence="false" border>
+            <ly-table tableName="deptManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept" :params="formInline" ref="tableref" :column="column" hidePagination :showSequence="false" border>
                 <template v-slot:table-top-bar>
                     <div class="left-panel">
                         <el-button type="primary" icon="plus"  @click="handleAddClick" v-show="hasPermission(route.name,'Create')">新增</el-button>

@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-	import { ref, watch, computed, onMounted, onActivated, onDeactivated } from 'vue'
+	import { ref, watch, computed, onMounted, onActivated, onDeactivated,nextTick } from 'vue'
 	import { ElMessage } from 'element-plus'
 	import tableConfig from "./table.js"
 	// import ColumnSetting from './columnSetting.vue'
@@ -201,7 +201,7 @@
 		rowKey: { type: String, default: "id" },
 		treeProps: { type: Object, default: () => ({children: 'children', hasChildren: 'hasChildren'}) },
 		isTree: { type: Boolean, default: false },//是否转换为树形结构数据。使用XEUtils
-		defaultExpandAll:{ type: Boolean, default: true },
+		defaultExpandAll:{ type: Boolean, default: false },
 		summaryMethod: { type: Function, default: null },
 		column: { type: Array, default: () => [] },
 		remoteSort: { type: Boolean, default: false },
@@ -354,6 +354,14 @@
 				total.value = res.data.total || 0
 				summary.value = res.data.summary || {}
 				emit('dataChange', res, tableData.value)
+				// 数据更新后，根据配置手动展开所有行(修复异步加载数据导致el-table自动展开树形数据失效问题)
+				nextTick(() => {
+					if (lyTable.value && props.defaultExpandAll) {
+						tableData.value.forEach(row => {
+							lyTable.value.toggleRowExpansion(row, true); // 强制展开
+						});
+					}
+				});
 			}
 		} catch (error) {
 			emptyText.value = error.statusText || "请求失败"
