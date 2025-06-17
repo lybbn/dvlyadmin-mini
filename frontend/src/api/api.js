@@ -69,4 +69,15 @@ Api.apiSystemMenuFieldGetModels = params => ajaxGet({url: `/api/system/menu_fiel
 // 自动生成列
 Api.apiSystemMenuFieldAutoCreate = params => ajaxPost({url: `/api/system/menu_field/auto_create/`,params})
 
+// 部门管理
+Api.apiSystemDept = params => ajaxGet({url: `/api/system/dept/`,params})
+// 部门管理 -- 新增
+Api.apiSystemDeptAdd = params => ajaxPost({url: `/api/system/dept/`,params})
+// 部门管理 -- 编辑
+Api.apiSystemDeptEdit = params => ajaxPut({url: `/api/system/dept/`,params})
+// 部门管理 -- 删除
+Api.apiSystemDeptDelete = params => ajaxDelete({url: `/api/system/dept/`,params})
+// 部门管理 -- 禁用启用
+Api.apiSystemDeptSetStatus = params => ajaxPost({url: `/api/system/dept/set_status/`,params})
+
 export default Api

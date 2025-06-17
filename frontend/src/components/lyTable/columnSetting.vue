@@ -98,6 +98,11 @@
 	}
 
 	const list = ref(null)
+
+	defineExpose({
+      	isSave,
+		usercolumn
+    })
 </script>
 
 <style scoped>

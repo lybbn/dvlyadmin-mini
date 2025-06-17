@@ -22,6 +22,8 @@
 				:size="config.size"
 				:border="config.border"
 				:stripe="config.stripe"
+				:tree-props="treeProps"
+				:default-expand-all="defaultExpandAll"
 				:summary-method="remoteSummary ? remoteSummaryMethod : summaryMethod"
 				@sort-change="sortChange"
 				@filter-change="filterChange"
@@ -38,7 +40,7 @@
 					width="60"
 					align="center"
 					label="序号"
-					v-if="showSequence"
+					v-if="config.sequence"
 				>
 					<template #default="scope">
 						<span v-text="getTableIndex(scope.$index)"></span>
@@ -95,6 +97,7 @@
 				></el-pagination>
 			</div>
 			<TableActions
+				ref="lyTableActionRef"
 				v-if="!hideDo && doPositionBottom"
 				:hide-refresh="hideRefresh"
 				:hide-setting="hideSetting"
@@ -106,6 +109,7 @@
 				@column-save="columnSettingSave"
 				@column-back="columnSettingBack"
 				@size-change="configSizeChange"
+				@sequence-change="val => config.sequence = val"
 				@border-change="val => config.border = val"
 				@stripe-change="val => config.stripe = val"
 			/>
@@ -195,6 +199,9 @@
 		pageSize: { type: Number, default: tableConfig.pageSize },//显示一页几行数据
 		pageSizes: { type: Array, default: tableConfig.pageSizes },
 		rowKey: { type: String, default: "id" },
+		treeProps: { type: Object, default: () => ({children: 'children', hasChildren: 'hasChildren'}) },
+		isTree: { type: Boolean, default: false },//是否转换为树形结构数据。使用XEUtils
+		defaultExpandAll:{ type: Boolean, default: true },
 		summaryMethod: { type: Function, default: null },
 		column: { type: Array, default: () => [] },
 		remoteSort: { type: Boolean, default: false },
@@ -219,6 +226,7 @@
 	const lyTableMain = ref(null)
 	const lyTable = ref(null)
 	const lyColumnSetting = ref(null)
+	let lyTableActionRef = ref(null)
 
 	// Computed properties
 	const _height = computed(() => Number(props.height) ? `${Number(props.height)}px` : props.height)
@@ -242,10 +250,23 @@
 	const summary = ref({})
 
 	const config = ref({
-	size: props.size,
-	border: props.border,
-	stripe: props.stripe
+		size: props.size,
+		border: props.border,
+		stripe: props.stripe,
+		sequence:props.showSequence
 	})
+
+	// 动态导入 XEUtils
+    const loadXEUtils = async () => {
+		try {
+			// 使用动态导入
+			const XEUtils = await import('xe-utils')
+			return XEUtils
+		} catch (error) {
+			console.error('Failed to load XEUtils:', error)
+			return null
+		}
+    }
 
 	// Watchers
 	watch(() => props.data, (newVal) => {
@@ -324,7 +345,12 @@
 				emptyText.value = res.msg
 			} else {
 				emptyText.value = "暂无数据"
-				tableData.value = res.data.data || []
+				let tdata = res.data.data
+				if(props.isTree){
+					const XEUtils = await loadXEUtils()
+      				tdata = XEUtils.toArrayTree(tdata, { parentKey: 'parent', strict: false })
+				}
+				tableData.value = tdata || []
 				total.value = res.data.total || 0
 				summary.value = res.data.summary || {}
 				emit('dataChange', res, tableData.value)
@@ -381,31 +407,33 @@
 	}
 
 	const columnSettingSave = async (userCol) => {
-		if (!lyColumnSetting.value) return
+		let settingref = lyTableActionRef.value.lyColumnSetting
+		if (!settingref) return
 		
-		lyColumnSetting.value.isSave = true
+		settingref.isSave = true
 		try {
 			await tableConfig.columnSettingSave(props.tableName, userCol)
 			ElMessage.success('保存成功')
 		} catch (error) {
 			ElMessage.error('保存失败')
 		} finally {
-			lyColumnSetting.value.isSave = false
+			settingref.isSave = false
 		}
 	}
 
 	const columnSettingBack = async () => {
-		if (!lyColumnSetting.value) return
+		let settingref = lyTableActionRef.value.lyColumnSetting
+		if (!settingref) return
 		
-		lyColumnSetting.value.isSave = true
+		settingref.isSave = true
 		try {
 			const column = await tableConfig.columnSettingReset(props.tableName, props.column)
 			userColumn.value = column
-			lyColumnSetting.value.usercolumn = JSON.parse(JSON.stringify(userColumn.value))
+			settingref.usercolumn = JSON.parse(JSON.stringify(userColumn.value))
 		} catch (error) {
 			ElMessage.error('重置失败')
 		} finally {
-			lyColumnSetting.value.isSave = false
+			settingref.isSave = false
 		}
 	}
 

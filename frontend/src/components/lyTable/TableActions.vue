@@ -56,6 +56,12 @@
                 <el-checkbox v-model="config.border" @change="emit('borderChange', $event)" label="纵向边框"></el-checkbox>
                 <el-checkbox v-model="config.stripe" @change="emit('stripeChange', $event)" label="斑马纹"></el-checkbox>
             </el-form-item>
+            <el-form-item label="序号列">
+                <el-radio-group v-model="config.sequence" @change="emit('sequenceChange', $event)">
+                    <el-radio :value="true">显示</el-radio>
+                    <el-radio :value="false">隐藏</el-radio>
+                </el-radio-group>
+            </el-form-item>
         </el-form>
     </el-popover>
     </div>
@@ -74,9 +80,10 @@
         config: { 
             type: Object, 
             default: () => ({
-            size: 'default',
-            border: false,
-            stripe: false
+                size: 'default',
+                border: false,
+                stripe: false,
+                sequence : false,
             })
         }
     })
@@ -88,7 +95,8 @@
         'columnBack',
         'sizeChange',
         'borderChange',
-        'stripeChange'
+        'stripeChange',
+        'sequenceChange'
     ])
 
     const customColumnShow = ref(false)
