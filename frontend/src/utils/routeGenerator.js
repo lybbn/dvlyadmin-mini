@@ -1,3 +1,7 @@
+import {useRoutesList} from '@/store/routesList';
+import {CustomStaticRoutes,staticRoutes,NotFound,RedirectRoute,dynamicRoutes} from '@/router/routes.js';
+import { withAutoBreadcrumb } from '@/router/autoBreadcrumb.js'
+
 export function generateLocalRoutes() {
     // 定义需要排除的路径
     const excludes = [
@@ -34,4 +38,31 @@ export function generateLocalRoutes() {
         })
         // 过滤掉排除路径
         .filter(route => !excludes.includes(route.path));
+}
+
+
+export async function initRoutes(router,dRoutes=dynamicRoutes){
+    let newrouter = await setAddRoute(router,dRoutes);
+    return newrouter
+}
+
+async function setAddRoute(router,dRoutes=dynamicRoutes) {
+	let routeChildren = await setFilterRoute(router,dRoutes=dynamicRoutes)
+    routeChildren.forEach((route) => {
+		router.addRoute(route);
+	});
+    router.addRoute(RedirectRoute);
+    router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
+    
+    const storesRoutesList = useRoutesList();
+	storesRoutesList.setRoutesList(routeChildren[0].children);
+    return router
+}
+
+//保留嵌套路由层级
+async function setFilterRoute(router,dRoutes=dynamicRoutes) {
+    let filterRoute = dRoutes
+	filterRoute[0].children = [...filterRoute[0].children,...CustomStaticRoutes, ...NotFound];
+    filterRoute = withAutoBreadcrumb(filterRoute)
+	return filterRoute;
 }

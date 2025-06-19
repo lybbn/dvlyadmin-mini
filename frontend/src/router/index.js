@@ -1,14 +1,14 @@
 import {createRouter, createWebHashHistory} from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import {CustomStaticRoutes,staticRoutes,NotFound,RedirectRoute,dynamicRoutes} from './routes';
-import { withAutoBreadcrumb } from './autoBreadcrumb.js'
+import {staticRoutes} from './routes';
 import config from "@/config/index";
 import {getToken,autoStorage} from '@/utils/util'
 import {storeToRefs} from 'pinia';
 import {useRoutesList} from '@/store/routesList';
 import {ElNotification} from "element-plus"
 import { cancelRequestState } from "@/store/cancelRequest";
+import {initRoutes} from '@/utils/routeGenerator.js'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -37,11 +37,15 @@ router.beforeEach(async (to, from, next) => {
         } else if (token && to.path === '/login') {
             next('/home');
             NProgress.done();
-        } else {
+        } else if(!token){
+            next(`/login`);
+            autoStorage.clear();
+            NProgress.done();
+        }else {
             const storesRoutesList = useRoutesList();
             const {routesList} = storeToRefs(storesRoutesList);
             if (routesList.value.length === 0) {
-                await initRoutes();
+                await initRoutes(router);
                 next({...to, replace: true});
             } else {
                 next();
@@ -61,29 +65,6 @@ router.onError((error) => {
 		message: error.message
 	});
 });
-
-async function initRoutes(){
-    await setAddRoute();
-}
-
-async function setAddRoute() {
-	let routeChildren = await setFilterRoute()
-    routeChildren.forEach((route) => {
-		router.addRoute(route);
-	});
-    router.addRoute(RedirectRoute);
-    router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
-    const storesRoutesList = useRoutesList();
-	storesRoutesList.setRoutesList(routeChildren[0].children);
-}
-
-//保留嵌套路由层级
-async function setFilterRoute() {
-    let filterRoute = dynamicRoutes
-	filterRoute[0].children = [...filterRoute[0].children,...CustomStaticRoutes, ...NotFound];
-    filterRoute = withAutoBreadcrumb(filterRoute)
-	return filterRoute;
-}
 
 // 导出路由
 export default router;

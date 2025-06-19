@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import Api from '@/api/api'
 import config from '@/config'
 import XEUtils from "xe-utils";
-import { generateLocalRoutes } from '@/utils/routeGenerator'
+import {dynamicRoutes} from '@/router/routes.js';
+import { generateLocalRoutes,initRoutes } from '@/utils/routeGenerator'
 
 export const useUserState = defineStore('userState', {
 	state:() => {
@@ -22,11 +23,11 @@ export const useUserState = defineStore('userState', {
                 softNums:0,
                 currentOs:"windows",
             },
-            // 完整菜单树 (用于菜单渲染)
+            // 完整菜单树 (用于菜单渲染),是获取后台菜单转换后的路由配置
             menus: [],
             // 扁平化权限集合 (用于快速权限检查)
             permissions: {
-                menus: [],    // 可访问的菜单路径
+                menus: [],    // 原始菜单路径
                 buttons: [],  // {menuName: [buttonCode1, buttonCode2]}  menuName 菜单组件名 有唯一性
                 columns: []   // {tableName: {columnName: permissionType}}
             }
@@ -59,51 +60,6 @@ export const useUserState = defineStore('userState', {
             })
         },
         /**
-         * 动态导入Vue组件
-         * @param {Object} dynamicViewsModules - import.meta.glob返回的对象 
-         * @param {String} componentPath - 组件路径 (如 'system/user/index')
-         * @returns {Promise<Component>}
-         */
-        async dynamicImport(dynamicViewsModules, componentPath) {
-            // 标准化路径格式（统一为相对路径）
-            const normalizedPath = componentPath.startsWith('/') 
-                ? componentPath.slice(1) 
-                : componentPath
-
-            // 1. 精确匹配（优先尝试）
-            const exactKey = `../views/${normalizedPath}.vue`
-            if (dynamicViewsModules[exactKey]) {
-                return dynamicViewsModules[exactKey]()
-            }
-
-            // 2. 模糊匹配（兼容不同路径格式）
-            const keys = Object.keys(dynamicViewsModules)
-            const matchKeys = keys.filter(key => {
-                // 移除路径前缀和扩展名
-                const cleanKey = key
-                .replace(/^..\/views\//, '')
-                .replace(/\.vue$/, '')
-                .replace(/\/index$/, '')
-                
-                // 匹配组件路径
-                return cleanKey === normalizedPath || 
-                    cleanKey.endsWith(`/${normalizedPath}`)
-            })
-
-            // 匹配结果处理
-            if (matchKeys.length === 1) {
-                return dynamicViewsModules[matchKeys[0]]()
-            }
-
-            if (matchKeys.length > 1) {
-                console.warn(`找到多个匹配组件: ${matchKeys.join(', ')}`)
-                return dynamicViewsModules[matchKeys[0]]() // 返回第一个匹配项
-            }
-
-            // 匹配失败处理
-            console.log(`未找到组件: ${componentPath}`)
-        },
-        /**
          * 转换后端菜单为路由配置
          * @param {Array} menus 后端菜单数据
          */
@@ -112,6 +68,8 @@ export const useUserState = defineStore('userState', {
             let localvuefiles = generateLocalRoutes()
             return menus.map(menu => {
                 let route = {
+                    id:menu.id,
+                    parent:menu.parent,
                     path: menu.web_path,
                     name: menu.component_name,
                     meta: {
@@ -157,19 +115,33 @@ export const useUserState = defineStore('userState', {
                 return route
             })
         },
+        /**
+         * 更新动态路由
+         * @returns {Promise<boolean>} 是否更新成功
+         */
+        async updateDynamicRoutes(router) {
+            try {
+                dynamicRoutes.children = this.menus
+                let newdynamicRoutes = dynamicRoutes
+                await initRoutes(router,newdynamicRoutes)
+                return true
+            } catch (error) {
+                console.error('路由更新失败:', error)
+                return false
+            }
+        },
 
         /**
          * 获取菜单
          */
-        async getSystemWebRouter(){
-            Api.apiSystemWebRouter().then(res=>{
-                if(res.code == 2000){
-                    let tmpdata = this.transformMenuToRoutes(res.data)
-                    this.permissions.menus = tmpdata
-                    this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: false })
-                    console.log(this.menus)
-                }
-            })
+        async getSystemWebRouter(router){
+            const res = await Api.apiSystemWebRouter();
+            if(res.code == 2000){
+                let tmpdata = this.transformMenuToRoutes(res.data)
+                this.permissions.menus = res.data
+                this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: true })
+                this.updateDynamicRoutes(router)
+            }
         },
         /**
          * 取系统配置

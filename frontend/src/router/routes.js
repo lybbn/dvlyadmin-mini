@@ -16,74 +16,74 @@ export const dynamicRoutes = [
 
 //自定义layout的children的静态路由，优先级高于后台api的动态路由
 export const CustomStaticRoutes = [
-	{
-		path: "/home",
-		name: 'home',
-		component: () => import('@/views/system/home/home.vue'),
-		meta: {
-			title: "首页",
-			requireAuth: true,
-			hidden:false,
-			icon:'House',
-			affix: true//固定
-		}
-	},
-	{
-		path: "/PersonalCenter",
-		name: 'PersonalCenter',
-		component: () => import('@/views/system/usercenter/PersonalCenter.vue'),
-		meta: {
-			title: "个人中心",
-			requireAuth: true,
-			hidden:false,
-			icon:'User',
-		}
-	},
-	{
-		path: "/PersonalCenters",
-		name: 'PersonalCenters',
-		component: () => import('@/views/system/usercenter/PersonalCenters.vue'),
-		meta: {
-			title: "个人中心简版",
-			requireAuth: true,
-			hidden:false,
-			icon:'User',
-		}
-	},
-	{
-		path: "/system",
-		name: 'system',
-		meta: {
-			title: "系统管理",
-			requireAuth: true,
-			hidden:false,
-			icon:'setting',
-		},
-		children:[
-			{
-				path: "/deptManage",
-				name: 'deptManage',
-				component: () => import('@/views/system/dept/deptManage.vue'),
-				meta: {
-					title: "部门管理",
-					requireAuth: true,
-					hidden:false,
-					icon:'OfficeBuilding',
-				}
-			},
-			{
-				path: "/menuManage",
-				name: 'menuManage',
-				component: () => import('@/views/system/menu/menuManage.vue'),
-				meta: {
-					title: "菜单管理",
-					requireAuth: true,
-					hidden:false,
-					icon:'Collection',
-				}
-			},
-		]
-	},
+	// {
+	// 	path: "/home",
+	// 	name: 'home',
+	// 	component: () => import('@/views/system/home/home.vue'),
+	// 	meta: {
+	// 		title: "首页",
+	// 		requireAuth: true,
+	// 		hidden:false,
+	// 		icon:'House',
+	// 		affix: true//固定
+	// 	}
+	// },
+	// {
+	// 	path: "/PersonalCenter",
+	// 	name: 'PersonalCenter',
+	// 	component: () => import('@/views/system/usercenter/PersonalCenter.vue'),
+	// 	meta: {
+	// 		title: "个人中心",
+	// 		requireAuth: true,
+	// 		hidden:false,
+	// 		icon:'User',
+	// 	}
+	// },
+	// {
+	// 	path: "/PersonalCenters",
+	// 	name: 'PersonalCenters',
+	// 	component: () => import('@/views/system/usercenter/PersonalCenters.vue'),
+	// 	meta: {
+	// 		title: "个人中心简版",
+	// 		requireAuth: true,
+	// 		hidden:false,
+	// 		icon:'User',
+	// 	}
+	// },
+	// {
+	// 	path: "/system",
+	// 	name: 'system',
+	// 	meta: {
+	// 		title: "系统管理",
+	// 		requireAuth: true,
+	// 		hidden:false,
+	// 		icon:'setting',
+	// 	},
+	// 	children:[
+	// 		{
+	// 			path: "/deptManage",
+	// 			name: 'deptManage',
+	// 			component: () => import('@/views/system/dept/deptManage.vue'),
+	// 			meta: {
+	// 				title: "部门管理",
+	// 				requireAuth: true,
+	// 				hidden:false,
+	// 				icon:'OfficeBuilding',
+	// 			}
+	// 		},
+	// 		{
+	// 			path: "/menuManage",
+	// 			name: 'menuManage',
+	// 			component: () => import('@/views/system/menu/menuManage.vue'),
+	// 			meta: {
+	// 				title: "菜单管理",
+	// 				requireAuth: true,
+	// 				hidden:false,
+	// 				icon:'Collection',
+	// 			}
+	// 		},
+	// 	]
+	// },
 	
 ]
 

@@ -96,6 +96,7 @@
 				// 3. 登录成功处理
 				setToken('logintoken', res.data.access);
 				setRefreshToken('refreshtoken', res.data.refresh);
+				await userState.getSystemWebRouter(router)
 				loginSuccess(); // 执行跳转等操作
 				ElMessage.success('登录成功');
 				islogining.value = false
