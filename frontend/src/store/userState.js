@@ -4,6 +4,7 @@ import config from '@/config'
 import XEUtils from "xe-utils";
 import {dynamicRoutes} from '@/router/routes.js';
 import { generateLocalRoutes,initRoutes } from '@/utils/routeGenerator'
+import { useKeepAliveStore } from "@/store/keepAlive";
 
 export const useUserState = defineStore('userState', {
 	state:() => {
@@ -66,6 +67,8 @@ export const useUserState = defineStore('userState', {
         transformMenuToRoutes(menus){
             const Component404 = () => import('@/views/system/error/404.vue')
             let localvuefiles = generateLocalRoutes()
+            const KeepAliveStore = useKeepAliveStore()
+
             return menus.map(menu => {
                 let route = {
                     id:menu.id,
@@ -83,7 +86,7 @@ export const useUserState = defineStore('userState', {
                         affix:false,
                     }
                 }
-
+                KeepAliveStore.updateKeepAlive(route)
                 // 动态加载组件(优先使用后台配置返回的菜单)
                 if (menu.type == 1 && menu.component) {
                     try {
@@ -101,6 +104,10 @@ export const useUserState = defineStore('userState', {
                     }else{
                         route.component = Component404
                     }
+                }
+
+                if(menu.type == 2){
+                    route.component = () => import('@/layout/components/iframeView.vue')
                 }
 
                 // 处理子路由
@@ -121,7 +128,7 @@ export const useUserState = defineStore('userState', {
          */
         async updateDynamicRoutes(router) {
             try {
-                dynamicRoutes.children = this.menus
+                dynamicRoutes[0].children = this.menus
                 let newdynamicRoutes = dynamicRoutes
                 await initRoutes(router,newdynamicRoutes)
                 return true
@@ -140,7 +147,7 @@ export const useUserState = defineStore('userState', {
                 let tmpdata = this.transformMenuToRoutes(res.data)
                 this.permissions.menus = res.data
                 this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: true })
-                this.updateDynamicRoutes(router)
+                await this.updateDynamicRoutes(router)
             }
         },
         /**

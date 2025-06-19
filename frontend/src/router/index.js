@@ -8,7 +8,7 @@ import {storeToRefs} from 'pinia';
 import {useRoutesList} from '@/store/routesList';
 import {ElNotification} from "element-plus"
 import { cancelRequestState } from "@/store/cancelRequest";
-import {initRoutes} from '@/utils/routeGenerator.js'
+import { useUserState } from "@/store/userState";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -35,6 +35,7 @@ router.beforeEach(async (to, from, next) => {
             autoStorage.clear();
             NProgress.done();
         } else if (token && to.path === '/login') {
+            console.log(router.hasRoute('home'))
             next('/home');
             NProgress.done();
         } else if(!token){
@@ -45,9 +46,26 @@ router.beforeEach(async (to, from, next) => {
             const storesRoutesList = useRoutesList();
             const {routesList} = storeToRefs(storesRoutesList);
             if (routesList.value.length === 0) {
-                await initRoutes(router);
+                let userState = useUserState()
+                await userState.getSystemWebRouter(router);
+                if (to.path === '/home') {//避免没有home首页时，跳转到第一个可用路由
+                    const hasHomePath = userState.permissions.menus.some(route => route.web_path === '/home');
+                    if (!hasHomePath) {
+                        // 跳转到第一个路由
+                        const firstRoute = routesList.value[0]?.path
+                        return next(firstRoute); // 重定向到第一个路由
+                    }
+                }
                 next({...to, replace: true});
             } else {
+                if (to.path === '/home') {//避免没有home首页时，跳转到第一个可用路由
+                    const hasHomePath = router.getRoutes().some(route => route.path === '/home');
+                    if (!hasHomePath) {
+                        // 跳转到第一个路由
+                        const firstRoute = routesList.value[0]?.path
+                        return next(firstRoute); // 重定向到第一个路由
+                    }
+                }
                 next();
             }
         }

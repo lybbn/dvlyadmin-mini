@@ -353,6 +353,9 @@
     import XEUtils from "xe-utils";
     import moduleMenuButton from "./components/moduleMenuButton.vue";
     import DialogTableList from "@/components/dialog/dialogTableList.vue"
+    import { useUserState } from "@/store/userState";
+
+    let userState = useUserState()
 
     let formRefm = ref(null)
     let formRefb = ref(null)
@@ -888,7 +891,8 @@
                 apiObj(param).then(res=>{
                     loadingMenuPage.value=false
                     if(res.code ==2000) {
-                        getMenuData()
+                        // getMenuData()
+                        window.location.reload()
                     } else {
                         ElMessage.warning(res.msg)
                         return

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import {autoStorage} from '@/utils/util'
 
 export const useKeepAliveStore = defineStore('keepAlive', {
     state:() => {
@@ -12,13 +11,21 @@ export const useKeepAliveStore = defineStore('keepAlive', {
 
     },
     actions: {
-        setKeepAliveRoute(val) {
-            this.keepAliveRoute = val;
-            autoStorage.set('keepAliveRoute',val);
+        // 根据路由更新缓存列表（自动去重）
+        updateKeepAlive(route) {
+            if (route.meta?.isKeepAlive && route.name) {
+                if (!this.keepAliveRoute.includes(route.name)) {
+                    this.keepAliveRoute = [...this.keepAliveRoute, route.name];
+                }
+            }else if(!route.meta?.isKeepAlive && route.name){
+                if (this.keepAliveRoute.includes(route.name)) {
+                    this.keepAliveRoute = this.keepAliveRoute.filter(name => name !== route.name);
+                }
+            }
         },
-        setRouteShow(val){
-			this.routeShow = val
-            autoStorage.set('routeShow',val);
-		}
+        // 清空所有缓存
+        clearKeepAlive() {
+            this.keepAliveRoute = [];
+        },
     },
 })

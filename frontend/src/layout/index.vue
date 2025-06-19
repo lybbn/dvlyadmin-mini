@@ -37,7 +37,6 @@
 							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
 						</keep-alive>
 					</router-view>
-					<iframeView></iframeView>
 				</div>
 			</div>
 		</section>
@@ -71,7 +70,6 @@
 							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
 						</keep-alive>
 					</router-view>
-					<iframeView></iframeView>
 				</div>
 			</div>
 		</section>
@@ -127,7 +125,6 @@
 							<component :is="Component" :key="route.path" v-if="KeepAliveStore.routeShow" />
 						</keep-alive>
 					</router-view>
-					<iframeView></iframeView>
 				</div>
 			</div>
 		</section>
@@ -163,7 +160,6 @@ import TabsView from './components/TabsView.vue'
 import SideMobile from './components/sideMobile.vue';
 import NavMenu from './components/NavMenu.vue';
 import userbar from './components/userbar.vue';
-import iframeView from './components/iframeView.vue';
 import { useSiteThemeStore } from "@/store/siteTheme";
 import { useKeepAliveStore } from "@/store/keepAlive";
 import { useUserState } from "@/store/userState";
@@ -383,7 +379,6 @@ onMounted(() => {
 	router.afterEach(showThis);
 	// 监听点击事件
     document.addEventListener('click', handleClickOutside);
-	userState.getSystemWebRouter(router)
 })
 
 onBeforeUnmount(() => {
