@@ -19,7 +19,7 @@ export const CustomStaticRoutes = [
 	{
 		path: "/home",
 		name: 'home',
-		component: () => import('@/views/system/home/index.vue'),
+		component: () => import('@/views/system/home/home.vue'),
 		meta: {
 			title: "首页",
 			requireAuth: true,

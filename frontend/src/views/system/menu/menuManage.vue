@@ -177,7 +177,7 @@
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===1">
                         <el-form-item label="组件路径">
-                            <el-input v-model="formData.component" placeholder="输入前端页面组件的位置路径"/>
+                            <el-input v-model="formData.component" placeholder="前端页面组件的位置路径：system/dept/deptManage"/>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" v-if="formData?.type ===2 || formData?.type ===3">

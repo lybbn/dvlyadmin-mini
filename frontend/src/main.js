@@ -17,7 +17,7 @@ import App from './App.vue'
 const app = createApp(App);
 
 // 自定义指令
-import directivePlugin from '@/utils/directive.js'
+// import directivePlugin from '@/utils/directive.js'
 
 import Particles from "@tsparticles/vue3";
 import { loadSlim } from "@tsparticles/slim";
@@ -36,6 +36,6 @@ app.use(i18n)
 app.use(lyIntall);
 app.use(store)
 app.use(router);
-app.use(directivePlugin)
+// app.use(directivePlugin)
 
 app.mount('#app')

@@ -302,16 +302,27 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_DIST':'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF':'SIDECAR',
     'REDOC_DIST':'SIDECAR',
+    # 'SERVE_AUTHENTICATION': ['rest_framework_simplejwt.authentication.JWTAuthentication'],
+    # 'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
     'SERVE_INCLUDE_SCHEMA': False, # 如果不需要在浏览器中直接查看，可以设置为 False(线上部署可为False)
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': r'/api/',
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
-        "persistAuthorization": True,
+        "persistAuthorization": True, # 保持认证状态
         "displayOperationId": True,
+        'securityDefinitions': {
+            'JWT': {
+                'type': 'apiKey',
+                'name': 'Authorization',
+                'in': 'header',
+                'description': 'JWT 格式: JWT <token>'
+            }
+        },
+        'security': [{'JWT': []}]  # 全局启用认证
     },
     'PREPROCESSING_HOOKS': ['drf_spectacular.hooks.preprocess_exclude_path_format'],
-    'SECURITY': [{'jwt': []}],
+    'SECURITY': [{'JWT': []}],# 全局安全要求
 }
 # ================================================= #
 # ****************** simplejwt配置 ***************** #

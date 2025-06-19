@@ -2,7 +2,7 @@
     <ly-dialog :title="titleMap[mode]" v-model="visible" width="500px" destroy-on-close @closed="emits('closed')">
         <el-form :model="formData" :rules="rules" :disabled="mode=='show'" ref="dialogForm" label-width="auto">
             <el-form-item label="上级部门" prop="parent">
-                <el-tree-select v-model="formData.parent" node-key="id" :data="groups"
+                <el-tree-select v-model="formData.parent" node-key="id" :data="groups" default-expand-all
                                 check-strictly filterable clearable :render-after-expand="false"
                                 :props="{label:'name',value: 'id'}"
                                 style="width: 100%" placeholder="请选择/为空则为顶级" >
@@ -43,6 +43,7 @@
     import {deepClone} from "@/utils/util.js"
     import Api from "@/api/api.js"
     import { ElMessage, ElMessageBox } from 'element-plus'
+    import XEUtils from "xe-utils";
 
     const emits = defineEmits(['refreshData', 'closed'])
 
@@ -91,9 +92,9 @@
     }
     
     const getGroup = async () => {
-        Api.apiSystemDept({page:1,limit:999}).then(res=>{
+        Api.apiSystemDept({page:1,limit:999,status:1}).then(res=>{
             if(res.code === 2000){
-                groups.value = res.data.data
+                groups.value = XEUtils.toArrayTree(res.data.data, { parentKey: 'parent', strict: false })
             }
         })
     }

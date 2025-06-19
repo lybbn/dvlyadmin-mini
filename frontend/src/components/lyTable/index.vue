@@ -8,8 +8,28 @@
 -->
 <template>
 	<div class="lyTable" :style="{ height: _height }" ref="lyTableMain" v-loading="loading">
-		<div class="lytopaction">
-			<slot name="table-top-bar"></slot>
+		<div class="lytopaction" v-if="!hideTopBar">
+			<div>
+				<slot name="topbar"></slot>
+			</div>
+			<TableActions
+				style="float: right;"
+				ref="lyTableActionRef"
+				v-if="!hideDo && !doPositionBottom"
+				:hide-refresh="hideRefresh"
+				:hide-setting="hideSetting"
+				:user-column="userColumn"
+				:column="column"
+				:config="config"
+				@refresh="refreshData"
+				@column-change="columnSettingChange"
+				@column-save="columnSettingSave"
+				@column-back="columnSettingBack"
+				@size-change="configSizeChange"
+				@sequence-change="val => config.sequence = val"
+				@border-change="val => config.border = val"
+				@stripe-change="val => config.stripe = val"
+			/>
 		</div>
 		<div class="lyTable-table" :style="{ height: _table_height }">
 			<el-table
@@ -178,11 +198,12 @@
 </template>
 
 <script setup>
-	import { ref, watch, computed, onMounted, onActivated, onDeactivated,nextTick } from 'vue'
+	import { ref, watch, computed, onMounted, onActivated, onDeactivated,nextTick, onUnmounted } from 'vue'
 	import { ElMessage } from 'element-plus'
 	import tableConfig from "./table.js"
 	// import ColumnSetting from './columnSetting.vue'
 	import TableActions from './TableActions.vue'
+	import { debounce } from 'lodash-es';
 
 	const props = defineProps({
 		tableName: { type: String, default: "lyTable" },
@@ -207,6 +228,7 @@
 		remoteSort: { type: Boolean, default: false },
 		remoteFilter: { type: Boolean, default: false },
 		remoteSummary: { type: Boolean, default: false },
+		hideTopBar:{ type: Boolean, default: false },//隐藏表格顶部操作栏
 		doPositionBottom:{ type: Boolean, default: true },//操作栏是否在底部
 		hidePagination: { type: Boolean, default: false },//隐藏分页
 		hideDo: { type: Boolean, default: false },//隐藏底部操作栏
@@ -550,6 +572,15 @@
 		})
 	}
 
+	const handleResize = debounce(() => {
+		lyTable.value?.doLayout(); // 调用表格的布局方法
+	}, 200);
+
+	const cleanup = () => {
+		handleResize.cancel(); // 必须取消防抖函数
+		window.removeEventListener('resize', handleResize);
+	};
+
 	// Native table methods
 	const clearSelection = () => lyTable.value?.clearSelection()
 	const toggleRowSelection = (row, selected) => lyTable.value?.toggleRowSelection(row, selected)
@@ -570,6 +601,11 @@
 			tableData.value = props.data
 			total.value = props.data.length
 		}
+		window.addEventListener('resize', handleResize);
+	})
+
+	onUnmounted(()=>{
+		cleanup()
 	})
 
 	onActivated(() => {
@@ -622,6 +658,12 @@
 
 	.lyTable-table {
 		height:100%;
+	}
+
+	.lytopaction{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	.lyTable-page {

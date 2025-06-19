@@ -92,11 +92,13 @@
 			const res = await Api.getToken(formData.value);
     
 			if (res.code === 2000) {
+				islogining.value = true
 				// 3. 登录成功处理
 				setToken('logintoken', res.data.access);
 				setRefreshToken('refreshtoken', res.data.refresh);
 				loginSuccess(); // 执行跳转等操作
 				ElMessage.success('登录成功');
+				islogining.value = false
 			} else {
 				// 4. 登录失败（服务端返回错误）
 				ElMessage.error(res.msg || '登录失败');

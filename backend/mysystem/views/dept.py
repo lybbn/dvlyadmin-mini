@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 """
-@Remark: 角色管理
+@Remark: 部门管理
 """
 import django_filters
 from rest_framework import serializers
 
 from mysystem.models import Dept
-from utils.jsonResponse import SuccessResponse,ErrorResponse
+from utils.jsonResponse import SuccessResponse,ErrorResponse,DetailResponse
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
 from utils.common import get_parameter_dic
@@ -37,37 +37,6 @@ class DeptSerializer(CustomModelSerializer):
         fields = "__all__"
         read_only_fields = ["id"]
 
-
-class DeptCreateUpdateSerializer(CustomModelSerializer):
-    """
-    部门管理 创建/更新时的列化器
-    """
-
-    class Meta:
-        model = Dept
-        fields = '__all__'
-
-
-class DeptTreeSerializer(CustomModelSerializer):
-    """
-    部门表的树形序列化器
-    """
-    children = serializers.SerializerMethodField(read_only=True)
-
-    def get_children(self, instance):
-        queryset = Dept.objects.filter(parent=instance.id).filter(status=1)
-        if queryset:
-            serializer = DeptTreeSerializer(queryset, many=True)
-            return serializer.data
-        else:
-            return None
-
-    class Meta:
-        model = Dept
-        fields = "__all__"
-        read_only_fields = ["id"]
-
-
 class DeptViewSet(CustomModelViewSet):
     """
     部门管理接口:
@@ -80,15 +49,12 @@ class DeptViewSet(CustomModelViewSet):
     def set_status(self,request,*args, **kwargs):
         """禁用/启用"""
         reqData = get_parameter_dic(request)
-        instance = self.filter_queryset(self.get_queryset(id=reqData.get("id",""))).first()
+        id=reqData.get("id","")
+        queryset = self.filter_queryset(self.get_queryset())
+        instance = queryset.filter(id=id).first()
         if instance:
             instance.status = False if instance.status else True
             instance.save()
-            return SuccessResponse(data=None, msg="修改成功")
+            return DetailResponse(data=None, msg="设置成功")
         else:
             return ErrorResponse(msg="未获取到数据")
-
-    def dept_tree(self, request):
-        queryset = Dept.objects.exclude(status=0).filter(parent=None)
-        serializer = DeptTreeSerializer(queryset, many=True)
-        return SuccessResponse(data=serializer.data, msg="获取成功")

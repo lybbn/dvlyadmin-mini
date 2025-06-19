@@ -25,6 +25,7 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView, SpectacularSwaggerView
 from utils.permission import CustomPermission
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 #自定义
 from utils.streamingmedia_response import streamingmedia_serve
@@ -36,16 +37,25 @@ urlpatterns = [
     path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
     
     #接口文档（线上部署需注释掉，确保安全性）
-    path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(permission_classes=[IsAuthenticated,CustomPermission]), name='schema'),
-    # path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    # path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(authentication_classes=[JWTAuthentication],permission_classes=[IsAuthenticated,CustomPermission]), name='schema'),
+]
 
+if settings.DEBUG:
+    #接口文档（线上部署需注释掉，确保安全性）
+    urlpatterns += [
+        path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),#api/schema/lyjson/有认证情况下，需要去除lyjson接口认证，否则报错
+        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),#api/schema/lyjson/有认证情况下，需要去除lyjson接口认证，否则报错
+    ]
+
+urlpatterns += [
     #管理后台的标准接口
     path('api/system/', include('mysystem.urls')),
     path('api/token/', LoginView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/captcha/', CaptchaView.as_view()),
+]
 
+urlpatterns += [
     #集成部署后端管理页面和uniapp h5页面
     path('h5/',h5web ,name='h5端页面部署'),
     path('favicon.ico',RedirectView.as_view(url=r'static/favicon.ico')),

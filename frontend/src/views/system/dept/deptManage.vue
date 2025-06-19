@@ -3,7 +3,7 @@
         <el-card class="tableSelect" ref="tableSelect" shadow="hover">
             <el-form :inline="true" :model="formInline" label-position="left">
                 <el-form-item label="部门名称">
-                    <el-input v-model.trim="formInline.search" maxlength="60"  clearable placeholder="部门名称" style="width:160px"></el-input>
+                    <el-input v-model.trim="formInline.name" maxlength="60"  clearable placeholder="部门名称" style="width:160px"></el-input>
                 </el-form-item>
                 <el-form-item label="">
                     <el-button  @click="search" type="primary" icon="Search" v-show="hasPermission(route.name,'Search')">查询</el-button>
@@ -12,19 +12,15 @@
             </el-form>
         </el-card>
         <el-card class="lytable" shadow="hover">
-            <ly-table tableName="deptManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept" :params="formInline" ref="tableref" :column="column" hidePagination :showSequence="false" border>
-                <template v-slot:table-top-bar>
-                    <div class="left-panel">
-                        <el-button type="primary" icon="plus"  @click="handleAddClick" v-show="hasPermission(route.name,'Create')">新增</el-button>
-                        <el-button type="danger" plain icon="delete"></el-button>
-                    </div>
-                    <div class="right-panel">
-                    </div>
+            <ly-table tableName="deptManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept" :params="formInline" ref="tableref" :column="column" hidePagination @selection-change="selectionChange" border>
+                <template v-slot:topbar>
+                    <el-button type="primary" icon="plus"  @click="handleAddClick" v-show="hasPermission(route.name,'Create')">新增</el-button>
+                    <el-button type="danger" plain icon="delete" :disabled="selection.length==0"  @click="batch_del"></el-button>
                 </template>
                 <template #status="scope">
                     <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)"></el-switch>
                 </template>
-                <el-table-column label="操作" fixed="right" width="180">
+                <el-table-column label="操作" fixed="right" width="150">
                     <template #header>
                         <div style="display: flex;justify-content: space-between;align-items: center;">
                             <div>操作</div>
@@ -64,6 +60,7 @@
     const tableSelect = ref(null)
     const tableref = ref(null)
     const saveDialogRef = ref(null)
+    let selection = ref([])
 
     const statusList = [
         { id: 1, name: '正常' },
@@ -97,11 +94,20 @@
             width: "100"
         },
         {
+            label: "排序",
+            prop: "sort",
+            width: "100"
+        },
+        {
             label: "创建时间",
             prop: "create_datetime",
             minWidth: "180"
         }
     ]
+
+    function selectionChange(selections){
+        selection.value = selections;
+    }
 
     // 方法
     const setFull = () => {
@@ -116,6 +122,26 @@
         })
     }
 
+    function batch_del(){
+        ElMessageBox.confirm(`确定删除选中的 ${selection.value.length} 项吗？`, '提示', {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: 'warning'
+        }).then(() => {
+            let ids = selection.value.map(item => item.id);
+            Api.apiSystemDeptDelete({id:ids}).then(res=>{
+                if(res.code == 2000) {
+                    search()
+                    ElMessage.success("操作成功")
+                } else {
+                    ElMessage.warning(res.msg)
+                }
+            })
+        }).catch(() => {
+
+        })
+    }
+
     const handleEdit = (row, flag) => {
         switch (flag) {
             case 'edit':
@@ -127,9 +153,9 @@
             case 'delete':
                 ElMessageBox.confirm('您确定要删除选中的数据吗？', "警告", {
                     closeOnClickModal: false,
-                    type: "warning"
+                    type: "warning",
                 }).then(() => {
-                    UsersUsersDelete({ id: row.id }).then(res => {
+                    Api.apiSystemDeptDelete({ id: row.id }).then(res => {
                     if (res.code == 2000) {
                         ElMessage.success(res.msg)
                         search()

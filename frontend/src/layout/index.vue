@@ -383,6 +383,7 @@ onMounted(() => {
 	router.afterEach(showThis);
 	// 监听点击事件
     document.addEventListener('click', handleClickOutside);
+	userState.getSystemWebRouter()
 })
 
 onBeforeUnmount(() => {
