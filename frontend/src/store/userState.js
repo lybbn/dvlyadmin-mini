@@ -108,6 +108,11 @@ export const useUserState = defineStore('userState', {
 
                 if(menu.type == 2){
                     route.component = () => import('@/layout/components/iframeView.vue')
+                    route.name = menu.web_path
+                }
+
+                if(menu.type == 3){
+                    route.component = () => import('@/layout/components/linkView.vue')
                 }
 
                 // 处理子路由
