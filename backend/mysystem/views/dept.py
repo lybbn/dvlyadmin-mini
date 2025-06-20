@@ -14,7 +14,7 @@ from utils.common import get_parameter_dic
 
 class DeptFilterSet(django_filters.rest_framework.FilterSet):
     """
-    老师管理 过滤器
+    部门管理 过滤器
     """
     #开始时间
     beginAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='gte')  # 指定过滤的字段

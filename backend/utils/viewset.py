@@ -17,6 +17,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import utils
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
+from utils.export_import_mixin import ImportExportMixin
 
 def get_object_or_404(queryset, *filter_args, **filter_kwargs):
     """
@@ -79,7 +80,7 @@ class CustomDjangoFilterBackend(DjangoFilterBackend):
 
         return None
 
-class CustomModelViewSet(ModelViewSet):
+class CustomModelViewSet(ModelViewSet,ImportExportMixin):
     """
     自定义的ModelViewSet:
     统一标准的返回格式;新增,查询,修改可使用不同序列化器
@@ -89,6 +90,7 @@ class CustomModelViewSet(ModelViewSet):
     (4)export_field_dict = {} 导出时的字段,如：export_field_dict = {'name':'姓名','age':'年龄'}
     (5)export_download_mode 指定导出excel形式：temp 内存型临时下载（系统不保存文件，内存文件流直接下载）、url 下载链接（系统保存文件，返回http/https下载链接地址）
     (6)export_download_filename 指定导出excel文件名称，可为空: 如：export_download_filename = "导出用户数据"
+    (7)import_field_dict = {} 导入字段映射 {'excel列名': 'model字段名'}，支持嵌套如 'c.d'
     """
     values_queryset = None
     ordering_fields = '__all__'
@@ -98,6 +100,7 @@ class CustomModelViewSet(ModelViewSet):
     export_field_dict = {}
     export_download_mode = "temp"
     export_download_filename = ""
+    import_field_dict = {}
     filterset_fields = ()
     # filterset_fields = '__all__'
     search_fields = ()

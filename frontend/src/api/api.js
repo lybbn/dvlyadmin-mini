@@ -80,4 +80,15 @@ Api.apiSystemDeptDelete = params => ajaxDelete({url: `/api/system/dept/`,params}
 // 部门管理 -- 禁用启用
 Api.apiSystemDeptSetStatus = params => ajaxPost({url: `/api/system/dept/set_status/`,params})
 
+// 角色管理
+Api.apiSystemRole = params => ajaxGet({url: `/api/system/role/`,params})
+// 角色管理 -- 新增
+Api.apiSystemRoleAdd = params => ajaxPost({url: `/api/system/role/`,params})
+// 角色管理 -- 编辑
+Api.apiSystemRoleEdit = params => ajaxPut({url: `/api/system/role/`,params})
+// 角色管理 -- 删除
+Api.apiSystemRoleDelete = params => ajaxDelete({url: `/api/system/role/`,params})
+// 角色管理 -- 禁用启用
+Api.apiSystemRoleSetStatus = params => ajaxPost({url: `/api/system/role/set_status/`,params})
+
 export default Api

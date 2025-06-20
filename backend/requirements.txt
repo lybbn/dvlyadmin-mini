@@ -12,4 +12,6 @@ django-redis
 drf-spectacular
 drf-spectacular-sidecar
 user-agents==2.2.0
+openpyxl
+requests
 #psycopg2

@@ -19,6 +19,8 @@
 				:hide-refresh="hideRefresh"
 				:hide-setting="hideSetting"
 				:user-column="userColumn"
+				:hideExport="hideExport"
+				:hideImport="hideImport"
 				:column="column"
 				:config="config"
 				@refresh="refreshData"
@@ -29,6 +31,8 @@
 				@sequence-change="val => config.sequence = val"
 				@border-change="val => config.border = val"
 				@stripe-change="val => config.stripe = val"
+				@import="handleImport"
+				@export="handleExport"
 			/>
 		</div>
 		<div class="lyTable-table" :style="{ height: _table_height }">
@@ -122,6 +126,8 @@
 				:hide-refresh="hideRefresh"
 				:hide-setting="hideSetting"
 				:user-column="userColumn"
+				:hideExport="hideExport"
+				:hideImport="hideImport"
 				:column="column"
 				:config="config"
 				@refresh="refreshData"
@@ -132,6 +138,8 @@
 				@sequence-change="val => config.sequence = val"
 				@border-change="val => config.border = val"
 				@stripe-change="val => config.stripe = val"
+				@import="handleImport"
+				@export="handleExport"
 			/>
 			<!-- <div class="lyTable-do" v-if="!hideDo && doPositionBottom">
 				<el-button
@@ -194,6 +202,22 @@
 				</el-popover>
 			</div> -->
 		</div>
+		<LyDialog v-model="dialogExportVisible" top="30vh" title="导出字段" width="560px" :before-close="handleExportDialogClose" :showFullScreen="false">
+            <el-checkbox v-model="diaExportCheckAll" :indeterminate="isIndeterminate" @change="handleExportCheckAllChange">
+                <span style="font-weight: bold;font-size: 15px;">全选</span>（勾选需要导出的字段）
+            </el-checkbox>
+            <div class="checkbox-container">
+                <el-checkbox-group v-model="selectExportItems"  @change="handleCheckedExportChange">
+                    <el-checkbox v-for="item in column" :key="item.prop" :label="item.label" :value="item" class="custom-checkbox">
+                    	{{ item.label }}
+                    </el-checkbox>
+                </el-checkbox-group>
+            </div>
+            <template #footer>
+                <el-button @click="handleExportDialogClose" :loading="loadingSubmitSave">取消</el-button>
+                <el-button type="primary" @click="submitExport" :loading="loadingSubmitSave">导出</el-button>
+            </template>
+        </LyDialog>
 	</div>
 </template>
 
@@ -204,11 +228,14 @@
 	// import ColumnSetting from './columnSetting.vue'
 	import TableActions from './TableActions.vue'
 	import { debounce } from 'lodash-es';
+	import LyDialog from "@/components/dialog/dialog.vue"
 
 	const props = defineProps({
 		tableName: { type: String, default: "lyTable" },
 		successCode: { type: Number, default: 2000 },
-		apiObj: { type: Function, default: null },//api接口
+		apiObj: { type: Function, default: null },//api列表接口
+		apiImportObj: { type: Function, default: null },//api导入接口
+		apiExportObj: { type: Function, default: null },//api导出接口
 		params: { type: Object, default: () => ({}) },
 		data: { type: Array, default: () => [] },
 		height: { type: [String, Number], default: "100%" },
@@ -234,6 +261,8 @@
 		hideDo: { type: Boolean, default: false },//隐藏底部操作栏
 		hideRefresh: { type: Boolean, default: false },//隐藏刷新
 		hideSetting: { type: Boolean, default: false },//隐藏设置
+		hideExport:{ type: Boolean, default: false },//隐藏导出按钮
+        hideImport:{ type: Boolean, default: true },//隐藏导入按钮
 		paginationLayout: { type: String, default: tableConfig.paginationLayout },
 		paginationSmall: { type: Boolean, default: true },
 		paginationBackground: { type: Boolean, default: true },
@@ -592,6 +621,63 @@
 	const doLayout = () => lyTable.value?.doLayout()
 	const sort = (prop, order) => lyTable.value?.sort(prop, order)
 
+	let dialogExportVisible = ref(false)
+	let diaExportCheckAll = ref(true)
+	let isIndeterminate = ref(true)
+	let selectExportItems = ref([])
+	let loadingSubmitSave = ref(false)
+	function handleExportDialogClose(){
+		dialogExportVisible.value = false
+		selectExportItems.value = []
+        isIndeterminate.value = true
+		loadingSubmitSave.value = false
+	}
+
+	function handleCheckedExportChange(val){
+		const checkedCount = val.length
+        diaExportCheckAll.value = checkedCount === props.column.length
+        isIndeterminate.value = checkedCount > 0 && checkedCount < props.column.length
+	}
+
+	function handleExportCheckAllChange(val){
+		if(val){
+            selectExportItems.value = []
+            selectExportItems.value = props.column
+        }else{
+            selectExportItems.value = []
+        }
+        isIndeterminate.value = false
+	}
+
+	function handleExport(){
+        dialogExportVisible.value = true
+        selectExportItems.value = []
+		nextTick(()=>{
+			handleExportCheckAllChange(diaExportCheckAll.value)
+		})
+    }
+
+	async function submitExport(){
+		if(selectExportItems.value.length<1){
+			ElMessage.warning("请选择需要导出的字段")
+			return
+		}
+		if(!props.apiExportObj){
+			ElMessage.warning("请配置导出接口")
+			return
+		}
+		const res = await props.apiExportObj(reqData)
+		if (res.code !== props.successCode) {
+			ElMessage.warning(res.msg)
+			return
+		}
+
+	}
+
+    function handleImport(){
+        
+    }
+
 	// Lifecycle hooks
 	onMounted(() => {
 		if (props.column) getCustomColumn()
@@ -702,4 +788,16 @@
 		width: 8px;
 		border-radius: 8px;
 	}
+
+	.checkbox-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+	}
+
+	.custom-checkbox {
+		width: 120px;
+		margin-right: 0 !important;
+	}
+
 </style>

@@ -36,7 +36,7 @@ urlpatterns = [
     path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT},),  # 处理静态文件
     path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
     
-    #接口文档（线上部署需注释掉，确保安全性）
+    #接口文档（线上部署需注释掉，确保安全性，已添加需认证访问增强安全性）
     path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(authentication_classes=[JWTAuthentication],permission_classes=[IsAuthenticated,CustomPermission]), name='schema'),
 ]
 

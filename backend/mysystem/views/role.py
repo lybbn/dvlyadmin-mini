@@ -3,6 +3,7 @@
 """
 @Remark: 角色管理
 """
+import django_filters
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 
@@ -10,10 +11,26 @@ from mysystem.models import Role, Menu
 from mysystem.views.dept import DeptSerializer
 from mysystem.views.menu import MenuSerializer
 from mysystem.views.menu_button import MenuButtonSerializer
-from utils.jsonResponse import SuccessResponse
+from utils.jsonResponse import SuccessResponse,DetailResponse,ErrorResponse
 from utils.serializers import CustomModelSerializer
 from rest_framework.validators import UniqueValidator
 from utils.viewset import CustomModelViewSet
+from utils.common import get_parameter_dic
+
+class RoleFilterSet(django_filters.rest_framework.FilterSet):
+    """
+    角色管理 过滤器
+    """
+    #开始时间
+    beginAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='gte')  # 指定过滤的字段
+    #结束时间
+    endAt = django_filters.DateTimeFilter(field_name='create_datetime', lookup_expr='lte')
+    name = django_filters.CharFilter(field_name='name',lookup_expr='icontains')
+    status = django_filters.CharFilter(field_name='status')
+
+    class Meta:
+        model = Role
+        fields = ['beginAt', 'endAt', 'name','status']
 
 
 class RoleSerializer(CustomModelSerializer):
@@ -72,21 +89,32 @@ class RoleViewSet(CustomModelViewSet):
     serializer_class = RoleSerializer
     create_serializer_class = RoleCreateUpdateSerializer
     update_serializer_class = RoleCreateUpdateSerializer
-    filterset_fields = ['status']
+    filterset_class = RoleFilterSet
     search_fields = ('name', 'key')
+
+    def set_status(self,request,*args, **kwargs):
+        """禁用/启用"""
+        reqData = get_parameter_dic(request)
+        id=reqData.get("id","")
+        queryset = self.filter_queryset(self.get_queryset())
+        instance = queryset.filter(id=id).first()
+        if instance:
+            instance.status = False if instance.status else True
+            instance.save()
+            return DetailResponse(data=None, msg="设置成功")
+        else:
+            return ErrorResponse(msg="未获取到数据")
 
     def roleId_to_menu(self, request, *args, **kwargs):
         """通过角色id获取该角色用于的菜单"""
-        # instance = self.get_object()
-        # queryset = instance.menu.all()
         queryset = Menu.objects.filter(status=1).all()
         serializer = MenuPermissonSerializer(queryset, many=True)
-        return SuccessResponse(data=serializer.data)
+        return DetailResponse(data=serializer.data)
 
     def role_data(self,request,*args,**kwargs):
         instance = self.get_object()
         serializer = RoleSerializer(instance)
-        return SuccessResponse(data=serializer.data)
+        return DetailResponse(data=serializer.data)
 
 class PermissionViewSet(CustomModelViewSet):
     """
