@@ -101,7 +101,7 @@
 					</el-scrollbar>
 				</div>
 			</div>
-			<div v-if="!ismobile && nextMenu.length>0 || !pmenu.component" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
+			<div v-if="!ismobile && nextMenu.length>0" :class="isMenuCollapse ? 'lybbn-panel-side isCollapse' : 'lybbn-panel-side'">
 				<div class="lybbn-panel-side-scroll">
 					<el-scrollbar>
 						<el-menu class="rymenu" :default-active="active" router :collapse="isMenuCollapse" :unique-opened="true" :collapse-transition="false">
@@ -257,6 +257,7 @@ function showMenu(route) {
 	nextMenu.value = filterUrl2(route.children);
 	if((!route.children || route.children.length == 0) && route.component){
 		router.push({path: route.path})
+		nextMenu.value = []
 	}
 }
 
@@ -376,7 +377,7 @@ onMounted(() => {
 	window.addEventListener('resize', onLayoutResize);
 	// menu.value = filterUrl(storesRoutesList.routesList);
 	showThis()
-	router.afterEach(showThis);
+	// router.afterEach(showThis);
 	// 监听点击事件
     document.addEventListener('click', handleClickOutside);
 })
