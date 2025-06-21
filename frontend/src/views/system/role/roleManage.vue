@@ -183,25 +183,6 @@
         })
     }
 
-    const downloadFileURL = (url) => {
-        const iframe = document.createElement("iframe")
-        iframe.style.display = "none"
-        iframe.src = url
-        document.body.appendChild(iframe)
-    }
-
-    const exportDataBackend = () => {
-        const params = {
-            page: 1,
-            limit: 9999,
-        }
-        UsersUsersExportexecl(params).then(res => {
-            if (res.code == 2000) {
-                downloadFileURL(res.data.data)
-            }
-        })
-    }
-
     const search = () => {
         tableref.value.reload(formInline.value)
     }

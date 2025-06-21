@@ -106,134 +106,161 @@ request.interceptors.response.use(
 )
 
 function ajax(opt,method){
-  var token= getToken()
-  // var timestamp=new Date().getTime();
-  var params;
+    var token= getToken()
+    // var timestamp=new Date().getTime();
+    var params;
 
-  if(opt.params){
-    //对传入的参数进行深拷贝，防止传入的参数对象被页面上其他逻辑改变，导致签名错误
-    if (Object.prototype.toString.call(opt.params) != '[object FormData]') {
-      // 不是formdata类型
-      params = JSON.parse(JSON.stringify(opt.params));
-    }else{//formdata类型
-      params= opt.params
+    if(opt.params){
+        //对传入的参数进行深拷贝，防止传入的参数对象被页面上其他逻辑改变，导致签名错误
+        if (Object.prototype.toString.call(opt.params) != '[object FormData]') {
+            // 不是formdata类型
+            params = JSON.parse(JSON.stringify(opt.params));
+        }else{//formdata类型
+            params= opt.params
+        }
+        if(method=='GET') {
+            params={
+            ...params,
+            // 't':timestamp
+            }
+        }
+    }else{
+        params={}
     }
-    if(method=='GET') {
-      params={
-        ...params,
-        // 't':timestamp
-      }
-    }
-  }else{
-    params={}
-  }
 
-  if(method == 'PUT' || method == 'DELETE') {
-      var config={
-          url: API_BASE_URL + opt.url + params.id+'/',
-          method: method,
-          headers:{
-              Authorization: sysConfig.TOKEN_PREFIX + token,
-          }
-      }
-      if(!params.id){
-          config={
+    if(method == 'PUT' || method == 'DELETE') {
+        var config={
+            url: API_BASE_URL + opt.url + params.id+'/',
+            method: method,
+            headers:{
+                Authorization: sysConfig.TOKEN_PREFIX + token,
+            }
+        }
+        if(!params.id){
+            config={
             url: API_BASE_URL + opt.url,
             method: method,
             headers:{
                 Authorization: sysConfig.TOKEN_PREFIX + token,
             }
         }
-      }
+        }
 
-      method==="PUT"&&(config.params=params);
-      return new Promise((resolve,reject)=>{
-          request({
+        method==="PUT"&&(config.params=params);
+        return new Promise((resolve,reject)=>{
+            request({
                 url: config.url,
                 method: method,
                 headers:{
                     Authorization: sysConfig.TOKEN_PREFIX + token,
                 },
                 data: params
-              }).then(res=>{
+                }).then(res=>{
                 resolve(res.data)
-          }).catch(res=>{
-              reject(res)
-          })
-      })
-  }else if(method == 'GET2'){
-      var config2={
-          url: API_BASE_URL + opt.url + params.id+'/',
-          method: 'GET',
-          headers:{
-              Authorization: sysConfig.TOKEN_PREFIX + token,
-          }
-      }
-      if(!params.id){
-          config2={
-              url: API_BASE_URL + opt.url,
-              method: 'GET',
-              headers:{
-                  Authorization: sysConfig.TOKEN_PREFIX + token,
-              }
-          }
-      }
-      return new Promise((resolve,reject)=>{
-          // console.log(config,'config')
-          request({
-              url: config2.url,
-              method: 'GET',
-              headers:{
-                  Authorization: sysConfig.TOKEN_PREFIX + token,
-              },
-              data: params
-          }).then(res=>{
-              resolve(res.data)
-          }).catch(res=>{
-              reject(res)
-          })
-      })
-  }
-  else if(method == 'excel'){
-      var config3={
-          url: API_BASE_URL + opt.url,
-          method: 'POST',
-          headers:{
-              Authorization: sysConfig.TOKEN_PREFIX + token,
-          },
-          responseType:  'blob', //此属性非常重要，不然数据是乱码
-      }
-      config3.data=params
-      return new Promise((resolve,reject)=>{
-          request(config3).then(res=>{
-              resolve(res)
-          }).catch(res=>{
-              resolve(res)
-          })
-      })
-  }
-  else {
-      var config1={
-          url: API_BASE_URL + opt.url,
-          method: method,
-          headers:{
-              Authorization: sysConfig.TOKEN_PREFIX + token,
-          }
-      }
-      method==="GET"&&(config1.params=params);
-      method==="POST"&&(config1.data=params);
-      method==="PATCH"&&(config1.data=params);
-      return new Promise((resolve,reject)=>{
-          request(config1).then(res=>{
-              resolve(res.data)
-          }).catch(res=>{
-              reject(res)
-          })
-      })
-  }
+            }).catch(res=>{
+                reject(res)
+            })
+        })
+    }else if(method == 'GET2'){
+        var config2={
+            url: API_BASE_URL + opt.url + params.id+'/',
+            method: 'GET',
+            headers:{
+                Authorization: sysConfig.TOKEN_PREFIX + token,
+            }
+        }
+        if(!params.id){
+            config2={
+                url: API_BASE_URL + opt.url,
+                method: 'GET',
+                headers:{
+                    Authorization: sysConfig.TOKEN_PREFIX + token,
+                }
+            }
+        }
+        return new Promise((resolve,reject)=>{
+            // console.log(config,'config')
+            request({
+                url: config2.url,
+                method: 'GET',
+                headers:{
+                    Authorization: sysConfig.TOKEN_PREFIX + token,
+                },
+                data: params
+            }).then(res=>{
+                resolve(res.data)
+            }).catch(res=>{
+                reject(res)
+            })
+        })
+    }
+    else if(method == 'excel'){
+        let baseurl = API_BASE_URL + opt.url
+        var config3={
+            url: buildUrlQuery(baseurl,opt.queryParams),
+            method: 'POST',
+            headers:{
+                Authorization: sysConfig.TOKEN_PREFIX + token,
+            },
+            responseType:  'blob', //此属性非常重要，不然数据是乱码
+        }
+        config3.data=params
+        return new Promise((resolve,reject)=>{
+            request(config3).then(res=>{
+                resolve(res)
+            }).catch(res=>{
+                resolve(res)
+            })
+        })
+    }
+    else {
+        var config1={
+            url: API_BASE_URL + opt.url,
+            method: method,
+            headers:{
+                Authorization: sysConfig.TOKEN_PREFIX + token,
+            }
+        }
+        method==="GET"&&(config1.params=params);
+        method==="POST"&&(config1.data=params);
+        method==="PATCH"&&(config1.data=params);
+        return new Promise((resolve,reject)=>{
+            request(config1).then(res=>{
+                resolve(res.data)
+            }).catch(res=>{
+                reject(res)
+            })
+        })
+    }
 }
 
+function isEmpty(query) {
+    return (
+        query === "" ||
+        query === null ||
+        query === undefined ||
+        (typeof query === 'object' && Object.keys(query).length === 0)
+    )
+}
 
+/**
+ * 构建URL参数
+ */
+const buildUrlQuery = (baseUrl, queryParams) => {
+    if(isEmpty(queryParams)){
+        return baseUrl
+    }
+    // 移除baseUrl可能存在的查询参数
+    const cleanBaseUrl = baseUrl.split('?')[0]
+
+    const queryString = Object.entries(queryParams)
+    .filter(([_, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join('&');
+  
+    const turl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    return turl
+}
 
 export function ajaxGet (opt) {
     return ajax(opt,"GET")

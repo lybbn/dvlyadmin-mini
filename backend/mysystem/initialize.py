@@ -55,9 +55,9 @@ class Initialize:
     def init_dept(self):
         """初始化部门信息"""
         self.dept_data = [
-            {"id": "1", "name": "lyadmin团队", "sort": 1, "parent_id": None},
-            {"id": "2", "name": "财务部门", "sort": 2,"parent_id": "1"},
-            {"id": "3", "name": "研发部门", "sort": 3,"parent_id": "1"},
+            {"id": "8b304f92647747aabffc7e8750397762", "name": "lyadmin团队", "sort": 1, "parent_id": None},
+            {"id": "5e5af490ab0146d09045e6ece736c05f", "name": "财务部门", "sort": 2,"parent_id": "8b304f92647747aabffc7e8750397762"},
+            {"id": "877641076a3b4a93b2e58e02246dbf3e", "name": "研发部门", "sort": 3,"parent_id": "8b304f92647747aabffc7e8750397762"},
         ]
         self.save(Dept, self.dept_data, "部门信息")
 
@@ -74,44 +74,32 @@ class Initialize:
             {"id": "8", "name": "导入", "value": "Import"},
             {"id": "9", "name": "修改密码", "value": "ChangePass"},
             {"id": "10", "name": "禁用", "value": "Disable"},
-            {"id": "11", "name": "日志", "value": "Logs"}
+            {"id": "11", "name": "日志", "value": "Logs"},
+            {"id": "12", "name": "移动", "value": "Move"}
         ]
         self.save(Button, self.button_data, "权限表标识")
 
     def init_menu(self):
         """初始化菜单表"""
         self.menu_data = [
-            # 主菜单
-            {'id': '9065cb5445ac42ef93eb9e75e6287792', 'name': 'DashBoard', 'sort': 1, 'web_path': 'analysis', 'icon': 'DataLine', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': '2e3438c8-3ddc-43ff-b8d8-cca328e4856e', 'name': '管理员管理', 'sort': 3, 'web_path': 'adminManage', 'icon': 'avatar', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': '244b28685cd14a39a383189981510d4a', 'name': '用户管理', 'sort': 5, 'web_path': 'userManage', 'icon': 'user-filled', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': 'd73f73a399af48cea6a8490ac508d7a0', 'name': '用户管理CRUD', 'sort': 7, 'web_path': 'userManageCrud', 'icon': 'user-filled', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': 'd4e2fe169a8b40f3846421ac04e4fccb', 'name': '平台设置', 'sort': 9, 'web_path': '', 'icon': 'platform', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'name': '系统管理', 'sort': 990, 'web_path': '', 'icon': 'tools', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': '25735adb-d051-4b7b-bbb7-1154526f3e4c', 'name': '个人中心', 'sort': 13, 'web_path': 'personalCenter', 'icon': 'user', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': 'c236fb6b-ddaa-4deb-b79b-16e42d9f347f', 'name': '日志管理', 'sort': 999, 'web_path': 'journalManage', 'icon': 'info-filled', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            {'id': '77edf447326b4e0dbc6f9719c1de8a12', 'name': '系统监控', 'sort': 888, 'web_path': '', 'icon': 'TrendCharts', 'parent_id': None, 'visible': 1, 'isautopm': 0},
-            
-            # 子菜单
-            {'id': '4236eb70-1558-43a0-9cf2-037230c547f9', 'name': '部门管理', 'sort': 1, 'web_path': 'departmentManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'component': 'system/dept', 'component_name': 'dept', 'visible': 1, 'isautopm': 0},
-            {'id': '56c3f341-4f46-4b04-9cfc-c8a14701707e', 'name': '菜单管理', 'sort': 2, 'web_path': 'menuManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'component': 'system/menu', 'component_name': 'menu', 'visible': 1, 'isautopm': 0},
-            {'id': '15c9ebc5-d12f-470a-a560-938a7dc57570', 'name': '角色管理', 'sort': 3, 'web_path': 'roleManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'component': 'system/role', 'component_name': 'role', 'visible': 1, 'isautopm': 0},
-            {'id': 'a607e820-36e5-45c0-aabf-85a8e4e2c7ac', 'name': '权限管理', 'sort': 4, 'web_path': 'authorityManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'component': 'system/rolePermission', 'component_name': 'rolePermission', 'visible': 1, 'isautopm': 0},
-            {'id': '151035da-77a3-4a62-b474-fce6824571fb', 'name': '按钮管理', 'sort': 6, 'web_path': 'buttonManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'component': 'system/button', 'component_name': 'buttonManage', 'visible': 0, 'isautopm': 0},
-            {'id': '02c24003527546359b5a77ae07adc7d5', 'name': '地区管理', 'sort': 7, 'web_path': 'areaManage', 'parent_id': '54f769b0-3dff-416c-8102-e55ec44827cc', 'visible': 1, 'isautopm': 0},
-            
-            # 其他子菜单...
+            {'id': '4a7a7748387f44dbab72027d8bdc87f7', 'name': '首页','icon': 'House', 'sort': 10, 'web_path': '/home', 'parent_id': None, 'component': None, 'component_name': 'home', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '98870fbaffb348ab9fd16a88e946bf09', 'name': '个人中心','icon': 'User', 'sort': 19, 'web_path': '/PersonalCenter', 'parent_id': None, 'component': None, 'component_name': 'PersonalCenter', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '0c66eff6687d4fea8955a420850159c1', 'name': '个人中心简版','icon': 'User', 'sort': 22, 'web_path': '/PersonalCenters', 'parent_id': None, 'component': None, 'component_name': 'PersonalCenters', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '150e0957200146b3bd0226c45e8031f7', 'name': 'iframe嵌套','icon': 'Link', 'sort': 33, 'web_path': '/docdvlyadmin','link_url': 'https://doc.lybbn.cn', 'parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '9ece0330c65e40df8da00190107d908e', 'name': '外链测试','icon': 'Link', 'sort': 36, 'web_path': '/docdvlyadminlink','link_url': 'https://doc.lybbn.cn', 'parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': 'af862854dc44410d84b8b2ae5c16c90d', 'name': '系统管理','icon': 'Setting', 'sort': 40, 'web_path': '/PersonalCenters', 'parent_id': None, 'component': None, 'component_name': None, 'visible': 1,'cache': 0, 'isautopm': 0,'type': 0},
+            {'id': '95227fe101e747908c12b56d2bae5e8e', 'name': '部门管理','icon': 'OfficeBuilding', 'sort': 50, 'web_path': '/deptManage', 'parent_id': 'af862854dc44410d84b8b2ae5c16c90d', 'component': None, 'component_name': 'deptManage', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '菜单管理','icon': 'Collection', 'sort': 90, 'web_path': '/menuManage', 'parent_id': 'af862854dc44410d84b8b2ae5c16c90d', 'component': None, 'component_name': 'menuManage', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
+            {'id': '1b5018bdb5e04698b84da505e8a6b93c', 'name': '角色管理','icon': 'TrophyBase', 'sort': 100, 'web_path': '/roleManage', 'parent_id': 'af862854dc44410d84b8b2ae5c16c90d', 'component': None, 'component_name': 'roleManage', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
         ]
         self.save(Menu, self.menu_data, "菜单表")
 
     def init_menu_button(self):
         """初始化菜单权限表"""
         self.menu_button_data = [
-            # 示例数据
             {'id': 'e7fa30290d37447585ea7583d9d01f1b', 'menu_id': 'ae5629946df4497cbec10419e8375dd9', 'name': '编辑', 'value': 'Update', 'api': '/api/platformsettings/lunboimg/{id}/', 'method': 2},
             {'id': '6e4251a948f348ccaa419a777a118048', 'menu_id': '80a340eae92b430abe17635468c2df1d', 'name': '编辑', 'value': 'Update', 'api': '/api/platformsettings/other/{id}/', 'method': 2},
             {'id': '0209de89-6b9f-4d8a-84d3-ccfc3cc8b4da', 'menu_id': '151035da-77a3-4a62-b474-fce6824571fb', 'name': '编辑', 'value': 'Update', 'api': '/api/system/button/{id}/', 'method': 2},
-            # 其他按钮权限...
         ]
         self.save(MenuButton, self.menu_button_data, "菜单权限表")
 

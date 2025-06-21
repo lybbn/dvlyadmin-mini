@@ -65,24 +65,17 @@ class ImportExportMixin:
     import_field_dict = {}
     export_field_dict = {}
     import_image_fields = []
-    
-    def __init__(self, request=None, downloadMode="temp", fileName=default_file_name):
-        if request:
-            self.request = request
-            # 表格表头最大宽度，默认80个字符
-            self.export_column_width = 80
-            # 下载模式：temp 内存型临时下载、url 下载链接
-            self.download_mode = downloadMode
-            # 保存文件名
-            self.file_name = fileName
-            # 保存目录
-            self.save_dir = os.path.join('systemexport', time.strftime('%Y-%m-%d', time.localtime(time.time())))
-            # 保存位置
-            self.save_path = os.path.join(settings.MEDIA_ROOT, self.save_dir, self.file_name)
-            # 下载URL
-            self.download_url = getfulldomian(request) + settings.MEDIA_URL + pathname2url(self.save_dir) + "/" + self.file_name
-            # 是否显示图片,否的话为地址
-            self.show_image = True
+    # 表格表头最大宽度，默认80个字符
+    export_column_width = 80
+    # 保存文件名
+    file_name = default_file_name
+    # 保存目录
+    save_dir = os.path.join('systemexport', time.strftime('%Y-%m-%d', time.localtime(time.time())))
+    # 保存位置
+    save_path = os.path.join(settings.MEDIA_ROOT, save_dir, file_name)
+
+    # 是否显示图片,否的话为地址
+    show_image = True
 
     def is_image(self, urlstr):
         """是否为图片地址"""
@@ -220,12 +213,33 @@ class ImportExportMixin:
             current[parts[-1]] = value
         else:
             data_dict[field_name] = value
+    
+    def get_export_filename(self,queryset):
+        """
+        取导出文件名
+        """
+        model = None
+        if queryset is not None and hasattr(queryset, 'model'):
+            model = queryset.model
+        if model:
+            return getattr(model, '_meta').verbose_name
+        else:
+            model = queryset.model._meta.verbose_name
+        if not model:return self.file_name
+        return model
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def export_data(self, request, *args, **kwargs):
-        """导出数据为Excel（支持图片和嵌套字段）"""
+        """
+        导出数据为Excel（支持图片和嵌套字段）
+        @param: export_fields 优先使用前端传递的导出字段
+        """
+        export_fields = request.data.get('export_fields', {})
+        if not export_fields:
+            assert self.export_field_dict, "'%s' 请配置对应的导出模板字段。" % self.__class__.__name__
+        self.export_field_dict = export_fields
         queryset = self.get_export_queryset()
-        assert self.export_field_dict, "'%s' 请配置对应的导出模板字段。" % self.__class__.__name__
+        if not self.export_serializer_class:self.export_serializer_class = self.serializer_class
         assert self.export_serializer_class, "'%s' 请配置对应的导出序列化器。" % self.__class__.__name__
         serializer = self.export_serializer_class(queryset, many=True, request=request)
         data = serializer.data
@@ -311,7 +325,8 @@ class ImportExportMixin:
                 output_buffer.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = f'attachment; filename={escape_uri_path(self.file_name)}'
+            export_file_name = f'导出{self.get_export_filename(queryset)}数据.xlsx'
+            response['Content-Disposition'] = f'attachment; filename={escape_uri_path(export_file_name)}'
             return response
             
         except Exception as e:

@@ -12,7 +12,7 @@
             </el-form>
         </el-card>
         <el-card class="lytable" shadow="hover">
-            <ly-table tableName="deptManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept" :params="formInline" ref="tableref" :column="column" hidePagination @selection-change="selectionChange" border>
+            <ly-table tableName="deptManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="999" :is-tree="true" :apiObj="Api.apiSystemDept"  :apiExportObj="Api.apiSystemDeptExport" :params="formInline" ref="tableref" :column="column" hidePagination @selection-change="selectionChange" border>
                 <template v-slot:topbar>
                     <el-button type="primary" icon="plus"  @click="handleAddClick" v-show="hasPermission(route.name,'Create')">新增</el-button>
                     <el-button type="danger" plain icon="delete" :disabled="selection.length==0"  @click="batch_del"></el-button>
@@ -190,25 +190,6 @@
                     ElMessage.warning(res.msg)
                 }
             })
-        })
-    }
-
-    const downloadFileURL = (url) => {
-        const iframe = document.createElement("iframe")
-        iframe.style.display = "none"
-        iframe.src = url
-        document.body.appendChild(iframe)
-    }
-
-    const exportDataBackend = () => {
-        const params = {
-            page: 1,
-            limit: 9999,
-        }
-        UsersUsersExportexecl(params).then(res => {
-            if (res.code == 2000) {
-                downloadFileURL(res.data.data)
-            }
         })
     }
 

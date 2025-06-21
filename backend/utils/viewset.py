@@ -88,9 +88,7 @@ class CustomModelViewSet(ModelViewSet,ImportExportMixin):
     (2)update_serializer_class 修改时,使用的序列化器
     (3)export_serializer_class 导出数据,使用的序列化器，可为空，为空则调用默认序列化器
     (4)export_field_dict = {} 导出时的字段,如：export_field_dict = {'name':'姓名','age':'年龄'}
-    (5)export_download_mode 指定导出excel形式：temp 内存型临时下载（系统不保存文件，内存文件流直接下载）、url 下载链接（系统保存文件，返回http/https下载链接地址）
-    (6)export_download_filename 指定导出excel文件名称，可为空: 如：export_download_filename = "导出用户数据"
-    (7)import_field_dict = {} 导入字段映射 {'excel列名': 'model字段名'}，支持嵌套如 'c.d'
+    (5)import_field_dict = {} 导入字段映射 {'excel列名': 'model字段名'}，支持嵌套如 'c.d'
     """
     values_queryset = None
     ordering_fields = '__all__'
@@ -98,8 +96,6 @@ class CustomModelViewSet(ModelViewSet,ImportExportMixin):
     update_serializer_class = None
     export_serializer_class = None
     export_field_dict = {}
-    export_download_mode = "temp"
-    export_download_filename = ""
     import_field_dict = {}
     filterset_fields = ()
     # filterset_fields = '__all__'

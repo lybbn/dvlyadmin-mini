@@ -79,6 +79,8 @@ Api.apiSystemDeptEdit = params => ajaxPut({url: `/api/system/dept/`,params})
 Api.apiSystemDeptDelete = params => ajaxDelete({url: `/api/system/dept/`,params})
 // 部门管理 -- 禁用启用
 Api.apiSystemDeptSetStatus = params => ajaxPost({url: `/api/system/dept/set_status/`,params})
+// 部门管理 -- 导出
+Api.apiSystemDeptExport = (queryParams,params) => ajaxDownloadExcel({url: `/api/system/dept/export_data/`,queryParams:queryParams,params})
 
 // 角色管理
 Api.apiSystemRole = params => ajaxGet({url: `/api/system/role/`,params})

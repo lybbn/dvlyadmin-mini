@@ -666,10 +666,49 @@
 			ElMessage.warning("请配置导出接口")
 			return
 		}
-		const res = await props.apiExportObj(reqData)
-		if (res.code !== props.successCode) {
-			ElMessage.warning(res.msg)
-			return
+		try {
+			// 构建导出字段映射
+			let export_fields = {}
+			selectExportItems.value.forEach(item => {
+				export_fields[item.prop] =  item.label
+			})
+			//数据过滤
+			let reqData = {}
+
+			Object.assign(reqData, tableParams.value)
+
+			const res = await props.apiExportObj(reqData,{export_fields:export_fields})
+			if (res?.code && res.code !== props.successCode) {
+				ElMessage.warning(res.msg)
+				return
+			}
+
+			let fileName = new Date().getTime() +".xlsx"
+			let dispositionStr = res.headers["content-disposition"];
+			if (dispositionStr == null || dispositionStr === "") {
+
+			}else{
+				// 获取文件名
+				let dispositionArr = dispositionStr.split(";");
+				fileName = decodeURIComponent(dispositionArr[1]);
+				fileName = fileName.split("=")[1];
+			}
+			const blob = new Blob([res.data], {
+				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			});
+			// 创建下载链接
+			const url = window.URL.createObjectURL(blob)
+			const link = document.createElement('a')
+			link.href = url
+            link.download = fileName //下载后文件名
+			document.body.appendChild(link)
+			link.click()
+			document.body.removeChild(link); //下载完成移除元素
+            window.URL.revokeObjectURL(url);  //释放blob对象
+			ElMessage.success('导出成功')
+			handleExportDialogClose()
+		} catch (error) {
+			ElMessage.error('导出失败: ' + (error.response?.data?.error || error.message))
 		}
 
 	}
