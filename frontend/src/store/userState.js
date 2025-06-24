@@ -127,6 +127,11 @@ export const useUserState = defineStore('userState', {
                     route.component = () => import('@/layout/components/linkView.vue')
                 }
 
+                if(menu.type == 0){
+                    console.log()
+                    route.name = route.name || `${route.id}-directory`; // 确保目录类型有 name,消除警告
+                }
+
                 // 处理子路由
                 if (menu.children?.length) {
                     route.children = transformMenuToRoutes(menu.children)
@@ -135,7 +140,6 @@ export const useUserState = defineStore('userState', {
                         route.redirect = `${route.path}/${route.children[0].path}`
                     }
                 }
-
                 return route
             })
         },

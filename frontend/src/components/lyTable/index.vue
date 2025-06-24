@@ -9,10 +9,10 @@
 <template>
 	<div class="lyTable" :style="{ height: _height }" ref="lyTableMain" v-loading="loading">
 		<div class="lytopaction" v-if="!hideTopBar">
-			<div>
+			<div class="lyflexcenter">
 				<slot name="topbar"></slot>
 				<el-button icon="Download" type="primary" @click="handleExport" title="导出" v-if="!hideExport"></el-button>
-				<lyImportFile apiObj="" @success="handleImportSuccess"></lyImportFile>
+				<lyImportFile ref="lyImportRef" :apiObj="apiImportObj" @success="handleImportSuccess" style="margin-left: 12px;" v-auth="'Import'"></lyImportFile>
 			</div>
 			<TableActions
 				style="float: right;"
@@ -281,6 +281,7 @@
 	const lyTable = ref(null)
 	const lyColumnSetting = ref(null)
 	let lyTableActionRef = ref(null)
+	let lyImportRef = ref(null)
 
 	// Computed properties
 	const _height = computed(() => Number(props.height) ? `${Number(props.height)}px` : props.height)
@@ -719,6 +720,12 @@
 			ElMessage.error('导出失败: ' + (error.response?.data?.error || error.message))
 		}
 
+	}
+
+	function handleImport(){
+		nextTick(()=>{
+			lyImportRef.value.open()
+		})
 	}
 
     function handleImportSuccess(res, close){

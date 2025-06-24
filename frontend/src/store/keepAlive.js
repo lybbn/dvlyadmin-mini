@@ -4,7 +4,7 @@ export const useKeepAliveStore = defineStore('keepAlive', {
     state:() => {
         return {
             routeShow: true,
-            keepAliveRoute:[],//希望缓存的页面name，如['server']
+            keepAliveRoute:[],//希望缓存的页面name，如['server'],后台菜单的cache会覆盖此变量
         }
     },
     getters:{
@@ -28,4 +28,10 @@ export const useKeepAliveStore = defineStore('keepAlive', {
             this.keepAliveRoute = [];
         },
     },
+    persist: [
+        {
+            pick: ['keepAliveRoute'],
+            storage: sessionStorage,
+        }
+    ],
 })

@@ -7,73 +7,75 @@
 -->
 
 <template>
-    <slot :open="open">
-        <el-button type="primary" @click="open" icon="Upload" title="导入"></el-button>
-    </slot>
-    <el-dialog 
-        v-model="dialog" 
-        title="导入" 
-        :width="550" 
-        :close-on-click-modal="false" 
-        append-to-body 
-        destroy-on-close
-        >
-        <el-progress 
-            v-if="loading" 
-            :text-inside="true" 
-            :stroke-width="20" 
-            :percentage="percentage" 
-            style="margin-bottom: 15px;"
-        />
-        <div v-loading="loading">
-            <el-upload 
-            ref="uploader"
-            drag
-            :accept="accept"
-            :max-size="maxSize"
-            :limit="1"
-            :data="data"
-            :show-file-list="false"
-            :http-request="request"
-            :before-upload="before"
-            :on-progress="progress"
-            :on-success="success"
-            :on-error="error"
+    <div>
+        <slot :open="open">
+            <el-button type="primary" @click="open" icon="Upload" title="导入"></el-button>
+        </slot>
+        <el-dialog 
+            v-model="dialog" 
+            title="导入" 
+            :width="550" 
+            :close-on-click-modal="false" 
+            append-to-body 
+            destroy-on-close
             >
-            <slot name="uploader">
-                <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-                <div class="el-upload__text">
-                将文件拖到此处或 <em>点击选择文件上传</em>
-                </div>
-            </slot>
-            <template #tip>
-                <div class="el-upload__tip">
-                    <template v-if="tip">{{ tip }}</template>
-                    <template v-else>请上传小于或等于 {{ maxSize }}M 的 {{ accept }} 格式文件</template>
-                    <p v-if="templateUrl" style="margin-top: 7px;">
-                        <el-link :href="templateUrl" target="_blank" type="primary" :underline="false">
-                        下载导入模板
-                        </el-link>
-                    </p>
-                    <p v-if="!isEmpty(apiTemplateObj)" style="margin-top: 7px;">
-                        <el-button type="primary" link>
-                        下载导入模板
-                        </el-button>
-                    </p>
-                </div>
-            </template>
-            </el-upload>
-            <el-form 
-                v-if="$slots.form" 
-                inline 
-                label-width="100px" 
-                label-position="left" 
-                style="margin-top: 18px;"
+            <el-progress 
+                v-if="loading" 
+                :text-inside="true" 
+                :stroke-width="20" 
+                :percentage="percentage" 
+                style="margin-bottom: 15px;"
+            />
+            <div v-loading="loading">
+                <el-upload 
+                ref="uploader"
+                drag
+                :accept="accept"
+                :max-size="maxSize"
+                :limit="1"
+                :data="data"
+                :show-file-list="false"
+                :http-request="request"
+                :before-upload="before"
+                :on-progress="progress"
+                :on-success="success"
+                :on-error="error"
                 >
-                <slot name="form" :formData="formData"></slot>
-            </el-form>
-        </div>
-    </el-dialog>
+                <slot name="uploader">
+                    <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+                    <div class="el-upload__text">
+                    将文件拖到此处或 <em>点击选择文件上传</em>
+                    </div>
+                </slot>
+                <template #tip>
+                    <div class="el-upload__tip">
+                        <template v-if="tip">{{ tip }}</template>
+                        <template v-else>请上传小于或等于 {{ maxSize }}M 的 {{ accept }} 格式文件</template>
+                        <p v-if="templateUrl" style="margin-top: 7px;">
+                            <el-link :href="templateUrl" target="_blank" type="primary" :underline="false">
+                            下载导入模板
+                            </el-link>
+                        </p>
+                        <p v-if="!isEmpty(apiTemplateObj)" style="margin-top: 7px;">
+                            <el-button type="primary" link>
+                            下载导入模板
+                            </el-button>
+                        </p>
+                    </div>
+                </template>
+                </el-upload>
+                <el-form 
+                    v-if="$slots.form" 
+                    inline 
+                    label-width="100px" 
+                    label-position="left" 
+                    style="margin-top: 18px;"
+                    >
+                    <slot name="form" :formData="formData"></slot>
+                </el-form>
+            </div>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup>
@@ -165,6 +167,10 @@
             param.onError(err)
         })
     }
+
+    defineExpose({
+        open
+    })
 </script>
 
 <style scoped>

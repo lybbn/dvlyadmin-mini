@@ -1,24 +1,24 @@
 <template>
     <div :class="{'ly-is-full':isFull}" class="lycontainer">
-        <el-card class="tableSelect" ref="tableSelect" shadow="hover">
+        <el-card class="tableSelect" ref="tableSelect" shadow="hover" v-if="crudOptions.searchBar.showSearchBar">
             <el-form :inline="true" :model="formInline" label-position="left">
                 <el-form-item label="角色名称">
                     <el-input v-model.trim="formInline.name" maxlength="60"  clearable placeholder="角色名称" style="width:160px"></el-input>
                 </el-form-item>
                 <el-form-item label="">
-                    <el-button  @click="search" type="primary" icon="Search" v-show="hasPermission(route.name,'Search')">查询</el-button>
-                    <el-button  @click="handleEdit('','reset')" icon="Refresh">重置</el-button>
+                    <el-button  @click="search" type="primary" icon="Search" v-auth="'Search'">查询</el-button>
+                    <el-button  @click="handleEdit('','reset')" icon="Refresh" v-auth="'Search'">重置</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
         <el-card class="lytable" shadow="hover">
-            <ly-table tableName="roleManageTable" showSelectable row-key="id" :defaultExpandAll="true" :pageSize="10" :is-tree="true" :apiObj="Api.apiSystemRole" :params="formInline" ref="tableref" :column="column" @selection-change="selectionChange" border>
+            <ly-table v-bind="tableBindProps" ref="tableref" @selection-change="selectionChange">
                 <template v-slot:topbar>
-                    <el-button type="primary" icon="plus"  @click="handleAddClick" v-show="hasPermission(route.name,'Create')">新增</el-button>
-                    <el-button type="danger" plain icon="delete" :disabled="selection.length==0" title="批量删除"  @click="batch_del"></el-button>
+                    <el-button type="primary" icon="plus"  @click="handleAddClick" v-auth="'Create'">新增</el-button>
+                    <el-button type="danger" plain icon="delete" :disabled="selection.length==0" title="批量删除" @click="batch_del" v-auth="'Delete'"></el-button>
                 </template>
                 <template #status="scope">
-                    <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)"></el-switch>
+                    <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
                 </template>
                 <el-table-column label="操作" fixed="right" width="150">
                     <template #header>
@@ -32,8 +32,8 @@
                         </div>
                     </template>
                     <template #default="scope">
-                        <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-show="hasPermission(route.name,'Update')">编辑</span>
-                        <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-show="hasPermission(route.name,'Delete')">删除</span>
+                        <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-auth="'Update'">编辑</span>
+                        <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">删除</span>
                     </template>
                 </el-table-column>
             </ly-table>
@@ -42,62 +42,47 @@
     </div>
 </template>
 
-<script setup>
-    import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-    import { useRoute } from 'vue-router'
+<script setup name="roleManage">
+    import { ref, onMounted, onUnmounted, nextTick,computed } from 'vue'
     import { ElMessage, ElMessageBox } from 'element-plus'
-    import { FullScreen } from '@element-plus/icons-vue'
-    import Api from '@/api/api'
     import saveDialog from "./components/moduleSave.vue"
+    import { createCrudConfig } from './crud.js'
+    import { useUserState } from '@/store/userState' 
+    import { useRoute } from 'vue-router'
 
     const route = useRoute()
+    const userState = useUserState()
+
+    let crudOptions = ref(createCrudConfig().crudOptions)
+    
+    const hasBtnPermission = (btnCode) => {
+        return userState.hasButtonPermission(route.name, btnCode)
+    }
 
     // 状态管理
     const isFull = ref(false)
     const isDialogVisible = ref(false)
     const formInline = ref({})
-    const timers = ref([])
     const tableSelect = ref(null)
     const tableref = ref(null)
     const saveDialogRef = ref(null)
     let selection = ref([])
 
-    const statusList = [
-        { id: 1, name: '正常' },
-        { id: 0, name: '禁用' }
-    ]
-
-    const column = [
-        {
-            label: "角色名称",
-            prop: "name",
-            minWidth: "110"
-        },
-        {
-            label: "权限字符",
-            prop: "key",
-            minWidth: "110"
-        },
-        {
-            label: "状态",
-            prop: "status",
-            width: "100"
-        },
-        {
-            label: "排序",
-            prop: "sort",
-            width: "100"
-        },
-        {
-            label: "创建时间",
-            prop: "create_datetime",
-            minWidth: "180"
-        }
-    ]
-
     function selectionChange(selections){
         selection.value = selections;
     }
+
+    let tableBindProps= computed(() => (
+        {
+            ...crudOptions.value.table,
+            apiObj:crudOptions.value.request.list,
+            apiExportObj:crudOptions.value.request.export,
+            params:formInline.value,
+            column:crudOptions.value.columns,
+            hideExport:!hasBtnPermission('Export'),
+            hideImport:!hasBtnPermission('Import')
+        }
+    ))
 
     // 方法
     const setFull = () => {
@@ -119,7 +104,7 @@
             type: 'warning'
         }).then(() => {
             let ids = selection.value.map(item => item.id);
-            Api.apiSystemRoleDelete({id:ids}).then(res=>{
+            crudOptions.value.request.del({id:ids}).then(res=>{
                 if(res.code == 2000) {
                     search()
                     ElMessage.success("操作成功")
@@ -145,7 +130,7 @@
                     closeOnClickModal: false,
                     type: "warning",
                 }).then(() => {
-                    Api.apiSystemRoleDelete({ id: row.id }).then(res => {
+                    crudOptions.value.request.del({ id: row.id }).then(res => {
                     if (res.code == 2000) {
                         ElMessage.success(res.msg)
                         search()
@@ -157,7 +142,6 @@
                 break
             case 'reset':
                 formInline.value = {}
-                timers.value = []
                 search()
                 break
         }
@@ -171,7 +155,7 @@
             closeOnClickModal: false,
             type: "warning"
         }).then(() => {
-            Api.apiSystemRoleSetStatus({ id: row.id }).then(res => {
+            crudOptions.value.request.setStatus({ id: row.id }).then(res => {
                 if (res.code == 2000) {
                     originalStatus ? row.status = true : row.status = false
                     ElMessage.success(res.msg)
@@ -196,10 +180,4 @@
 
     onUnmounted(() => {
     })
-
-    // 权限检查函数
-    const hasPermission = (routeName, action) => {
-        // 实现你的权限检查逻辑
-        return true
-    }
 </script>

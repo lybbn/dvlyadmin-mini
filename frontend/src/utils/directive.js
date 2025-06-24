@@ -136,112 +136,115 @@ export default {
                 const boundary = binding.value?.boundary ?? true;
                 const withinParent = binding.value?.withinParent ?? false;
 
-                const startDrag = (e) => {
-                    // 记录点击开始时间
-                    clickStartTime = Date.now();
-                    moved = false;
-                    
-                    // 获取初始位置
-                    const clientX = e.clientX ?? e.touches[0].clientX;
-                    const clientY = e.clientY ?? e.touches[0].clientY;
-                    startX = clientX;
-                    startY = clientY;
-                    
-                    // 获取当前元素位置
-                    const rect = el.getBoundingClientRect();
-                    initialLeft = rect.left;
-                    initialTop = rect.top;
-                    
-                    // 添加样式
-                    el.style.transition = 'none'; // 拖动时禁用过渡效果
-                    document.addEventListener('mousemove', onDrag);
-                    document.addEventListener('touchmove', onDrag, { passive: false });
-                    document.addEventListener('mouseup', endDrag);
-                    document.addEventListener('touchend', endDrag);
-                };
+                // Define handlers as properties of the element so they can be accessed in unmounted
+                el.__dragHandlers__ = {
+                    startDrag: function(e) {
+                        // 记录点击开始时间
+                        clickStartTime = Date.now();
+                        moved = false;
+                        
+                        // 获取初始位置
+                        const clientX = e.clientX ?? e.touches[0].clientX;
+                        const clientY = e.clientY ?? e.touches[0].clientY;
+                        startX = clientX;
+                        startY = clientY;
+                        
+                        // 获取当前元素位置
+                        const rect = el.getBoundingClientRect();
+                        initialLeft = rect.left;
+                        initialTop = rect.top;
+                        
+                        // 添加样式
+                        el.style.transition = 'none'; // 拖动时禁用过渡效果
+                        document.addEventListener('mousemove', el.__dragHandlers__.onDrag);
+                        document.addEventListener('touchmove', el.__dragHandlers__.onDrag, { passive: false });
+                        document.addEventListener('mouseup', el.__dragHandlers__.endDrag);
+                        document.addEventListener('touchend', el.__dragHandlers__.endDrag);
+                    },
 
-                const onDrag = (e) => {
-                    // 标记已经开始移动
-                    moved = true;
-                    
-                    e.preventDefault();
-                    
-                    const clientX = e.clientX ?? e.touches[0].clientX;
-                    const clientY = e.clientY ?? e.touches[0].clientY;
-                    
-                    // 计算移动距离
-                    const dx = clientX - startX;
-                    const dy = clientY - startY;
-                    
-                    // 只有移动超过阈值才认为是拖拽
-                    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                        isDragging = true;
-                        el.style.cursor = 'grabbing';
-                    }
-                    
-                    // 应用新位置
-                    let newLeft = initialLeft + dx;
-                    let newTop = initialTop + dy;
-                    
-                    // 边界检查
-                    if ((boundary || withinParent) && isDragging) {
-                        const boundaryRect = withinParent 
-                        ? el.parentElement.getBoundingClientRect()
-                        : {
-                            left: 0,
-                            top: 0,
-                            right: window.innerWidth,
-                            bottom: window.innerHeight,
-                            width: window.innerWidth,
-                            height: window.innerHeight
-                            };
+                    onDrag: function(e) {
+                        // 标记已经开始移动
+                        moved = true;
                         
-                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - el.offsetWidth));
-                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - el.offsetHeight));
+                        e.preventDefault();
                         
-                        if (withinParent) {
-                        newLeft = Math.max(boundaryRect.left, Math.min(newLeft, boundaryRect.right - el.offsetWidth));
-                        newTop = Math.max(boundaryRect.top, Math.min(newTop, boundaryRect.bottom - el.offsetHeight));
+                        const clientX = e.clientX ?? e.touches[0].clientX;
+                        const clientY = e.clientY ?? e.touches[0].clientY;
+                        
+                        // 计算移动距离
+                        const dx = clientX - startX;
+                        const dy = clientY - startY;
+                        
+                        // 只有移动超过阈值才认为是拖拽
+                        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                            isDragging = true;
+                            el.style.cursor = 'grabbing';
                         }
-                    }
-                    
-                    if (isDragging) {
-                        el.style.left = `${newLeft}px`;
-                        el.style.top = `${newTop}px`;
-                    }
-                };
+                        
+                        // 应用新位置
+                        let newLeft = initialLeft + dx;
+                        let newTop = initialTop + dy;
+                        
+                        // 边界检查
+                        if ((boundary || withinParent) && isDragging) {
+                            const boundaryRect = withinParent 
+                            ? el.parentElement.getBoundingClientRect()
+                            : {
+                                left: 0,
+                                top: 0,
+                                right: window.innerWidth,
+                                bottom: window.innerHeight,
+                                width: window.innerWidth,
+                                height: window.innerHeight
+                                };
+                            
+                            newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - el.offsetWidth));
+                            newTop = Math.max(0, Math.min(newTop, boundaryRect.height - el.offsetHeight));
+                            
+                            if (withinParent) {
+                            newLeft = Math.max(boundaryRect.left, Math.min(newLeft, boundaryRect.right - el.offsetWidth));
+                            newTop = Math.max(boundaryRect.top, Math.min(newTop, boundaryRect.bottom - el.offsetHeight));
+                            }
+                        }
+                        
+                        if (isDragging) {
+                            el.style.left = `${newLeft}px`;
+                            el.style.top = `${newTop}px`;
+                        }
+                    },
 
-                const endDrag = (e) => {
-                    // 判断是否为点击事件
-                    const clickDuration = Date.now() - clickStartTime;
-                    const isClick = !moved && clickDuration < 200;
-                    
-                    if (isClick) {
-                        // 如果是点击，触发原始点击事件
-                        const clickEvent = new MouseEvent('click', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window
-                        });
-                        el.dispatchEvent(clickEvent);
+                    endDrag: function(e) {
+                        // 判断是否为点击事件
+                        const clickDuration = Date.now() - clickStartTime;
+                        const isClick = !moved && clickDuration < 200;
+                        
+                        if (isClick) {
+                            // 如果是点击，触发原始点击事件
+                            const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                            });
+                            el.dispatchEvent(clickEvent);
+                        }
+                        
+                        isDragging = false;
+                        el.style.cursor = 'move';
+                        
+                        // 恢复过渡效果
+                        el.style.transition = 'all 0.3s ease';
+                        
+                        // 移除事件监听
+                        document.removeEventListener('mousemove', el.__dragHandlers__.onDrag);
+                        document.removeEventListener('touchmove', el.__dragHandlers__.onDrag);
+                        document.removeEventListener('mouseup', el.__dragHandlers__.endDrag);
+                        document.removeEventListener('touchend', el.__dragHandlers__.endDrag);
                     }
-                    
-                    isDragging = false;
-                    el.style.cursor = 'move';
-                    
-                    // 恢复过渡效果
-                    el.style.transition = 'all 0.3s ease';
-                    
-                    // 移除事件监听
-                    document.removeEventListener('mousemove', onDrag);
-                    document.removeEventListener('touchmove', onDrag);
-                    document.removeEventListener('mouseup', endDrag);
-                    document.removeEventListener('touchend', endDrag);
                 };
 
                 // 添加事件监听
-                el.addEventListener('mousedown', startDrag);
-                el.addEventListener('touchstart', startDrag, { passive: false });
+                el.addEventListener('mousedown', el.__dragHandlers__.startDrag);
+                el.addEventListener('touchstart', el.__dragHandlers__.startDrag, { passive: false });
                 
                 // 确保元素有定位样式
                 if (!['fixed', 'absolute', 'relative'].includes(getComputedStyle(el).position)) {
@@ -251,8 +254,15 @@ export default {
             
             unmounted(el) {
                 // 清理事件监听
-                el.removeEventListener('mousedown', startDrag);
-                el.removeEventListener('touchstart', startDrag);
+                if (el.__dragHandlers__) {
+                    el.removeEventListener('mousedown', el.__dragHandlers__.startDrag);
+                    el.removeEventListener('touchstart', el.__dragHandlers__.startDrag);
+                    document.removeEventListener('mousemove', el.__dragHandlers__.onDrag);
+                    document.removeEventListener('touchmove', el.__dragHandlers__.onDrag);
+                    document.removeEventListener('mouseup', el.__dragHandlers__.endDrag);
+                    document.removeEventListener('touchend', el.__dragHandlers__.endDrag);
+                    delete el.__dragHandlers__;
+                }
             }
         })
         

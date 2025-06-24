@@ -25,11 +25,12 @@
     import { ref, onMounted } from 'vue'
     import lyDialog from "@/components/dialog/dialog.vue"
     import {deepClone} from "@/utils/util.js"
-    import Api from "@/api/api.js"
     import { ElMessage, ElMessageBox } from 'element-plus'
-    import XEUtils from "xe-utils";
+    import { createCrudConfig } from '../crud.js'
 
     const emits = defineEmits(['refreshData', 'closed'])
+
+    let crudOptions = ref(createCrudConfig().crudOptions)
 
     let mode = ref("add")
     const titleMap = {
@@ -63,9 +64,6 @@
         ]
     }
     
-    // 所需数据选项
-    const groups = ref([])
-    
     // 方法
     const handleOpen = (item = null,modeType = 'add') => {
         mode.value = modeType
@@ -79,9 +77,9 @@
         dialogForm.value.validate(async (valid) => {
             if (valid) {
                 isSaveing.value = true
-                let apiObj = Api.apiSystemRoleAdd
+                let apiObj = crudOptions.value.request.add
                 if(mode.value == "edit"){
-                    apiObj = Api.apiSystemRoleEdit
+                    apiObj = crudOptions.value.request.edit
                 }
                 const res = await apiObj(formData.value)
                 isSaveing.value = false

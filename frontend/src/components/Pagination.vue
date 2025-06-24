@@ -1,6 +1,10 @@
-/**
-* 分页组件
-*/
+<!--
+ * @Descripttion: 分页组件
+ * @author：lybbn
+ * @version：1.0
+ * @EditDate：2025-06-24
+ * @program：dvlyadmin-mini
+-->
 <template>
     <div class="lyPagination-page" :class="border?'lyPagination-page-border':''">
         <el-pagination class="page-box" :class="'page-box-'+position" :hide-on-single-page="hideOnSinglePage" @size-change="handleSizeChange" @current-change="handleCurrentChange" background :size="small?'small':'default'" v-model:current-page="childMsg.page" :page-sizes="pageSizes" :page-size="childMsg.limit" :layout="layout" :total="childMsg.total"></el-pagination>
