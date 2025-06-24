@@ -7,27 +7,6 @@
                     <el-form-item label="部门名称">
                         <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
                     </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门名称">
-                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="部门名称"></el-input>
-                    </el-form-item>
                 </template>
             </lySearchBar>
         </el-card>

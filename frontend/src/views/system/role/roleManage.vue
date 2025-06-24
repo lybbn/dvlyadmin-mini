@@ -1,15 +1,14 @@
 <template>
     <div :class="{'ly-is-full':isFull}" class="lycontainer">
         <el-card class="tableSelect" ref="tableSelect" shadow="hover" v-if="crudOptions.searchBar.showSearchBar">
-            <el-form :inline="true" :model="formInline" label-position="left">
-                <el-form-item label="角色名称">
-                    <el-input v-model.trim="formInline.name" maxlength="60"  clearable placeholder="角色名称" style="width:160px"></el-input>
-                </el-form-item>
-                <el-form-item label="">
-                    <el-button  @click="search" type="primary" icon="Search" v-auth="'Search'">查询</el-button>
-                    <el-button  @click="handleEdit('','reset')" icon="Refresh" v-auth="'Search'">重置</el-button>
-                </el-form-item>
-            </el-form>
+            <lySearchBar :model="formInline" @search="search" @reset="handleEdit('','reset')">
+                <!-- 自定义默认搜索项 -->
+                <template #default>
+                    <el-form-item label="角色名称">
+                        <el-input v-model.trim="formInline.name" maxlength="60" clearable style="width:160px" placeholder="角色名称"></el-input>
+                    </el-form-item>
+                </template>
+            </lySearchBar>
         </el-card>
         <el-card class="lytable" shadow="hover">
             <ly-table v-bind="tableBindProps" ref="tableref" @selection-change="selectionChange">
@@ -47,6 +46,7 @@
     import { ElMessage, ElMessageBox } from 'element-plus'
     import saveDialog from "./components/moduleSave.vue"
     import { createCrudConfig } from './crud.js'
+    import lySearchBar from '@/components/lySearchBar.vue'
     import { useUserState } from '@/store/userState' 
     import { useRoute } from 'vue-router'
 

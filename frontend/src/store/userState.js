@@ -128,7 +128,6 @@ export const useUserState = defineStore('userState', {
                 }
 
                 if(menu.type == 0){
-                    console.log()
                     route.name = route.name || `${route.id}-directory`; // 确保目录类型有 name,消除警告
                 }
 
