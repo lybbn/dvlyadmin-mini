@@ -75,7 +75,8 @@ class Initialize:
             {"id": "9", "name": "修改密码", "value": "ChangePass"},
             {"id": "10", "name": "禁用", "value": "Disable"},
             {"id": "11", "name": "日志", "value": "Logs"},
-            {"id": "12", "name": "移动", "value": "Move"}
+            {"id": "12", "name": "移动", "value": "Move"},
+            {"id": "13", "name": "设置状态", "value": "SetStatus"},
         ]
         self.save(Button, self.button_data, "权限表标识")
 
@@ -97,9 +98,11 @@ class Initialize:
     def init_menu_button(self):
         """初始化菜单权限表"""
         self.menu_button_data = [
-            {'id': 'e7fa30290d37447585ea7583d9d01f1b', 'menu_id': 'ae5629946df4497cbec10419e8375dd9', 'name': '编辑', 'value': 'Update', 'api': '/api/platformsettings/lunboimg/{id}/', 'method': 2},
-            {'id': '6e4251a948f348ccaa419a777a118048', 'menu_id': '80a340eae92b430abe17635468c2df1d', 'name': '编辑', 'value': 'Update', 'api': '/api/platformsettings/other/{id}/', 'method': 2},
-            {'id': '0209de89-6b9f-4d8a-84d3-ccfc3cc8b4da', 'menu_id': '151035da-77a3-4a62-b474-fce6824571fb', 'name': '编辑', 'value': 'Update', 'api': '/api/system/button/{id}/', 'method': 2},
+            {'id': 1, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '查询', 'value': 'menuManage:Search', 'api': '/api/system/menu/', 'method': 0},
+            {'id': 2, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '新增', 'value': 'deptManage:Create', 'api': '/api/system/dept/', 'method': 1},
+            {'id': 3, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '删除', 'value': 'deptManage:Delete', 'api': '/api/system/dept/{id}/', 'method': 3},
+            {'id': 4, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '编辑', 'value': 'deptManage:Update', 'api': '/api/system/dept/{id}/', 'method': 2},
+            {'id': 5, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '查询', 'value': 'deptManage:Update', 'api': '/api/system/dept/', 'method': 0},
         ]
         self.save(MenuButton, self.menu_button_data, "菜单权限表")
 

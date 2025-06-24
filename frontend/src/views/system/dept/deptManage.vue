@@ -18,7 +18,7 @@
                     <el-button type="danger" plain icon="delete" :disabled="selection.length==0" title="批量删除" @click="batch_del" v-auth="'Delete'"></el-button>
                 </template>
                 <template #status="scope">
-                    <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" v-auth="'sss1111'"></el-switch>
+                    <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" v-auth="'SetStatus'"></el-switch>
                 </template>
                 <el-table-column label="操作" fixed="right" width="150">
                     <template #header>

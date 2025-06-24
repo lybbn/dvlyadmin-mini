@@ -238,10 +238,13 @@ function filterUrl(map) {
 }
 
 //路由监听高亮
-function showThis() {
+//update 是否更新pmenu和nextMenu的值
+function showThis(update=true) {
 	nextTick(() => {
-		pmenu.value = route.meta.breadcrumb ? route.meta.breadcrumb[0] : {}
-		nextMenu.value = filterUrl2(pmenu.value.children)
+		if(update){
+			pmenu.value = route.meta.breadcrumb ? route.meta.breadcrumb[0] : {}
+			nextMenu.value = filterUrl2(pmenu.value.children)
+		}
 		//新增嵌套路由根据activeMenu决定高亮菜单
 		if(route.meta && route.meta.activeMenu){
 			active.value = route.meta.activeMenu;
@@ -377,7 +380,7 @@ onMounted(() => {
 	window.addEventListener('resize', onLayoutResize);
 	// menu.value = filterUrl(storesRoutesList.routesList);
 	showThis()
-	// router.afterEach(showThis);
+	router.afterEach(() => showThis(false))
 	// 监听点击事件
     document.addEventListener('click', handleClickOutside);
 	userState.getMenuButtonPermission()
