@@ -55,6 +55,8 @@ Api.apiSystemMenuButtonEdit = params => ajaxPut({url: `/api/system/menu_button/`
 Api.apiSystemMenuButtonDelete = params => ajaxDelete({url: `/api/system/menu_button/`,params})
 // 菜单按钮API -- 批量生成
 Api.apiSystemMenuButtonBatchGenerate = params => ajaxPost({url: `/api/system/menu_button/batch_generate/`,params})
+// 根据角色获取菜单按钮
+Api.apiSystemMenuButtonPermission= params => ajaxGet({url: `/api/system/menu_button/menu_button_permission/`,params})
 
 // 获取菜单列
 Api.apiSystemMenuField = params => ajaxGet({url: `/api/system/menu_field/`,params})

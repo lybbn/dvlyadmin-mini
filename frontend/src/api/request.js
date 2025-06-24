@@ -250,8 +250,6 @@ const buildUrlQuery = (baseUrl, queryParams) => {
     if(isEmpty(queryParams)){
         return baseUrl
     }
-    // 移除baseUrl可能存在的查询参数
-    const cleanBaseUrl = baseUrl.split('?')[0]
 
     const queryString = Object.entries(queryParams)
     .filter(([_, value]) => value !== undefined && value !== null)

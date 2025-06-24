@@ -29,7 +29,7 @@ export const useUserState = defineStore('userState', {
             // 扁平化权限集合 (用于快速权限检查)
             permissions: {
                 menus: [],    // 原始菜单路径
-                buttons: [],  // {menuName: [buttonCode1, buttonCode2]}  menuName 菜单组件名 有唯一性
+                buttons: [],  // {menuName:buttonCode}  menuName 菜单组件名 有唯一性
                 columns: []   // {tableName: {columnName: permissionType}}
             }
         }
@@ -41,7 +41,8 @@ export const useUserState = defineStore('userState', {
         },
         // 检查是否有按钮权限
         hasButtonPermission: (state) => (menuName, buttonCode) => {
-            return state.permissions.buttons[menuName]?.includes(buttonCode) || false
+            let pcode = `${menuName}:${buttonCode}`
+            return state.permissions.buttons.includes(pcode)
         },
         // 获取列权限
         getColumnPermission: (state) => (tableName, columnName) => {
@@ -57,6 +58,17 @@ export const useUserState = defineStore('userState', {
             Api.systemUserUserInfo().then(res => {
                 if (res.code == 2000) {
 					this.userInfo = res.data
+                }
+            })
+        },
+        /**
+         * 获取菜单按钮权限
+         * @methods getSystemUserInfo
+         */
+        async getMenuButtonPermission(){
+            Api.apiSystemMenuButtonPermission().then(res => {
+                if (res.code == 2000) {
+					this.permissions.buttons = res.data
                 }
             })
         },

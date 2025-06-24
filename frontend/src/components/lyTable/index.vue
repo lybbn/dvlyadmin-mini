@@ -11,6 +11,8 @@
 		<div class="lytopaction" v-if="!hideTopBar">
 			<div>
 				<slot name="topbar"></slot>
+				<el-button icon="Download" type="primary" @click="handleExport" title="导出" v-if="!hideExport"></el-button>
+				<lyImportFile apiObj="" @success="handleImportSuccess"></lyImportFile>
 			</div>
 			<TableActions
 				style="float: right;"
@@ -229,6 +231,7 @@
 	import TableActions from './TableActions.vue'
 	import { debounce } from 'lodash-es';
 	import LyDialog from "@/components/dialog/dialog.vue"
+	import lyImportFile from '@/components/lyImportFile.vue'
 
 	const props = defineProps({
 		tableName: { type: String, default: "lyTable" },
@@ -248,7 +251,7 @@
 		pageSizes: { type: Array, default: tableConfig.pageSizes },
 		rowKey: { type: String, default: "id" },
 		treeProps: { type: Object, default: () => ({children: 'children', hasChildren: 'hasChildren'}) },
-		isTree: { type: Boolean, default: false },//是否转换为树形结构数据。使用XEUtils
+		isTree: { type: Boolean, default: false },//把扁平数据是否转换为树形结构数据。使用XEUtils
 		defaultExpandAll:{ type: Boolean, default: false },
 		summaryMethod: { type: Function, default: null },
 		column: { type: Array, default: () => [] },
@@ -523,8 +526,13 @@
 		})
 		updateData(newFilters)
 	}
-
+    
+	let selected_ids = ref([])
 	const handleSelectionChange = (selection) => {
+		selected_ids.value = []
+		if(selection && selection.length>0){
+			selected_ids.value = selection.map(item => item.id)
+		}
 		emit('selectionChange', selection)
 	}
 
@@ -676,8 +684,8 @@
 			let reqData = {}
 
 			Object.assign(reqData, tableParams.value)
-
-			const res = await props.apiExportObj(reqData,{export_fields:export_fields})
+			//勾选的数据id数组
+			const res = await props.apiExportObj(reqData,{export_fields:export_fields,selected_ids:selected_ids.value})
 			if (res?.code && res.code !== props.successCode) {
 				ElMessage.warning(res.msg)
 				return
@@ -713,8 +721,8 @@
 
 	}
 
-    function handleImport(){
-        
+    function handleImportSuccess(res, close){
+        close()
     }
 
 	// Lifecycle hooks

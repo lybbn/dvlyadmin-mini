@@ -2,7 +2,7 @@
 import config from "./config"
 import api from "@/api/api"
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import { directive } from './directives';
+import directives from '@/utils/directive.js';
 import lyTable from "@/components/lyTable/index.vue";
 
 export default {
@@ -13,7 +13,7 @@ export default {
         for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
             app.component(key, component)
         }
-        directive(app)
+        app.use(directives)
         app.component("ly-table", lyTable);
     }
 }

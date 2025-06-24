@@ -231,14 +231,26 @@ class ImportExportMixin:
     @action(detail=False, methods=['post'])
     def export_data(self, request, *args, **kwargs):
         """
-        导出数据为Excel（支持图片和嵌套字段）
+        导出数据为Excel（支持图片和嵌套字段）,支持前端自定义字段和勾选数据导出
         @param: export_fields 优先使用前端传递的导出字段
+        @param: selected_ids 只导出前端勾选出来的数据id列表
+        请求体示例:
+        {
+            "selected_ids": [1, 2, 3],
+            "export_fields": {
+                "name": "产品名称",
+                "code": "产品代码"
+            }
+        }
         """
         export_fields = request.data.get('export_fields', {})
         if not export_fields:
             assert self.export_field_dict, "'%s' 请配置对应的导出模板字段。" % self.__class__.__name__
         self.export_field_dict = export_fields
+        selected_ids = request.data.get('selected_ids', [])
         queryset = self.get_export_queryset()
+        if selected_ids:
+            queryset = queryset.filter(id__in=selected_ids)
         if not self.export_serializer_class:self.export_serializer_class = self.serializer_class
         assert self.export_serializer_class, "'%s' 请配置对应的导出序列化器。" % self.__class__.__name__
         serializer = self.export_serializer_class(queryset, many=True, request=request)
@@ -337,7 +349,7 @@ class ImportExportMixin:
     @transaction.atomic
     def import_data(self, request, *args, **kwargs):
         """导入Excel数据（支持嵌套字段）"""
-        assert self.import_field_dict, "'%s' 请配置对应的导出模板字段。" % self.__class__.__name__
+        assert self.import_field_dict, "'%s' 请配置对应的导入模板字段。" % self.__class__.__name__
         if 'file' not in request.FILES:
             return ErrorResponse(msg='请上传文件')
         

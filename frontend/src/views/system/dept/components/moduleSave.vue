@@ -44,8 +44,11 @@
     import Api from "@/api/api.js"
     import { ElMessage, ElMessageBox } from 'element-plus'
     import XEUtils from "xe-utils";
+    import { createCrudConfig } from '../crud.js'
 
     const emits = defineEmits(['refreshData', 'closed'])
+
+    let crudOptions = ref(createCrudConfig().crudOptions)
 
     let mode = ref("add")
     const titleMap = {
@@ -92,7 +95,7 @@
     }
     
     const getGroup = async () => {
-        Api.apiSystemDept({page:1,limit:999,status:1}).then(res=>{
+        crudOptions.value.request.list({page:1,limit:999,status:1}).then(res=>{
             if(res.code === 2000){
                 groups.value = XEUtils.toArrayTree(res.data.data, { parentKey: 'parent', strict: false })
             }
@@ -103,9 +106,9 @@
         dialogForm.value.validate(async (valid) => {
             if (valid) {
                 isSaveing.value = true
-                let apiObj = Api.apiSystemDeptAdd
+                let apiObj = crudOptions.value.request.add
                 if(mode.value == "edit"){
-                    apiObj = Api.apiSystemDeptEdit
+                    apiObj = crudOptions.value.request.edit
                 }
                 const res = await apiObj(formData.value)
                 isSaveing.value = false

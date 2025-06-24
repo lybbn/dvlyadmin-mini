@@ -29,7 +29,10 @@ system_url.register(r'operation_log', OperationLogViewSet)
 urlpatterns = [
     re_path('menu/update_sort/', MenuViewSet.as_view({'post': 'update_sort'})),
     re_path('menu_tree/', MenuViewSet.as_view({'get': 'menu_tree'})),
+    
+    re_path('menu_button/menu_button_permission/', MenuButtonViewSet.as_view({'get': 'menu_button_permission'})),
     re_path('menu_button/batch_generate/', MenuButtonViewSet.as_view({'post': 'batch_generate'})),
+
     re_path('menu_field/get_models/', MenuFieldViewSet.as_view({'get': 'get_models'})),
     re_path('menu_field/auto_create/', MenuFieldViewSet.as_view({'post': 'auto_create'})),
     re_path('menu/web_router/', MenuViewSet.as_view({'get': 'web_router'})),#也可以在视图的action装饰器中自动生成

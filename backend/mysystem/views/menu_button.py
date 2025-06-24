@@ -3,7 +3,7 @@
 """
 @Remark: 菜单按钮管理
 """
-from mysystem.models import MenuButton,Menu
+from mysystem.models import MenuButton,Menu,RoleMenuButtonPermission
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
 from utils.common import get_parameter_dic
@@ -29,6 +29,18 @@ class MenuButtonViewSet(CustomModelViewSet):
     serializer_class = MenuButtonSerializer
     filterset_fields = ['menu']
 
+    def menu_button_permission(self,request):
+        """
+        获取根据角色获取按钮权限
+        """
+        is_superuser = request.user.is_superuser
+        if is_superuser:
+            queryset = MenuButton.objects.values_list('value',flat=True)
+        else:
+            role_id = request.user.role.values_list('id', flat=True)
+            queryset = RoleMenuButtonPermission.objects.filter(role__in=role_id).values_list('menu_button__value',flat=True).distinct()
+        return DetailResponse(data=queryset)
+
     def batch_generate(self,request):
         """自动批量生成增删改查详情 按钮权限"""
         reqData = get_parameter_dic(request)
@@ -45,6 +57,7 @@ class MenuButtonViewSet(CustomModelViewSet):
             {'menu': ins.id, 'name': '编辑', 'value': f'{ins.component_name}:Update', 'api': f'{baseapi}{{id}}/', 'method': 2},
             {'menu': ins.id, 'name': '查询', 'value': f'{ins.component_name}:Search', 'api': f'{baseapi}', 'method': 0},
             {'menu': ins.id, 'name': '详情', 'value': f'{ins.component_name}:Detail', 'api': f'{baseapi}{{id}}/', 'method': 0},
+            {'menu': ins.id, 'name': '导出', 'value': f'{ins.component_name}:Export', 'api': f'{baseapi}export_data/', 'method': 1},
         ]
         serializer = self.get_serializer(data=data_list, many=True)
         serializer.is_valid(raise_exception=True)
