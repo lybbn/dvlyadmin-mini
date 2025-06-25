@@ -131,6 +131,10 @@
         uploader.value.clearFiles()
         loading.value = false
         percentage.value = 0
+        if(res.code != 2000){
+            ElMessage.warning(res.msg)
+            return
+        }
         emit('success', res, close)
     }
 
@@ -150,13 +154,13 @@
         }
         
         const data = new FormData()
-        data.append(param.filename, param.file)
+        data.append('file', param.file)
         
         for (const key in requestData) {
             data.append(key, requestData[key])
         }
         
-        props.apiObj(data, {
+        props.apiObj({formData:data}, {
             onUploadProgress: e => {
             const complete = parseInt(((e.loaded / e.total) * 100) | 0, 10)
             param.onProgress({ percent: complete })

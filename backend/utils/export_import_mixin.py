@@ -344,12 +344,14 @@ class ImportExportMixin:
         except Exception as e:
             logger.error(f"导出失败: {str(e)}")
             return ErrorResponse(msg=f'导出失败: {str(e)}')
-
+    
     @action(detail=False, methods=['post'])
     @transaction.atomic
     def import_data(self, request, *args, **kwargs):
-        """导入Excel数据（支持嵌套字段）"""
+        """批量导入Excel数据（支持嵌套字段）"""
         assert self.import_field_dict, "'%s' 请配置对应的导入模板字段。" % self.__class__.__name__
+        assert self.import_serializer_class, "'%s' 请配置对应的导入序列化器。" % self.__class__.__name__
+        
         if 'file' not in request.FILES:
             return ErrorResponse(msg='请上传文件')
         
@@ -361,17 +363,20 @@ class ImportExportMixin:
             wb = load_workbook(filename=BytesIO(file.read()))
             ws = wb.active
             
-            # 获取表头映射 (Excel列名 -> 模型字段名)
-            headers = []
-            for cell in ws[1]:
-                headers.append(cell.value)
+            # 获取表头映射
+            headers = [cell.value for cell in ws[1]]
             
-            # 处理导入数据
-            success_count = 0
+            # 验证表头
+            missing_headers = set(self.import_field_dict.keys()) - set(headers)
+            if missing_headers:
+                return ErrorResponse(msg=f'缺少必要的列: {", ".join(missing_headers)}')
+            
+            # 准备批量数据
+            valid_data = []
             error_count = 0
             error_messages = []
             
-            for row in ws.iter_rows(min_row=2, values_only=True):
+            for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
                 if not any(row):  # 跳过空行
                     continue
                 
@@ -383,71 +388,85 @@ class ImportExportMixin:
                         
                         excel_col_name = headers[idx]
                         if excel_col_name in self.import_field_dict:
-                            model_field = self.import_field_dict[excel_col_name]
+                            field_info = self.import_field_dict[excel_col_name]
+                            model_field = field_info if isinstance(field_info, str) else field_info['field']
                             
                             # 处理图片字段
-                            if (model_field in self.import_image_fields or 
+                            if hasattr(self, 'import_image_fields') and (
+                                model_field in self.import_image_fields or 
                                 ('.' in model_field and model_field.split('.')[-1] in self.import_image_fields)):
-                                # 如果是图片字段，确保是有效URL
-                                if cell_value and self.is_image(cell_value):
-                                    self.process_nested_field(model_field, cell_value, row_data)
-                                else:
-                                    self.process_nested_field(model_field, None, row_data)
-                            else:
-                                # 处理普通字段
-                                if cell_value is None:
-                                    cell_value = ""
-                                self.process_nested_field(model_field, cell_value, row_data)
+                                cell_value = cell_value if (cell_value and self.is_image(cell_value)) else None
+                            
+                            # 处理普通字段
+                            cell_value = "" if cell_value is None else cell_value
+                            self.process_nested_field(model_field, cell_value, row_data)
                     
-                    # 预处理数据
-                    processed_data = self.before_import_row(row_data, ws.iter_rows(min_row=2).index(row) + 2)
+                    # 预处理
+                    processed_data = self.before_import_row(row_data, row_idx)
+                    valid_data.append(processed_data)
                     
-                    # 创建或更新数据
-                    serializer = self.get_serializer(data=processed_data)
-                    serializer.is_valid(raise_exception=True)
-                    serializer.save()
-                    
-                    success_count += 1
                 except Exception as e:
                     error_count += 1
-                    error_messages.append(f"第{ws.iter_rows(min_row=2).index(row) + 2}行错误: {str(e)}")
+                    error_messages.append(f"第{row_idx}行错误: {str(e)}")
                     continue
             
-            # 导入后处理
-            self.after_import(success_count, error_count, error_messages)
+            # 批量导入
+            if valid_data:
+                print(valid_data)
+                serializer = self.import_serializer_class(data=valid_data, many=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
             
-            result = {
+            # 后处理
+            self.after_import(len(valid_data), error_count, error_messages)
+            
+            return DetailResponse(data={
                 'success': True,
-                'success_count': success_count,
+                'success_count': len(valid_data),
                 'error_count': error_count,
                 'error_messages': error_messages
-            }
-            return DetailResponse(data=result)
+            })
             
         except Exception as e:
-            logger.error(f"导入失败: {str(e)}")
+            logger.error(f"导入失败: {str(e)}", exc_info=True)
             return ErrorResponse(msg=f'导入失败: {str(e)}')
     
     def generate_template(self):
         """
-        生成导入模板
+        生成简化版导入模板（仅包含字段标题和示例数据）
         """
         wb = Workbook()
         ws = wb.active
         ws.title = "导入模板"
         
-        # 设置样式
+        # 基础样式设置
         header_font = Font(bold=True, color="FFFFFF")
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
-        example_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
         left_center = Alignment(horizontal='left', vertical='center')
         
-        # 写入表头
+        # 准备数据
         headers = []
-        for excel_col, model_field in self.import_field_dict.items():
-            headers.append(excel_col)
+        example_values = []
         
+        # 获取示例数据
+        example_data = self.get_import_example_data() if hasattr(self, 'get_import_example_data') else {}
+        
+        for excel_col, field_info in self.import_field_dict.items():
+            # 支持字典和字符串两种配置方式
+            if isinstance(field_info, dict):
+                model_field = field_info.get('field', field_info)
+                example = field_info.get('example', example_data.get(model_field, ''))
+            else:
+                example = example_data.get(field_info, '')
+            
+            headers.append(excel_col)
+            example_values.append(example)
+        
+        # 写入表头行
         ws.append(headers)
+        
+        # 写入示例数据行
+        ws.append(example_values)
         
         # 设置表头样式
         for col in range(1, len(headers) + 1):
@@ -455,20 +474,14 @@ class ImportExportMixin:
             cell.font = header_font
             cell.fill = header_fill
             cell.alignment = left_center
-            
-            # 标记必填字段
-            model_field = list(self.import_field_dict.values())[col-1]
         
         # 设置列宽
         for col in range(1, len(headers) + 1):
             col_letter = get_column_letter(col)
             ws.column_dimensions[col_letter].width = 20
         
-        # 添加数据验证说明
-        # ws.cell(row=4, column=1, value="填写说明：")
-        # ws.cell(row=5, column=1, value="1. 红色标题列为必填字段")
-        # ws.cell(row=6, column=1, value="2. 图片字段请填写完整URL地址")
-        # ws.cell(row=7, column=1, value="3. 不要修改表头名称")
+        # 冻结表头行
+        ws.freeze_panes = "A2"
         
         # 返回文件流
         output = BytesIO()

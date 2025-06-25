@@ -730,6 +730,8 @@
 	}
 
     function handleImportSuccess(res, close){
+		ElMessage.success("导入成功")
+		refreshData()
         close()
     }
 

@@ -95,7 +95,7 @@ export const useUserState = defineStore('userState', {
                         hidden : !menu.visible,
                         requiresAuth: true,
                         isKeepAlive:menu.cache,
-                        affix:false,
+                        affix:false,//默认全部为非固定，如果要固定则可扩展或反馈dvlyadmin-mini的作者lybbn
                     }
                 }
                 KeepAliveStore.updateKeepAlive(route)

@@ -89,12 +89,14 @@ class CustomModelViewSet(ModelViewSet,ImportExportMixin):
     (3)export_serializer_class 导出数据,使用的序列化器，可为空，为空则调用默认序列化器
     (4)export_field_dict = {} 导出时的字段,如：export_field_dict = {'name':'姓名','age':'年龄'}
     (5)import_field_dict = {} 导入字段映射 {'excel列名': 'model字段名'}，支持嵌套如 'c.d'
+    (6)import_serializer_class 导入时需要的序列化
     """
     values_queryset = None
     ordering_fields = '__all__'
     create_serializer_class = None
     update_serializer_class = None
     export_serializer_class = None
+    import_serializer_class = None
     export_field_dict = {}
     import_field_dict = {}
     filterset_fields = ()
