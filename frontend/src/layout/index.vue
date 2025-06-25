@@ -167,7 +167,6 @@ import { useRoutesList } from "@/store/routesList";
 import { useRouter, useRoute } from 'vue-router'
 import config from '@/config'
 import Api from "@/api/api";
-import { isEmpty } from '@/utils/util';
 import { ElMessageBox } from 'element-plus'
 
 const route = useRoute()

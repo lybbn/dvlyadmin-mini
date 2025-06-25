@@ -129,6 +129,7 @@ export const useUserState = defineStore('userState', {
 
                 if(menu.type == 0){
                     route.name = route.name || `${route.id}-directory`; // 确保目录类型有 name,消除警告
+                    route.path = route.path || `/${route.id}-directory`
                 }
 
                 // 处理子路由

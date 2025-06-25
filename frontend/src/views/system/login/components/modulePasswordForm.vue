@@ -28,6 +28,7 @@
 	import Api from "@/api/api"
 	import sysConfig from "@/config"
 	import {useUserState} from "@/store/userState";
+	import { useTabsStore } from '@/store/tabs'
 
 	const userState = useUserState()
 
@@ -99,6 +100,7 @@
 				await userState.getSystemWebRouter(router)
 				loginSuccess(); // 执行跳转等操作
 				ElMessage.success('登录成功');
+
 				islogining.value = false
 			} else {
 				// 4. 登录失败（服务端返回错误）
@@ -118,9 +120,19 @@
 		}
 	}
 
+	function getCacheActiveTab(){
+		let tabsStore = useTabsStore()
+		return tabsStore.activeTab
+	}
+
 	function loginSuccess(){
-		// router.push('/');
-		window.location.href = API_BASE_URL+"/#/"
+		let firstpath = getCacheActiveTab()
+		if(!firstpath){
+			window.location.href = API_BASE_URL+"/#/"
+		}else{
+			router.push(firstpath);
+		}
+		
 	}
 
 	onMounted(()=>{

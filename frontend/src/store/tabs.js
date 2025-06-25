@@ -82,4 +82,11 @@ export const useTabsStore = defineStore('tabs', () => {
         closeOtherTabs,
         closeAllTabs
     }
+},{
+    persist: [
+        {
+            pick: ['tabsList','activeTab'],
+            storage: sessionStorage,
+        }
+    ],
 })

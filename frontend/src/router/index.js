@@ -9,6 +9,7 @@ import {useRoutesList} from '@/store/routesList';
 import {ElNotification} from "element-plus"
 import { cancelRequestState } from "@/store/cancelRequest";
 import { useUserState } from "@/store/userState";
+import { useTabsStore } from '@/store/tabs'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -35,7 +36,6 @@ router.beforeEach(async (to, from, next) => {
             autoStorage.clear();
             NProgress.done();
         } else if (token && to.path === '/login') {
-            console.log(router.hasRoute('home'))
             next('/home');
             NProgress.done();
         } else if(!token){
@@ -52,7 +52,7 @@ router.beforeEach(async (to, from, next) => {
                     const hasHomePath = userState.permissions.menus.some(route => route.web_path === '/home');
                     if (!hasHomePath) {
                         // 跳转到第一个路由
-                        const firstRoute = routesList.value[0]?.path
+                        const firstRoute = getFirstMenuRoutePath(routesList.value)
                         return next(firstRoute); // 重定向到第一个路由
                     }
                 }
@@ -62,7 +62,7 @@ router.beforeEach(async (to, from, next) => {
                     const hasHomePath = router.getRoutes().some(route => route.path === '/home');
                     if (!hasHomePath) {
                         // 跳转到第一个路由
-                        const firstRoute = routesList.value[0]?.path
+                        const firstRoute = getFirstMenuRoutePath(routesList.value)
                         return next(firstRoute); // 重定向到第一个路由
                     }
                 }
@@ -71,6 +71,47 @@ router.beforeEach(async (to, from, next) => {
         }
     }
 })
+
+function getCacheActiveTab(){
+    let tabsStore = useTabsStore()
+    return tabsStore.activeTab
+}
+
+function getFirstMenuRoutePath(menuList) {
+    let c_tab_path = getCacheActiveTab()
+    if(c_tab_path){
+        return c_tab_path
+    }
+    const firstMenu = findFirstAvailableMenu(menuList)
+    if (firstMenu) {
+        return firstMenu.path
+    }
+    return '/'
+}
+
+// 递归查找第一个可用菜单
+function findFirstAvailableMenu(menus) {
+    for (const menu of menus) {
+        // 跳过隐藏菜单、外链和404页面、重定向页面
+        if (menu.meta?.hidden || menu.meta?.type === 3 || menu.name === 'notFound' || menu.name === 'RedirectTo') {
+            continue
+        }
+
+        // 情况1：如果是菜单类型(type=1、2)，直接返回
+        if (menu.meta?.type === 1 || menu.meta?.type === 2) {
+            return menu
+        }
+
+        // 情况2：如果是目录(type=0)且有子菜单，递归查找
+        if ((menu.meta?.type === 0 || menu.meta?.type === 2) && menu.children?.length) {
+            const childMenu = findFirstAvailableMenu(menu.children)
+            if (childMenu) {
+                return childMenu
+            }
+        }
+    }
+    return null
+}
 
 router.afterEach(() => {
     NProgress.done();
