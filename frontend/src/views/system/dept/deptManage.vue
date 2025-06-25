@@ -76,7 +76,9 @@
         {
             ...crudOptions.value.table,
             apiObj:crudOptions.value.request.list,
+            apiImportObj:crudOptions.value.request.import,
             apiExportObj:crudOptions.value.request.export,
+            apiTemplateObj:crudOptions.value.request.dltemplate,
             params:formInline.value,
             column:crudOptions.value.columns,
             hideExport:!hasBtnPermission('Export'),

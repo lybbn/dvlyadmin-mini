@@ -465,10 +465,10 @@ class ImportExportMixin:
             ws.column_dimensions[col_letter].width = 20
         
         # 添加数据验证说明
-        ws.cell(row=4, column=1, value="填写说明：")
-        ws.cell(row=5, column=1, value="1. 红色标题列为必填字段")
-        ws.cell(row=6, column=1, value="2. 图片字段请填写完整URL地址")
-        ws.cell(row=7, column=1, value="3. 不要修改表头名称")
+        # ws.cell(row=4, column=1, value="填写说明：")
+        # ws.cell(row=5, column=1, value="1. 红色标题列为必填字段")
+        # ws.cell(row=6, column=1, value="2. 图片字段请填写完整URL地址")
+        # ws.cell(row=7, column=1, value="3. 不要修改表头名称")
         
         # 返回文件流
         output = BytesIO()
@@ -476,20 +476,22 @@ class ImportExportMixin:
         output.seek(0)
         return output
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def download_template(self, request, *args, **kwargs):
         """
         下载导入模板
         """
+        assert self.import_field_dict, "'%s' 请配置对应的导入模板字段。" % self.__class__.__name__
         try:
             template_stream = self.generate_template()
             response = HttpResponse(
                 template_stream.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            filename = f"import_template_{time.strftime('%Y%m%d')}.xlsx"
+            mname = self.get_export_filename(self.get_export_queryset())
+            filename = f"import_template_{mname}.xlsx" if mname else f"import_template_{time.strftime('%Y%m%d')}.xlsx"
             response['Content-Disposition'] = f'attachment; filename={escape_uri_path(filename)}'
             return response
         except Exception as e:
             logger.error(f"生成模板失败: {str(e)}")
-            return Response({'detail': f'生成模板失败: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return ErrorResponse(msg=f'生成模板失败: {str(e)}')

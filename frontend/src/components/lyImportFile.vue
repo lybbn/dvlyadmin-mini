@@ -57,7 +57,7 @@
                             </el-link>
                         </p>
                         <p v-if="!isEmpty(apiTemplateObj)" style="margin-top: 7px;">
-                            <el-button type="primary" link>
+                            <el-button type="primary" link @click="handleDownloadTemplate">
                             下载导入模板
                             </el-button>
                         </p>
@@ -82,11 +82,12 @@
     import { ref } from 'vue'
     import { ElMessage, ElNotification } from 'element-plus'
     import { UploadFilled } from '@element-plus/icons-vue'
-    import { isEmpty } from '@/utils/util'
+    import { isEmpty,extractFilenameFromHeaders } from '@/utils/util'
+    import { saveAs } from 'file-saver'
 
     const props = defineProps({
-        apiObj: { type: Object, default: () => ({}) },
-        apiTemplateObj: { type: Object, default: () => ({}) },
+        apiObj: { type: Function, default: null },
+        apiTemplateObj: { type: Function, default: null},
         data: { type: Object, default: () => ({}) },
         accept: { type: String, default: ".xls, .xlsx" },
         maxSize: { type: Number, default: 10 },
@@ -155,7 +156,7 @@
             data.append(key, requestData[key])
         }
         
-        props.apiObj.post(data, {
+        props.apiObj(data, {
             onUploadProgress: e => {
             const complete = parseInt(((e.loaded / e.total) * 100) | 0, 10)
             param.onProgress({ percent: complete })
@@ -165,6 +166,24 @@
         })
         .catch(err => {
             param.onError(err)
+        })
+    }
+
+    function handleDownloadTemplate(){
+        props.apiTemplateObj().then(res=>{
+            if(res.headers['content-type'] == 'application/json'){
+                const reader = new FileReader();
+                reader.readAsText(res.data) // 读取文件, 用字符串显示
+                reader.onload = () => {
+                    const jsonData = JSON.parse(reader.result);
+                    ElMessage.warning(jsonData.msg)
+                };
+            }else{
+                let tmpfilename = 'import_template.xlsx' // 默认文件名
+                let filename = extractFilenameFromHeaders(res.headers);
+                saveAs(res.data ,filename||tmpfilename)
+                ElMessage.success("下载成功")
+            }
         })
     }
 

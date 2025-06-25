@@ -91,7 +91,6 @@
                     // 强制重排
                     void itemsContainer.offsetHeight
                     hasOverflow.value = itemsContainer.scrollHeight > 42
-                    console.log(hasOverflow.value)
                 }
             }
             }, 10)

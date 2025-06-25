@@ -299,7 +299,7 @@ export function downloadFile (param) {
         headers: {
             Authorization: 'JWT ' + token,
         },
-        data:JSON.parse(JSON.stringify(param.params)),
+        data:param.params?JSON.parse(JSON.stringify(param.params)):null,
         responseType: 'blob'
     }).then(res => res);
 }

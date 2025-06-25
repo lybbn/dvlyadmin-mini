@@ -14,7 +14,8 @@ export function createCrudConfig(options = {}){
         list:api.list,
         export:api.export,
         detail:null,
-        import:null,
+        import:api.import,
+        dltemplate:api.downloadTemplate,
         setStatus:api.setStatus,
         ...(options.request || {}) // 允许覆盖请求方法
     }

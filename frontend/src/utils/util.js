@@ -552,3 +552,31 @@ export function getTableHeight(tableSelectHeight,allowPage=true){
         return height - pagination_height
     }
 }
+
+/**
+ * 从响应头解析文件名（兼容 RFC 5987 和传统格式）
+ */
+export function extractFilenameFromHeaders(headers) {
+	const disposition = headers['content-disposition'];
+	if (!disposition) return null;
+
+	// 1. 匹配 RFC 5987 格式（现代浏览器）：filename*=UTF-8''中文名.xlsx
+	const utf8Filename = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+	if (utf8Filename) {
+		return decodeURIComponent(utf8Filename[1]);
+	}
+
+	// 2. 匹配传统格式：filename="%E4%B8%AD%E6%96%87.xlsx"
+	const legacyFilename = disposition.match(/filename="([^"]+)"/i);
+	if (legacyFilename) {
+		return decodeURIComponent(legacyFilename[1]);
+	}
+
+	// 3. 无引号格式：filename=%E4%B8%AD%E6%96%87.xlsx
+	const rawFilename = disposition.match(/filename=([^;]+)/i);
+	if (rawFilename) {
+		return decodeURIComponent(rawFilename[1].trim());
+	}
+
+	return null;
+}

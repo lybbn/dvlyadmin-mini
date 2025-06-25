@@ -45,6 +45,7 @@ class DeptViewSet(CustomModelViewSet):
     serializer_class = DeptSerializer
     filterset_class = DeptFilterSet
     search_fields = ['name', 'owner','phone','email']
+    import_field_dict={"ID":"id","部门名称":"name","权限字符":"key","排序":"sort","上级部门":"parent","状态":"status"}
 
     def set_status(self,request,*args, **kwargs):
         """禁用/启用"""

@@ -12,7 +12,7 @@
 			<div class="lyflexcenter">
 				<slot name="topbar"></slot>
 				<el-button icon="Download" type="primary" @click="handleExport" title="导出" v-if="!hideExport"></el-button>
-				<lyImportFile ref="lyImportRef" :apiObj="apiImportObj" @success="handleImportSuccess" style="margin-left: 12px;" v-auth="'Import'"></lyImportFile>
+				<lyImportFile ref="lyImportRef" :apiObj="apiImportObj" :apiTemplateObj="apiTemplateObj" @success="handleImportSuccess" style="margin-left: 12px;" v-auth="'Import'"></lyImportFile>
 			</div>
 			<TableActions
 				style="float: right;"
@@ -239,6 +239,7 @@
 		apiObj: { type: Function, default: null },//api列表接口
 		apiImportObj: { type: Function, default: null },//api导入接口
 		apiExportObj: { type: Function, default: null },//api导出接口
+		apiTemplateObj: { type: Function, default: null },//api导入模板下载
 		params: { type: Object, default: () => ({}) },
 		data: { type: Array, default: () => [] },
 		height: { type: [String, Number], default: "100%" },

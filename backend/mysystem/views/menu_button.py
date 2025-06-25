@@ -25,7 +25,7 @@ class MenuButtonViewSet(CustomModelViewSet):
     """
     菜单按钮接口:
     """
-    queryset = MenuButton.objects.all()
+    queryset = MenuButton.objects.all().order_by("id")
     serializer_class = MenuButtonSerializer
     filterset_fields = ['menu']
 
