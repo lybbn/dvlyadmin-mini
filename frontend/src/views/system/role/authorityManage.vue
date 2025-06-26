@@ -2,90 +2,34 @@
     <div class="permission-container">
         <!-- 主内容区 -->
         <div class="permission-main">
-            <!-- 左侧面板 -->
-            <div class="left-panel">
-                <!-- 角色选择卡片 -->
-                <el-card class="panel-card" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <div class="lyflexcenter">
-                            <span style="margin-right:5px;">当前角色</span>
-                            <el-tag size="small" type="primary" v-if="roleObj.name">
-                                {{ roleObj.name }}
-                            </el-tag>
-                            <el-tag size="small" type="info" v-else>未选择</el-tag>
-                        </div>
-                        <el-button size="small" type="primary" @click="submitPermisson" :loading="saving" class="save-btn":disabled="!currentRole">保存</el-button>
-                    </div>
-                </template>
-                <el-scrollbar>
-                    <el-tree
-                    class="role-tree"
-                    :data="roleTreeData"
-                    :props="{ label: 'name' }"
-                    :highlight-current="true"
-                    node-key="node_id"
-                    default-expand-all
-                    @node-click="nodeClick"
-                    ref="roleTree"
-                    />
-                </el-scrollbar>
-                </el-card>
-
-                <!-- 数据范围授权卡片 -->
-                <el-card class="panel-card" shadow="hover">
-                    <template #header>
-                        <div class="card-header">
-                            <span>全局数据授权</span>
-                            <el-tooltip content="全局授权用户可操作的数据范围" placement="top">
-                                <el-icon><QuestionFilled /></el-icon>
-                            </el-tooltip>
-                        </div>
-                    </template>
-                    <el-select
-                        v-model="roleObj.data_range"
-                        @change="dataScopeSelectChange"
-                        placeholder="选择数据范围"
-                        :disabled="!roleObj.name"
-                        class="data-scope-select"
-                    >
-                        <el-option
-                        v-for="item in dataScopeOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                        />
-                    </el-select>
-                    
-                    <div class="dept-tree-container" v-show="roleObj.data_range === 4">
-                        <el-tree
-                        class="dept-tree"
-                        :data="deptOptions"
-                        show-checkbox
-                        default-expand-all
-                        :default-checked-keys="deptCheckedKeys"
-                        ref="deptTree"
-                        node-key="id"
-                        :props="{ label: 'name', children: 'children', disabled: 'disabled' }"
-                        :disabled="!roleObj.name"
-                        />
-                    </div>
-                </el-card>
-            </div>
-
             <!-- 右侧面板 -->
             <div class="right-panel">
                 <!-- 菜单权限卡片 -->
                 <el-card class="panel-card" shadow="hover">
                     <template #header>
                         <div class="card-header">
-                            <span>菜单/按钮授权</span>
-                            <el-tooltip content="授权用户在菜单中可操作的范围,选择菜单、数据权限、按钮权限" placement="top">
+                            <div class="permission-header">
+                                <span>当前角色</span>
+                                <div class="header-actions">
+                                    <el-select v-model="currentRole" placeholder="选择角色" class="role-select" @change="handleRoleChange" style="width:200px;">
+                                        <el-option
+                                            v-for="role in roleList"
+                                            :key="role.id"
+                                            :label="role.name"
+                                            :value="role.id"
+                                        />
+                                    </el-select>
+                                    <el-button type="primary" :icon="Check" @click="savePermissions" :loading="saving" class="save-btn">
+                                    保存配置
+                                    </el-button>
+                                </div>
+                            </div>
+                            <el-tooltip content="授权用户在菜单中可操作的范围,选择菜单、数据权限、按钮权限、列权限（点击菜单配置）" placement="top">
                                 <el-icon><QuestionFilled /></el-icon>
                             </el-tooltip>
                         </div>
                     </template>
-                    <el-scrollbar v-loading="loadingPage" always>
+                    <el-scrollbar v-loading="loadingPage" always class="tree-scroll-container">
                         <el-empty description="请先选择角色" v-if="!roleObj.name" />
                         <el-tree
                             v-else
@@ -99,15 +43,18 @@
                             :expand-on-click-node="false"
                             :default-checked-keys="menuCheckedKeys"
                             :check-strictly="true"
+                            :check-on-click-leaf="false"
+                            @node-click="handleNodeClick"
                             @check-change="handleCheckClick"
                         >
                             <template #default="{ node, data }">
                                 <div class="menu-node-container">
-                                    <div class="menu-node-header" :style="{width:((4-node.level)*18+220)+'px'}">
+                                    <div class="menu-node-header" :style="{width:((4-node.level)*18+210)+'px'}">
                                         <span class="menu-name">{{ data.name }}</span>
                                         <el-select
+                                        @click.stop=""
                                         v-if="data.type === 1"
-                                        v-model="data.data_range"
+                                        v-model="data.data_scope"
                                         @change="dataScopeMenuSelectChange"
                                         size="small"
                                         class="menu-data-scope-select"
@@ -121,16 +68,17 @@
                                         </el-select>
                                     </div>
                                     
-                                    <div class="button-permissions" v-if="data.menuPermission && data.menuPermission.length">
+                                    <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length">
                                         <el-tag type="info" size="small">按钮权限:</el-tag>
                                         <el-checkbox-group v-model="data.menuPermissionChecked">
                                             <el-checkbox
-                                                v-for="item in data.menuPermission"
+                                                @click.stop=""
+                                                v-for="item in data.menu_buttons"
                                                 :key="item.id"
-                                                :label="item.id"
+                                                :label="item.name"
+                                                :value="item.id"
                                                 class="button-checkbox"
                                             >
-                                                {{ item.name }}
                                             </el-checkbox>
                                         </el-checkbox-group>
                                     </div>
@@ -141,117 +89,72 @@
                 </el-card>
 
                 <!-- 列权限卡片 -->
-                <el-card class="panel-card" shadow="hover">
+                <el-drawer v-model="feildDrawer" direction="rtl" size="50%" class="lydrawer">
                     <template #header>
-                        <div class="card-header">
-                        <span>列权限</span>
-                        <el-tooltip content="配置表格列可见性和可编辑性" placement="top">
-                            <el-icon><QuestionFilled /></el-icon>
-                        </el-tooltip>
+                        <div class="lyflexcenter">
+                            <h4>列权限-</h4>
+                            <el-tooltip content="配置表格列可见性和可编辑性" placement="bottom">
+                                <el-icon><QuestionFilled /></el-icon>
+                            </el-tooltip>
                         </div>
                     </template>
-                    <el-scrollbar v-loading="loadingPage">
-                        <el-empty description="请先选择角色" v-if="!roleObj.name" />
-                        <div v-else>
-                        <el-table
-                            :data="columnData"
-                            style="width: 100%"
-                            class="column-permission-table"
-                            :row-class-name="tableRowClassName"
-                        >
-                            <el-table-column prop="name" label="列名" width="120" />
-                            <el-table-column prop="code" label="编码" width="120" />
-                            <el-table-column label="所属菜单" width="150">
-                            <template #default="{ row }">
-                                <el-tag size="small">{{ getMenuName(row.menuId) }}</el-tag>
-                            </template>
-                            </el-table-column>
-                            <el-table-column label="可见" width="80">
-                            <template #default="{ row }">
-                                <el-switch
-                                v-model="row.visible"
-                                :disabled="!hasMenuPermission(row.menuId)"
-                                active-color="#13ce66"
-                                />
-                            </template>
-                            </el-table-column>
-                            <el-table-column label="可编辑" width="90">
-                            <template #default="{ row }">
-                                <el-switch
-                                v-model="row.editable"
-                                :disabled="!row.visible || !hasMenuPermission(row.menuId)"
-                                active-color="#13ce66"
-                                />
-                            </template>
-                            </el-table-column>
-                            <el-table-column label="操作" width="120">
-                            <template #default="{ row }">
-                                <el-button
-                                size="small"
-                                @click="editColumnConfig(row)"
-                                :disabled="!hasMenuPermission(row.menuId)"
+                    <template #default>
+                        <el-scrollbar v-loading="loadingPage">
+                            <el-empty description="请先选择角色" v-if="!roleObj.name" />
+                            <div style="padding:10px;" v-else>
+                                <el-table
+                                :data="columnData"
+                                style="width: 100%"
+                                :row-class-name="tableRowClassName"
+                                @select-all="handleSelectAll"
                                 >
-                                高级配置
-                                </el-button>
-                            </template>
-                            </el-table-column>
-                        </el-table>
-                        </div>
-                    </el-scrollbar>
-                </el-card>
+                                    <el-table-column prop="title" label="列名" min-width="120" />
+                                    <el-table-column prop="field_name" label="字段" min-width="120" />
+                                    
+                                    <!-- 可见列 - 带表头复选框 -->
+                                    <el-table-column label="列可见" min-width="80">
+                                        <template #header>
+                                        <el-checkbox
+                                            v-model="allVisibleSelected"
+                                            :indeterminate="isIndeterminateVisible"
+                                            @change="toggleAllVisible"
+                                        >可见</el-checkbox>
+                                        </template>
+                                        <template #default="{ row }">
+                                        <el-checkbox
+                                            v-model="row.visible"
+                                            @change="updateVisibleSelection"
+                                        />
+                                        </template>
+                                    </el-table-column>
+                                    
+                                    <!-- 可编辑列 - 带表头复选框 -->
+                                    <el-table-column label="可编辑" min-width="90">
+                                        <template #header>
+                                        <el-checkbox
+                                            v-model="allEditableSelected"
+                                            :indeterminate="isIndeterminateEditable"
+                                            @change="toggleAllEditable"
+                                        >可编辑</el-checkbox>
+                                        </template>
+                                        <template #default="{ row }">
+                                        <el-checkbox
+                                            v-model="row.editable"
+                                            @change="updateEditableSelection"
+                                        />
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </el-scrollbar>
+                    </template>
+                    <template #footer>
+                        <el-button @click="feildDrawer=false">取消</el-button>
+                        <el-button type="primary" @click="confirmClick">确认</el-button>
+                    </template>
+                </el-drawer>
             </div>
         </div>
-
-        <!-- 移动端底部操作栏 -->
-        <div class="mobile-footer">
-            <el-button
-                type="primary"
-                :icon="Check"
-                @click="submitPermisson"
-                :loading="saving"
-                class="save-btn"
-                round
-                :disabled="!currentRole"
-            >
-                保存配置
-            </el-button>
-        </div>
-
-        <!-- 列高级配置对话框 -->
-        <el-dialog v-model="columnConfigDialogVisible" title="列高级配置" width="600px">
-            <el-form :model="currentColumnConfig" label-width="120px">
-                <el-form-item label="列名">
-                <el-input v-model="currentColumnConfig.name" disabled />
-                </el-form-item>
-                <el-form-item label="编码">
-                <el-input v-model="currentColumnConfig.code" disabled />
-                </el-form-item>
-                <el-form-item label="可见">
-                <el-switch v-model="currentColumnConfig.visible" active-color="#13ce66" />
-                </el-form-item>
-                <el-form-item label="可编辑">
-                <el-switch v-model="currentColumnConfig.editable" :disabled="!currentColumnConfig.visible" active-color="#13ce66" />
-                </el-form-item>
-                <el-form-item label="导出权限">
-                <el-switch v-model="currentColumnConfig.exportable" active-color="#13ce66" />
-                </el-form-item>
-                <el-form-item label="导入权限">
-                <el-switch v-model="currentColumnConfig.importable" active-color="#13ce66" />
-                </el-form-item>
-                <el-form-item label="验证规则">
-                <el-select v-model="currentColumnConfig.validationRules" multiple placeholder="选择验证规则">
-                    <el-option label="必填" value="required" />
-                    <el-option label="数字" value="numeric" />
-                    <el-option label="邮箱" value="email" />
-                    <el-option label="手机号" value="phone" />
-                </el-select>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="columnConfigDialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="saveColumnConfig">保存</el-button>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
@@ -264,9 +167,10 @@
 
     // 响应式数据
     const currentRole = ref(null)
+    let currentMenu = ref(null)
     const roleList = ref([])
     const roleTreeData = ref([])
-    const roleObj = ref({ name: null, data_range: null })
+    const roleObj = ref({ name: null, data_scope: null })
     const menuOptions = ref([])
     const menuCheckedKeys = ref([])
     const deptOptions = ref([])
@@ -289,29 +193,65 @@
         importable: false,
         validationRules: []
     })
-
+    let feildDrawer = ref(false)
     // 数据范围选项
     const dataScopeOptions = [
         { value: 0, label: '仅本人数据权限' },
         { value: 1, label: '本部门数据权限' },
         { value: 2, label: '本部门及以下数据权限' },
-        { value: 3, label: '全部数据权限' },
-        { value: 4, label: '自定义数据权限' }
+        { value: 3, label: '自定义部门数据权限' },
+        { value: 4, label: '全部数据权限' }
     ]
 
     const dataScopeOptionsMenu = [
         { value: 0, label: '仅本人数据权限' },
         { value: 1, label: '本部门数据权限' },
         { value: 2, label: '本部门及以下数据权限' },
-        { value: 3, label: '全部数据权限' },
+        { value: 4, label: '全部数据权限' },
         { value: 5, label: '同全局数据权限' }
     ]
 
-    // 计算属性
-    const hasChanges = computed(() => {
-        // 实现变更检测逻辑
-        return true
-    })
+    const allVisibleSelected = ref(false);
+    const isIndeterminateVisible = ref(false);
+    const allEditableSelected = ref(false);
+    const isIndeterminateEditable = ref(false);
+
+    // 切换所有可见状态
+    const toggleAllVisible = (val) => {
+        columnData.value.forEach(row => {
+            row.visible = val;
+        });
+        updateVisibleSelection();
+    };
+
+    // 切换所有可编辑状态
+    const toggleAllEditable = (val) => {
+        columnData.value.forEach(row => {
+            if(row.visible) {
+                row.editable = val;
+            }
+        });
+        updateEditableSelection();
+    };
+
+    // 更新可见选择状态
+    const updateVisibleSelection = () => {
+        const visibleRows = columnData.value.filter(row => row.visible);
+        allVisibleSelected.value = visibleRows.length === columnData.value.length;
+        isIndeterminateVisible.value = visibleRows.length > 0 && visibleRows.length < columnData.value.length;
+        
+        // 如果取消可见，同时取消可编辑
+        if(!allVisibleSelected.value) {
+            toggleAllEditable(false);
+        }
+    };
+
+    // 更新可编辑选择状态
+    const updateEditableSelection = () => {
+        const editableRows = columnData.value.filter(row => row.editable);
+        allEditableSelected.value = editableRows.length === columnData.value.filter(row => row.visible).length;
+        isIndeterminateEditable.value = editableRows.length > 0 && editableRows.length < columnData.value.filter(row => row.visible).length;
+    };
 
     // 生命周期钩子
     onMounted(() => {
@@ -330,11 +270,11 @@
             
             // 如果有历史选中的角色，自动选中
             if (history.state.id) {
-            const selectedRole = roleTreeData.value.find(role => role.id.toString() === history.state.id.toString())
-            if (selectedRole) {
-                currentRole.value = selectedRole.id
-                handleRoleChange(selectedRole.id)
-            }
+                const selectedRole = roleTreeData.value.find(role => role.id.toString() === history.state.id.toString())
+                if (selectedRole) {
+                    currentRole.value = selectedRole.id
+                    handleRoleChange(selectedRole.id)
+                }
             }
         } catch (error) {
             ElMessage.error('获取角色列表失败')
@@ -363,7 +303,7 @@
             const menuData = res.data.map(menu => {
             // 处理按钮权限选中状态
             const menuPermissionChecked = []
-            menu.menuPermission.forEach(btn => {
+            menu.menu_buttons.forEach(btn => {
                 if (role.permission && role.permission.includes(parseInt(btn.id))) {
                     menuPermissionChecked.push(btn.id)
                 }
@@ -373,12 +313,12 @@
             let dataRange = 5 // 默认同全局
             if (role.menuDataRange) {
                 const range = role.menuDataRange.find(item => item.menu_id.toString() === menu.id.toString())
-                if (range) dataRange = range.data_range
+                if (range) dataRange = range.data_scope
             }
             
             return {
                 ...menu,
-                data_range: dataRange,
+                data_scope: dataRange,
                 menuPermissionChecked
             }
             })
@@ -427,7 +367,7 @@
         roleObj.value = data
         fetchMenuData(data)
         fetchDeptData()
-        fetchColumnPermissions(data.id)
+        // fetchColumnPermissions(data.id)
     }
 
     const dataScopeSelectChange = (value) => {
@@ -440,10 +380,18 @@
     // 处理菜单数据范围变更
     }
 
+    function handleNodeClick(data, node, component){
+        if(data.type == 1){
+            currentMenu.value = data
+            columnData.value = data?.menu_fields || []
+            feildDrawer.value = true
+        }
+    }
+
     const handleCheckClick = (data, checked) => {
-        const { menuPermission, children } = data
-        if (menuPermission) {
-            data.menuPermissionChecked = checked ? menuPermission.map(btn => btn.id) : []
+        const { menu_buttons, children } = data
+        if (menu_buttons) {
+            data.menuPermissionChecked = checked ? menu_buttons.map(btn => btn.id) : []
         }
         if (children) {
             children.forEach(item => {
@@ -469,7 +417,7 @@
         return checkedMenuNodes.map(node => ({
             menu_id: node.id,
             menu_name: node.name,
-            data_range: node.data_range
+            data_scope: node.data_scope
         }))
     }
 
@@ -562,7 +510,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
         flex-wrap: wrap;
         gap: 10px;
     }
@@ -664,6 +611,22 @@
         padding: 8px;
     }
 
+    .tree-scroll-container {
+        width: 100%;
+        height: 100%;
+        
+        /* 关键样式 - 使滚动容器可以水平滚动 */
+        :deep(.el-scrollbar__wrap) {
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
+        :deep(.el-scrollbar__view) {
+            min-width: 100%;
+            display: inline-block;
+        }
+    }
+
     .menu-permission-tree {
         padding: 8px;
         flex: 1;
@@ -681,6 +644,7 @@
         align-items: center;
         min-height: 32px;
         margin-bottom: 4px;
+        flex-shrink: 0;
     }
 
     .menu-name {
@@ -717,29 +681,6 @@
         margin-right: 8px;
     }
 
-    .column-permission-table {
-        :deep(.disabled-row) {
-            opacity: 0.6;
-            pointer-events: none;
-            
-            .el-switch {
-                opacity: 0.6;
-            }
-        }
-    }
-
-    .mobile-footer {
-        display: none;
-        padding: 12px 16px;
-        background: var(--el-bg-color);
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-    }
-
     /* 响应式设计 */
     @media (max-width: 992px) {
         .permission-main {
@@ -758,8 +699,8 @@
 
     @media (max-width: 768px) {
         .permission-header {
-            flex-direction: column;
-            align-items: stretch;
+            align-items: center;
+            display:flex;
         }
         
         .header-actions {
@@ -782,25 +723,6 @@
         .save-btn {
             display: none;
         }
-        
-        .mobile-footer {
-            display: block;
-        }
-    }
 
-    /* 暗黑模式适配 */
-    @media (prefers-color-scheme: dark) {
-        .permission-container {
-            background-color: var(--el-bg-color-page);
-        }
-        
-        .panel-card :deep(.el-card__header) {
-            background-color: var(--el-fill-color-dark);
-        }
-        
-        .mobile-footer {
-            background: var(--el-bg-color-overlay);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-        }
     }
 </style>

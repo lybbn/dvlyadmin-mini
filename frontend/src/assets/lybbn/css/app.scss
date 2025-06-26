@@ -293,3 +293,15 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 	display: flex;
 	align-items: center;
 }
+.lydrawer{
+	.el-drawer__header{
+		margin-bottom:5px !important;
+		padding: 15px;
+		border-bottom: 1px solid var(--el-border-color-light);
+	}
+	.el-drawer__footer{
+		background: var(--el-bg-color);
+		border-top: 1px solid var(--el-border-color-light);
+		padding: 13px 15px !important;
+	}
+}

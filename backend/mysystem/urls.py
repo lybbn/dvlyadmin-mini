@@ -11,7 +11,7 @@ from mysystem.views.dept import DeptViewSet
 from mysystem.views.menu import MenuViewSet
 from mysystem.views.menu_button import MenuButtonViewSet
 from mysystem.views.operation_log import OperationLogViewSet
-from mysystem.views.role import RoleViewSet,PermissionViewSet
+from mysystem.views.role import RoleViewSet
 from mysystem.views.user import UserViewSet
 from mysystem.views.menu_field import MenuFieldViewSet
 
@@ -21,7 +21,6 @@ system_url.register(r'button', ButtonViewSet)
 system_url.register(r'menu_button', MenuButtonViewSet)
 system_url.register(r'menu_field', MenuFieldViewSet)
 system_url.register(r'role', RoleViewSet)
-system_url.register(r'permission', PermissionViewSet,basename='permission')
 system_url.register(r'dept', DeptViewSet)
 system_url.register(r'user', UserViewSet)
 system_url.register(r'operation_log', OperationLogViewSet)

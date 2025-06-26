@@ -7,9 +7,10 @@ import django_filters
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 
-from mysystem.models import Role, Menu
+from mysystem.models import Role, Menu,RoleMenuPermission,RoleMenuButtonPermission,FieldPermission
 from mysystem.views.dept import DeptSerializer
 from mysystem.views.menu import MenuSerializer
+from mysystem.views.menu_field import MenuFieldSerializer
 from mysystem.views.menu_button import MenuButtonSerializer
 from utils.jsonResponse import SuccessResponse,DetailResponse,ErrorResponse
 from utils.serializers import CustomModelSerializer
@@ -43,6 +44,36 @@ class RoleSerializer(CustomModelSerializer):
         fields = "__all__"
         read_only_fields = ["id"]
 
+class RoleMenuPermissionSerializer(CustomModelSerializer):
+    """
+    角色菜单权限-序列化器
+    """
+
+    class Meta:
+        model = RoleMenuPermission
+        fields = "__all__"
+        read_only_fields = ["id"]
+
+class RoleMenuButtonPermissionSerializer(CustomModelSerializer):
+    """
+    角色菜单按钮权限-序列化器
+    """
+
+    class Meta:
+        model = RoleMenuButtonPermission
+        fields = "__all__"
+        read_only_fields = ["id"]
+
+class FieldPermissionSerializer(CustomModelSerializer):
+    """
+    角色菜单列权限-序列化器
+    """
+
+    class Meta:
+        model = FieldPermission
+        fields = "__all__"
+        read_only_fields = ["id"]
+
 
 class RoleCreateUpdateSerializer(CustomModelSerializer):
     """
@@ -69,7 +100,8 @@ class MenuPermissonSerializer(CustomModelSerializer):
     """
     菜单的按钮权限
     """
-    menuPermission = MenuButtonSerializer(many=True, read_only=True)
+    menu_buttons = MenuButtonSerializer(many=True, read_only=True)
+    menu_fields = MenuFieldSerializer(many=True, read_only=True)
 
     class Meta:
         model = Menu
@@ -85,12 +117,21 @@ class RoleViewSet(CustomModelViewSet):
     retrieve:单例
     destroy:删除
     """
-    queryset = Role.objects.all()
+    queryset = Role.objects.all().order_by("id")
     serializer_class = RoleSerializer
     create_serializer_class = RoleCreateUpdateSerializer
     update_serializer_class = RoleCreateUpdateSerializer
     filterset_class = RoleFilterSet
     search_fields = ('name', 'key')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, request=request)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True, request=request)
+        return SuccessResponse(data=serializer.data, msg="获取成功")
 
     def set_status(self,request,*args, **kwargs):
         """禁用/启用"""
@@ -115,18 +156,3 @@ class RoleViewSet(CustomModelViewSet):
         instance = self.get_object()
         serializer = RoleSerializer(instance)
         return DetailResponse(data=serializer.data)
-
-class PermissionViewSet(CustomModelViewSet):
-    """
-    角色管理-权限管理接口
-    list:查询
-    create:新增
-    update:修改
-    retrieve:单例
-    destroy:删除
-    """
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    create_serializer_class = RoleCreateUpdateSerializer
-    update_serializer_class = RoleCreateUpdateSerializer
-    filterset_fields = ['status']

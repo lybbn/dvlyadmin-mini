@@ -53,7 +53,7 @@ DATASCOPE_CHOICES = (
     (2, "本部门及以下数据权限"),
     (3, "自定义部门数据权限"),
     (4, "全部数据权限"),
-    (5, "自定义数据权限"),#走按钮接口数据权限
+    (5, "同全局数据权限")
 )
 
 class Role(CoreModel):
@@ -61,7 +61,7 @@ class Role(CoreModel):
     key = models.CharField(max_length=64, verbose_name="权限字符", help_text="权限字符",unique=True,error_messages={'unique': '权限字符已存在'})
     sort = models.IntegerField(default=1, verbose_name="角色顺序", help_text="角色顺序")
     status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
-    data_scope = models.SmallIntegerField(default=3, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
+    data_scope = models.SmallIntegerField(default=4, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
     dept = models.ManyToManyField(to='Dept', verbose_name='数据权限-关联部门', db_constraint=False, help_text="数据权限-关联部门")#data_scope=4时会使用
     remark = models.CharField(max_length=255,null=True, blank=True, verbose_name="备注")
 
@@ -305,7 +305,7 @@ class Menu(CoreModel):
 
 class MenuField(models.Model):
     model = models.CharField(max_length=70, null=True, blank=True, verbose_name='所属模型Model')
-    menu = models.ForeignKey(to='Menu', on_delete=models.CASCADE, verbose_name='关联菜单', db_constraint=False)
+    menu = models.ForeignKey(to='Menu', on_delete=models.CASCADE, verbose_name='关联菜单', db_constraint=False,related_name='menu_fields')
     field_name = models.CharField(max_length=64, verbose_name='模型表字段名')
     title = models.CharField(max_length=64, verbose_name='字段显示名')
 
@@ -317,7 +317,7 @@ class MenuField(models.Model):
 
 class FieldPermission(models.Model):
     role = models.ForeignKey(to='Role', on_delete=models.CASCADE, verbose_name='关联角色', db_constraint=False)
-    field = models.ForeignKey(to='MenuField', on_delete=models.CASCADE,related_name='menu_field', verbose_name='字段', db_constraint=False)
+    field = models.ForeignKey(to='MenuField', on_delete=models.CASCADE,related_name='menu_field_permission', verbose_name='字段', db_constraint=False)
     can_view = models.BooleanField(default=True, verbose_name='查看权限')
     can_create = models.BooleanField(default=True, verbose_name='创建权限')
     can_update = models.BooleanField(default=True, verbose_name='更新权限')
@@ -329,7 +329,7 @@ class FieldPermission(models.Model):
         ordering = ("id",)
 
 class MenuButton(models.Model):
-    menu = models.ForeignKey(to="Menu", db_constraint=False, related_name="menuPermission", on_delete=models.CASCADE,verbose_name="关联菜单", help_text='关联菜单')
+    menu = models.ForeignKey(to="Menu", db_constraint=False, related_name="menu_buttons", on_delete=models.CASCADE,verbose_name="关联菜单", help_text='关联菜单')
     name = models.CharField(max_length=64, verbose_name="名称", help_text="名称")
     value = models.CharField(max_length=64, verbose_name="权限值", help_text="权限值")
     api = models.CharField(max_length=64, verbose_name="接口地址", help_text="接口地址")

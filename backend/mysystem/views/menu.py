@@ -47,8 +47,8 @@ class MenuTreeSerializer(CustomModelSerializer):
     菜单表的树形序列化器
     """
     children = serializers.SerializerMethodField(read_only=True)
-    menuPermission_name = serializers.SerializerMethodField(read_only=True)
-    menuPermission = MenuButtonSerializer(read_only=True,many=True)
+    menu_buttons_name = serializers.SerializerMethodField(read_only=True)
+    menu_buttons = MenuButtonSerializer(read_only=True,many=True)
 
     def get_children(self, instance):
         queryset = Menu.objects.filter(parent=instance.id).filter(status=1)
@@ -58,7 +58,7 @@ class MenuTreeSerializer(CustomModelSerializer):
         else:
             return None
 
-    def get_menuPermission_name(self, instance):
+    def get_menu_buttons_name(self, instance):
         queryset = MenuButton.objects.filter(menu=instance.id).values_list('name', flat=True)
         if queryset:
             return queryset
