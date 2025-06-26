@@ -53,11 +53,14 @@ class Initialize:
         print(f"初始化完成【{name}】")
 
     def init_dept(self):
-        """初始化部门信息"""
+        """
+        初始化部门信息
+        python .\manage.py  get_init_data mysystem.Dept
+        """
         self.dept_data = [
-            {"id": "8b304f92647747aabffc7e8750397762", "name": "lyadmin团队", "sort": 1, "parent_id": None},
-            {"id": "5e5af490ab0146d09045e6ece736c05f", "name": "财务部门", "sort": 2,"parent_id": "8b304f92647747aabffc7e8750397762"},
-            {"id": "877641076a3b4a93b2e58e02246dbf3e", "name": "研发部门", "sort": 3,"parent_id": "8b304f92647747aabffc7e8750397762"},
+            {"id": "8b304f92647747aabffc7e8750397762", "name": "lyadmin团队","key":"lyadmin", "sort": 1, "parent_id": None},
+            {"id": "5e5af490ab0146d09045e6ece736c05f", "name": "财务部门","key":"caiwu", "sort": 2,"parent_id": "8b304f92647747aabffc7e8750397762"},
+            {"id": "877641076a3b4a93b2e58e02246dbf3e", "name": "研发部门","key":"yanfa", "sort": 3,"parent_id": "8b304f92647747aabffc7e8750397762"},
         ]
         self.save(Dept, self.dept_data, "部门信息")
 
@@ -81,7 +84,10 @@ class Initialize:
         self.save(Button, self.button_data, "权限表标识")
 
     def init_menu(self):
-        """初始化菜单表"""
+        """
+        初始化菜单表
+        python .\manage.py  get_init_data mysystem.Menu
+        """
         self.menu_data = [
             {'id': '4a7a7748387f44dbab72027d8bdc87f7', 'name': '首页','icon': 'House', 'sort': 10, 'web_path': '/home', 'parent_id': None, 'component': None, 'component_name': 'home', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
             {'id': '98870fbaffb348ab9fd16a88e946bf09', 'name': '个人中心','icon': 'User', 'sort': 19, 'web_path': '/PersonalCenter', 'parent_id': None, 'component': None, 'component_name': 'PersonalCenter', 'visible': 1,'cache': 0, 'isautopm': 0,'type': 1},
@@ -96,21 +102,34 @@ class Initialize:
         self.save(Menu, self.menu_data, "菜单表")
 
     def init_menu_button(self):
-        """初始化菜单权限表"""
+        """
+        初始化菜单权限表
+        python .\manage.py  get_init_data mysystem.MenuButton
+        """
         self.menu_button_data = [
             {'id': 1, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '查询', 'value': 'menuManage:Search', 'api': '/api/system/menu/', 'method': 0},
             {'id': 2, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '新增', 'value': 'deptManage:Create', 'api': '/api/system/dept/', 'method': 1},
             {'id': 3, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '删除', 'value': 'deptManage:Delete', 'api': '/api/system/dept/{id}/', 'method': 3},
             {'id': 4, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '编辑', 'value': 'deptManage:Update', 'api': '/api/system/dept/{id}/', 'method': 2},
-            {'id': 5, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '查询', 'value': 'deptManage:Update', 'api': '/api/system/dept/', 'method': 0},
+            {'id': 5, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '查询', 'value': 'deptManage:Search', 'api': '/api/system/dept/', 'method': 0},
+            {'id': 7, 'menu_id': '1b5018bdb5e04698b84da505e8a6b93c', 'name': '新增', 'value': 'roleManage:Create', 'api': '/api/system/role/', 'method': 1},
+            {'id': 8, 'menu_id': '1b5018bdb5e04698b84da505e8a6b93c', 'name': '删除', 'value': 'roleManage:Delete', 'api': '/api/system/role/{id}/', 'method': 3},
+            {'id': 9, 'menu_id': '1b5018bdb5e04698b84da505e8a6b93c', 'name': '编辑', 'value': 'roleManage:Update', 'api': '/api/system/role/{id}/', 'method': 2},
+            {'id': 10, 'menu_id': '1b5018bdb5e04698b84da505e8a6b93c', 'name': '查询', 'value': 'roleManage:Search', 'api': '/api/system/role/', 'method': 0},
+            {'id': 12, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '删除', 'value': 'menuManage:Delete', 'api': '/api/system/menu/{id}/', 'method': 3},
+            {'id': 13, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '新增', 'value': 'menuManage:Create', 'api': '/api/system/menu/', 'method': 1},
+            {'id': 14, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '编辑', 'value': 'menuManage:Update', 'api': '/api/system/menu/{id}/', 'method': 2},
+            {'id': 15, 'menu_id': '2e9937b37ac94e248e9ed159bfe7b655', 'name': '移动', 'value': 'menuManage:Move', 'api': '/api/system/menu/update_sort/', 'method': 1},
+            {'id': 16, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '导出', 'value': 'deptManage:Export', 'api': '/api/system/dept/export_data/', 'method': 1},
+            {'id': 17, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '设置状态', 'value': 'deptManage:SetStatus', 'api': '/api/system/dept/set_status/', 'method': 1},
+            {'id': 18, 'menu_id': '95227fe101e747908c12b56d2bae5e8e', 'name': '导入', 'value': 'deptManage:Import', 'api': '/api/system/dept/import_data/', 'method': 1}
         ]
         self.save(MenuButton, self.menu_button_data, "菜单权限表")
 
     def init_role(self):
         """初始化角色表"""
         data = [
-            {"id": "1", "name": "管理员", "key": "admin", "sort": 1, "status": 1, "data_scope": 4},
-            {"id": "2", "name": "普通用户", "key": "public", "sort": 2, "status": 1, "data_scope": 0}
+            {"id": "854f77a5df34497a9af1d16379821f2b", "name": "管理员", "key": "admin", "sort": 1, "status": 1},
         ]
         self.save(Role, data, "角色表")
 
@@ -136,7 +155,7 @@ class Initialize:
                 "id": "2",
                 "password": "pbkdf2_sha256$260000$oivECWOjB0GJyMjPsrqb3t$9FvnYtXtsNWDva2P3A/eIg6cRMLOp7kiIOuwfLKyDAY=",
                 "is_superuser": 0, "is_staff": 0, "identity": 2,
-                "is_active": 1, "username": "test", "name": "测试用户", "mobile": "18888888888", "nickname": "测试用户",
+                "is_active": 1, "username": "test", "name": "前端用户", "mobile": "18888888888", "nickname": "前端用户",
                 "dept_id": "",
                 "role": [],
             },

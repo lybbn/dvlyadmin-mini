@@ -6,13 +6,15 @@ import api from "./api.js"
  * @returns {Object} CRUD配置对象
  */
 export function createCrudConfig(options = {}){
+    //需修改：命名规则（文件名+Table）
+    let tableName = "roleManageTable"
     //crud请求方法配置
     const request = {
         add:api.add,
         del:api.del,
         edit:api.edit,
         list:api.list,
-        export:api.export,
+        export:null,
         detail:null,
         import:null,
         setStatus:api.setStatus,
@@ -58,7 +60,7 @@ export function createCrudConfig(options = {}){
             },
             //分页
             pagination:{
-                hidePagination:true,
+                hidePagination:false,
                 ...(options.pagination || {})
             },
             //crud按钮配置
@@ -69,7 +71,7 @@ export function createCrudConfig(options = {}){
             },
             //table属性
             table: {
-                tableName:"roleManageTable",
+                tableName:tableName,
                 pageSize:10,
 				rowKey: 'id',
 				lazy: false,

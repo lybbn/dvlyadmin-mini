@@ -94,5 +94,7 @@ Api.apiSystemRoleEdit = params => ajaxPut({url: `/api/system/role/`,params})
 Api.apiSystemRoleDelete = params => ajaxDelete({url: `/api/system/role/`,params})
 // 角色管理 -- 禁用启用
 Api.apiSystemRoleSetStatus = params => ajaxPost({url: `/api/system/role/set_status/`,params})
+// 角色管理 -- 根据角色获取菜单
+Api.apiSystemRoleIdToMenuid = (id) => ajaxGet({url: `/api/system/role_id_to_menu/`+id+'/'})
 
 export default Api

@@ -38,6 +38,7 @@ urlpatterns = [
     re_path('menu/web_router/', MenuViewSet.as_view({'get': 'web_router'})),#也可以在视图的action装饰器中自动生成
     
     re_path('dept/set_status/', DeptViewSet.as_view({'post': 'set_status'})),
+    re_path('role/set_status/', RoleViewSet.as_view({'post': 'set_status'})),
 
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),
     re_path('role_data/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'role_data'})),

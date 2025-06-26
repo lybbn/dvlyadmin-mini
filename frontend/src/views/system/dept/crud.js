@@ -6,6 +6,8 @@ import api from "./api.js"
  * @returns {Object} CRUD配置对象
  */
 export function createCrudConfig(options = {}){
+    //需修改：命名规则（文件名+Table）
+    let tableName = "deptManageTable"
     //crud请求方法配置
     const request = {
         add:api.add,
@@ -27,19 +29,14 @@ export function createCrudConfig(options = {}){
             minWidth: "130"
         },
         {
+            label: "标识字符",
+            prop: "key",
+            minWidth: "100",
+        },
+        {
             label: "负责人",
             prop: "owner",
             minWidth: "100"
-        },
-        {
-            label: "联系电话",
-            prop: "phone",
-            minWidth: "100",
-        },
-        {
-            label: "邮箱",
-            prop: "email",
-            minWidth: "100",
         },
         {
             label: "状态",
@@ -74,13 +71,13 @@ export function createCrudConfig(options = {}){
             },
             //crud按钮配置
             rowHandle:{
-                width: 180,//操作列宽度,0表示不显示表格操作列
+                width: 150,//操作列宽度,0表示不显示表格操作列
                 fixed:"right",//固定操作列在右侧
                 ...(options.rowHandle || {})
             },
             //table属性
             table: {
-                tableName:"deptManageTable",
+                tableName:tableName,
                 pageSize:999,
 				rowKey: 'id',
 				lazy: false,

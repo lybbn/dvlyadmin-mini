@@ -44,7 +44,6 @@
     
     // 表单数据
     let formData = ref({
-        id: "",
         key: "",
         name: "",
         sort: 1,

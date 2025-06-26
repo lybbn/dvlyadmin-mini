@@ -14,15 +14,19 @@
             <el-form-item label="部门名称" prop="name">
                 <el-input v-model="formData.name" placeholder="请输入部门名称" clearable></el-input>
             </el-form-item>
+            <el-form-item label="标识字符" prop="key">
+                <el-input v-model="formData.key" placeholder="请输入标识字符" clearable></el-input>
+            </el-form-item>
             <el-form-item label="负责人" prop="owner">
                 <el-input v-model="formData.owner" placeholder="请输入负责人" clearable></el-input>
             </el-form-item>
-            <el-form-item label="联系电话" prop="phone">
+            
+            <!-- <el-form-item label="联系电话" prop="phone">
                 <el-input v-model="formData.phone" placeholder="请输入联系电话" clearable></el-input>
             </el-form-item>
             <el-form-item label="邮箱" prop="email">
                 <el-input v-model="formData.email" placeholder="请输入邮箱" clearable></el-input>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="排序" prop="sort">
                 <el-input-number v-model="formData.sort" controls-position="right" :min="1" style="width: 100%;"></el-input-number>
             </el-form-item>
@@ -62,7 +66,6 @@
     
     // 表单数据
     let formData = ref({
-        id: "",
         parent: "",
         name: "",
         sort: 1,
@@ -74,12 +77,9 @@
     
     // 验证规则
     let rules = {
-        sort: [
-            {required: true, message: '请输入排序', trigger: 'change'}
-        ],
-        name: [
-            {required: true, message: '请输入部门名称'}
-        ]
+        sort: [{required: true, message: '请输入排序', trigger: 'change'}],
+        name: [{required: true, message: '请输入部门名称'}],
+        key: [{ required: true, message: '请输入标识字符', trigger: 'blur' }],
     }
     
     // 所需数据选项

@@ -19,7 +19,7 @@
                 <template #status="scope">
                     <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
                 </template>
-                <el-table-column label="操作" fixed="right" width="150">
+                <el-table-column label="操作" :fixed="crudOptions.rowHandle.fixed" :width="crudOptions.rowHandle.width">
                     <template #header>
                         <div style="display: flex;justify-content: space-between;align-items: center;">
                             <div>操作</div>
@@ -33,6 +33,7 @@
                     <template #default="scope">
                         <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-auth="'Update'">编辑</span>
                         <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">删除</span>
+                        <span class="table-operate-btn warning" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">权限</span>
                     </template>
                 </el-table-column>
             </ly-table>
@@ -75,6 +76,7 @@
     let tableBindProps= computed(() => (
         {
             ...crudOptions.value.table,
+            ...crudOptions.value.pagination,
             apiObj:crudOptions.value.request.list,
             apiExportObj:crudOptions.value.request.export,
             params:formInline.value,

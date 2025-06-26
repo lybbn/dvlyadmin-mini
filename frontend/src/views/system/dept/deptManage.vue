@@ -19,7 +19,7 @@
                 <template #status="scope">
                     <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
                 </template>
-                <el-table-column label="操作" fixed="right" width="150">
+                <el-table-column label="操作" :fixed="crudOptions.rowHandle.fixed" :width="crudOptions.rowHandle.width">
                     <template #header>
                         <div style="display: flex;justify-content: space-between;align-items: center;">
                             <div>操作</div>
@@ -75,6 +75,7 @@
     let tableBindProps= computed(() => (
         {
             ...crudOptions.value.table,
+            ...crudOptions.value.pagination,
             apiObj:crudOptions.value.request.list,
             apiImportObj:crudOptions.value.request.import,
             apiExportObj:crudOptions.value.request.export,
@@ -82,7 +83,7 @@
             params:formInline.value,
             column:crudOptions.value.columns,
             hideExport:!hasBtnPermission('Export'),
-            hideImport:!hasBtnPermission('Import')
+            hideImport:!hasBtnPermission('Import'),
         }
     ))
 

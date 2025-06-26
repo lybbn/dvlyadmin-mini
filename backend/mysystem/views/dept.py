@@ -48,7 +48,7 @@ class DeptViewSet(CustomModelViewSet):
     import_field_dict={
         "ID":"id",
         "部门名称": {'field': 'name', 'example': '技术部门'},
-        "权限字符": {'field': 'key', 'example': 'tec'},
+        "标识字符": {'field': 'key', 'example': 'tec'},
         "排序":{'field': 'sort', 'example': 10},
         "上级部门":"parent",
         "状态":{'field': 'status', 'example': True}
