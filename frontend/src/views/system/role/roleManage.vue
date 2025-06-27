@@ -33,7 +33,7 @@
                     <template #default="scope">
                         <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-auth="'Update'">编辑</span>
                         <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">删除</span>
-                        <span class="table-operate-btn warning" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">权限</span>
+                        <span class="table-operate-btn warning" @click="handleEdit(scope.row,'gosq')">权限配置</span>
                     </template>
                 </el-table-column>
             </ly-table>
@@ -48,10 +48,11 @@
     import saveDialog from "./components/moduleSave.vue"
     import { createCrudConfig } from './crud.js'
     import lySearchBar from '@/components/lySearchBar.vue'
-    import { useUserState } from '@/store/userState' 
-    import { useRoute } from 'vue-router'
+    import { useUserState } from '@/store/userState'
+    import { useRouter, useRoute } from 'vue-router'
 
     const route = useRoute()
+    const router = useRouter()
     const userState = useUserState()
 
     let crudOptions = ref(createCrudConfig().crudOptions)
@@ -142,6 +143,8 @@
                     })
                 }).catch(() => {})
                 break
+            case 'gosq':
+                router.push({name:'authorityManage',state:{id:row.id}})
             case 'reset':
                 formInline.value = {}
                 search()

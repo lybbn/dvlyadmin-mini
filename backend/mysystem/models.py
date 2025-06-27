@@ -61,8 +61,6 @@ class Role(CoreModel):
     key = models.CharField(max_length=64, verbose_name="权限字符", help_text="权限字符",unique=True,error_messages={'unique': '权限字符已存在'})
     sort = models.IntegerField(default=1, verbose_name="角色顺序", help_text="角色顺序")
     status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
-    data_scope = models.SmallIntegerField(default=4, choices=DATASCOPE_CHOICES, verbose_name="数据权限范围",help_text="数据权限范围")#全局数据权限
-    dept = models.ManyToManyField(to='Dept', verbose_name='数据权限-关联部门', db_constraint=False, help_text="数据权限-关联部门")#data_scope=4时会使用
     remark = models.CharField(max_length=255,null=True, blank=True, verbose_name="备注")
 
     class Meta:
@@ -74,6 +72,8 @@ class Role(CoreModel):
 class RoleMenuPermission(models.Model):
     role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_permissions",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
     menu = models.ForeignKey(to="Menu",db_constraint=False,related_name="menu_permissions",on_delete=models.CASCADE,verbose_name="关联菜单",help_text="关联菜单")
+    data_scope = models.SmallIntegerField(default=4, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#菜单全局接口数据权限，默认全部数据权限
+    dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=4时会使用
 
     class Meta:
         db_table = table_prefix + "role_menu_permission"
@@ -84,8 +84,8 @@ class RoleMenuPermission(models.Model):
 class RoleMenuButtonPermission(models.Model):
     role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu_button",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
     menu_button = models.ForeignKey(to="MenuButton",db_constraint=False,related_name="menu_button_permission",on_delete=models.CASCADE,verbose_name="关联菜单按钮",help_text="关联菜单按钮",null=True,blank=True)
-    data_scope = models.SmallIntegerField(default=3, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#局部接口数据权限，默认全部数据权限
-    dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=4时会使用
+    data_scope = models.SmallIntegerField(default=5, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#局部接口按钮数据权限，默认同菜单接口权限
+    dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=3时会使用
 
     class Meta:
         db_table = table_prefix + "role_menubutton_permission"

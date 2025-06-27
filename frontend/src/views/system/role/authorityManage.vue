@@ -24,7 +24,7 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-tooltip content="授权用户在菜单中可操作的范围,选择菜单、数据权限、按钮权限、列权限（点击菜单配置）" placement="top">
+                            <el-tooltip raw-content content="<div>1、授权角色在菜单中可操作的范围、数据权限、按钮权限、列权限（点击配置）</div><div>2、数据权限支持具体按钮的配置，点击按钮后的settings配置即可</div><div>3、列权限如不可点击，则先需要在【菜单管理】中配置列权限</div>" placement="bottom">
                                 <el-icon><QuestionFilled /></el-icon>
                             </el-tooltip>
                         </div>
@@ -49,7 +49,7 @@
                         >
                             <template #default="{ node, data }">
                                 <div class="menu-node-container">
-                                    <div class="menu-node-header" :style="{width:((4-node.level)*18+210)+'px'}">
+                                    <div class="menu-node-header" :style="{width:((4-node.level)*18+280)+'px'}">
                                         <span class="menu-name">{{ data.name }}</span>
                                         <el-select
                                         @click.stop=""
@@ -58,27 +58,32 @@
                                         @change="dataScopeMenuSelectChange"
                                         size="small"
                                         class="menu-data-scope-select"
+                                        :disabled="true"
                                         >
-                                        <el-option
-                                            v-for="item in dataScopeOptionsMenu"
-                                            :key="item.value"
-                                            :label="item.label"
-                                            :value="item.value"
-                                        />
+                                            <el-option
+                                                v-for="item in dataScopeOptions"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value"
+                                            />
                                         </el-select>
+                                        <el-button type="primary" size="small" v-if="data.type === 1" @click.stop.prevent="handleMenuDataScopeClick(item)">数据权限</el-button>
                                     </div>
-                                    
-                                    <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length">
-                                        <el-tag type="info" size="small">按钮权限:</el-tag>
-                                        <el-checkbox-group v-model="data.menuPermissionChecked">
+                                    <div class="button-permissions" v-if="data.type === 1">
+                                        <el-button type="primary" :disabled="!data.menu_fields || data.menu_fields.length<1" size="small" @click.stop="handleFeildNodeClick(data)">列权限</el-button>
+                                    </div>
+                                    <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length" @click.stop.prevent="">
+                                        <el-tag type="primary" size="small">按钮权限:</el-tag>
+                                        <el-checkbox-group v-model="data.menuPermissionChecked" @click.stop="">
                                             <el-checkbox
-                                                @click.stop=""
                                                 v-for="item in data.menu_buttons"
                                                 :key="item.id"
                                                 :label="item.name"
                                                 :value="item.id"
                                                 class="button-checkbox"
                                             >
+                                                <span @click.stop.prevent="">{{item.name}}</span>
+                                                <el-icon @click.stop.prevent="handleJuDataScopeClick(item)" v-if="data.menuPermissionChecked.includes(item.id)" style="margin-left:5px;"><Setting /></el-icon>
                                             </el-checkbox>
                                         </el-checkbox-group>
                                     </div>
@@ -92,8 +97,8 @@
                 <el-drawer v-model="feildDrawer" direction="rtl" size="50%" class="lydrawer">
                     <template #header>
                         <div class="lyflexcenter">
-                            <h4>列权限-</h4>
-                            <el-tooltip content="配置表格列可见性和可编辑性" placement="bottom">
+                            <h4>列权限{{"-"+currentMenu?.name}}</h4>
+                            <el-tooltip content="配置表格列可见性和可编辑、可创建性" placement="bottom">
                                 <el-icon><QuestionFilled /></el-icon>
                             </el-tooltip>
                         </div>
@@ -108,9 +113,8 @@
                                 :row-class-name="tableRowClassName"
                                 @select-all="handleSelectAll"
                                 >
-                                    <el-table-column prop="title" label="列名" min-width="120" />
                                     <el-table-column prop="field_name" label="字段" min-width="120" />
-                                    
+                                    <el-table-column prop="title" label="列名" min-width="120" />
                                     <!-- 可见列 - 带表头复选框 -->
                                     <el-table-column label="列可见" min-width="80">
                                         <template #header>
@@ -118,16 +122,30 @@
                                             v-model="allVisibleSelected"
                                             :indeterminate="isIndeterminateVisible"
                                             @change="toggleAllVisible"
-                                        >可见</el-checkbox>
+                                        >列可见</el-checkbox>
                                         </template>
                                         <template #default="{ row }">
                                         <el-checkbox
-                                            v-model="row.visible"
+                                            v-model="row.can_view"
                                             @change="updateVisibleSelection"
                                         />
                                         </template>
                                     </el-table-column>
-                                    
+                                    <el-table-column label="可创建" min-width="90">
+                                        <template #header>
+                                            <el-checkbox
+                                                v-model="allEditableSelected"
+                                                :indeterminate="isIndeterminateEditable"
+                                                @change="toggleAllEditable"
+                                            >可创建</el-checkbox>
+                                        </template>
+                                        <template #default="{ row }">
+                                        <el-checkbox
+                                            v-model="row.can_create"
+                                            @change="updateEditableSelection"
+                                        />
+                                        </template>
+                                    </el-table-column>
                                     <!-- 可编辑列 - 带表头复选框 -->
                                     <el-table-column label="可编辑" min-width="90">
                                         <template #header>
@@ -139,7 +157,7 @@
                                         </template>
                                         <template #default="{ row }">
                                         <el-checkbox
-                                            v-model="row.editable"
+                                            v-model="row.can_update"
                                             @change="updateEditableSelection"
                                         />
                                         </template>
@@ -153,15 +171,19 @@
                         <el-button type="primary" @click="confirmClick">确认</el-button>
                     </template>
                 </el-drawer>
+                <moduleDataScope ref="dataScopeDialogRef" @refreshData="" v-if="isDialogDataScopeVisible" @closed="isDialogDataScopeVisible = false"></moduleDataScope>
+                <moduleMenuDataScope ref="menuDataScopeDialogRef" @refreshData="" v-if="isDialogMenuDataScopeVisible" @closed="isDialogMenuDataScopeVisible = false"></moduleMenuDataScope>
             </div>
         </div>
     </div>
 </template>
 
-<script setup>
-    import { ref, computed, onMounted, watch } from 'vue'
+<script setup name="authorityManage">
+    import { ref, computed, onMounted, nextTick } from 'vue'
     import { Check, Lock, QuestionFilled } from '@element-plus/icons-vue'
     import { ElMessage } from 'element-plus'
+    import moduleDataScope from './components/moduleDataScope.vue'
+    import moduleMenuDataScope from './components/moduleMenuDataScope.vue'
     import XEUtils from 'xe-utils'
     import Api from "@/api/api.js"
 
@@ -215,6 +237,10 @@
     const isIndeterminateVisible = ref(false);
     const allEditableSelected = ref(false);
     const isIndeterminateEditable = ref(false);
+    let dataScopeDialogRef = ref(null)
+    let isDialogDataScopeVisible = ref(false)
+    let menuDataScopeDialogRef = ref(null)
+    let isDialogMenuDataScopeVisible = ref(false)
 
     // 切换所有可见状态
     const toggleAllVisible = (val) => {
@@ -381,6 +407,10 @@
     }
 
     function handleNodeClick(data, node, component){
+        currentMenu.value = data
+    }
+
+    function handleFeildNodeClick(data){
         if(data.type == 1){
             currentMenu.value = data
             columnData.value = data?.menu_fields || []
@@ -446,6 +476,20 @@
             columnData.value[index] = { ...currentColumnConfig.value }
         }
         columnConfigDialogVisible.value = false
+    }
+
+    function handleJuDataScopeClick (item){
+        isDialogDataScopeVisible.value = true
+        nextTick(() => {
+            dataScopeDialogRef.value.handleOpen(item)
+        })
+    }
+
+    function handleMenuDataScopeClick(item){
+        isDialogMenuDataScopeVisible.value = true
+        nextTick(() => {
+            menuDataScopeDialogRef.value.handleOpen(item)
+        })
     }
 
     const submitPermisson = async () => {
@@ -642,8 +686,7 @@
     .menu-node-header {
         display: flex;
         align-items: center;
-        min-height: 32px;
-        margin-bottom: 4px;
+        min-height: 30px;
         flex-shrink: 0;
     }
 
@@ -653,14 +696,14 @@
         flex: 1;
         min-width: 0;
         white-space: nowrap;
-        line-height: 32px; /* 设置固定行高 */
+        line-height: 30px; /* 设置固定行高 */
     }
 
     .menu-data-scope-select {
         width: 150px;
         /* 确保选择框高度与其他元素一致 */
         :deep(.el-input__wrapper) {
-            height: 32px;
+            height: 30px;
             padding-top: 1px;
             padding-bottom: 1px;
         }
@@ -678,7 +721,7 @@
     }
 
     .button-checkbox {
-        margin-right: 8px;
+        width:80px;
     }
 
     /* 响应式设计 */
