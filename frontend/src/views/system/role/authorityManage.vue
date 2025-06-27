@@ -19,7 +19,7 @@
                                             :value="role.id"
                                         />
                                     </el-select>
-                                    <el-button type="primary" :icon="Check" @click="submitPermisson" :loading="saving" class="save-btn">
+                                    <el-button type="primary" :icon="Check" @click="submitPermisson" :loading="saving" class="save-btn" v-auth="'Save'">
                                     保存配置
                                     </el-button>
                                 </div>
@@ -362,7 +362,7 @@
                     fds.can_update = false
                     for (var i=0;i<role.role_field_permission.length;i++){
                         let temp_role_field_permission = role.role_field_permission[i]
-                        if(fds.field_name === temp_role_field_permission.field){
+                        if(fds.field_name === temp_role_field_permission.field_name){
                             fds.can_view = temp_role_field_permission.can_view
                             fds.can_create = temp_role_field_permission.can_create
                             fds.can_update = temp_role_field_permission.can_update

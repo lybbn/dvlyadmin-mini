@@ -69,6 +69,10 @@ class FieldPermissionSerializer(CustomModelSerializer):
     """
     角色菜单列权限-序列化器
     """
+    field_name = serializers.SerializerMethodField()
+
+    def get_field_name(self,obj):
+        return obj.field.field_name
 
     class Meta:
         model = FieldPermission
@@ -188,9 +192,9 @@ class RolePermissionViewSet(CustomModelViewSet):
                 
                 # 2. 批量创建新权限
                 stats = {
-                    'menu': self._bulk_create_menu_permissions(role_id, RoleMenuPermission_list,request),
-                    'button': self._bulk_create_button_permissions(role_id, RoleMenuButtonPermission_list,request),
-                    'field': self._bulk_create_field_permissions(role_id, FieldPermission_list,request)
+                    'menu': self._bulk_create_menu_permissions(RoleMenuPermission_list,request),
+                    'button': self._bulk_create_button_permissions(RoleMenuButtonPermission_list,request),
+                    'field': self._bulk_create_field_permissions(FieldPermission_list,request)
                 }
                 
                 return DetailResponse(data=stats, msg="保存成功")
@@ -209,7 +213,7 @@ class RolePermissionViewSet(CustomModelViewSet):
         RoleMenuButtonPermission.objects.filter(role_id=role_id).delete()
         FieldPermission.objects.filter(role_id=role_id).delete()
     
-    def _bulk_create_menu_permissions(self, role_id, data,request):
+    def _bulk_create_menu_permissions(self, data,request):
         """批量创建菜单权限"""
         if not data:
             return 0
@@ -220,10 +224,10 @@ class RolePermissionViewSet(CustomModelViewSet):
             request=request
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(role_id=role_id)
+        serializer.save()
         return len(serializer.validated_data)
     
-    def _bulk_create_button_permissions(self, role_id, data,request):
+    def _bulk_create_button_permissions(self, data,request):
         """批量创建按钮权限"""
         if not data:
             return 0
@@ -234,19 +238,18 @@ class RolePermissionViewSet(CustomModelViewSet):
             request=request
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(role_id=role_id)
+        serializer.save()
         return len(serializer.validated_data)
     
-    def _bulk_create_field_permissions(self, role_id, data,request):
+    def _bulk_create_field_permissions(self, data,request):
         """批量创建字段权限"""
         if not data:
             return 0
-            
         serializer = FieldPermissionSerializer(
             data=data,
             many=True,
             request=request
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(role_id=role_id)
+        serializer.save()
         return len(serializer.validated_data)
