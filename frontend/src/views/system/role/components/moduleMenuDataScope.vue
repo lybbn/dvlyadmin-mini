@@ -2,7 +2,7 @@
     <ly-dialog :title="titleMap[mode]" v-model="visible" width="500px" destroy-on-close @closed="emits('closed')">
         <el-form :model="formData" :rules="rules" :disabled="mode=='show'" ref="dialogForm" label-width="auto">
             <el-form-item label="" prop="data_scope">
-                <el-select v-model="formData.data_scope" @change="dataScopeMenuSelectChange">
+                <el-select v-model="formData.data_scope" @change="dataScopeSelectChange">
                     <el-option
                         v-for="item in dataScopeOptions"
                         :key="item.value"
@@ -69,7 +69,7 @@
     const dataScopeOptions = [
         { value: 0, label: '仅本人数据权限' },
         { value: 1, label: '本部门数据权限' },
-        { value: 2, label: '本部门及以下数据权限' },
+        { value: 2, label: '本部门及以下' },
         { value: 3, label: '自定义部门数据权限' },
         { value: 4, label: '全部数据权限' }
     ]
@@ -85,6 +85,12 @@
         data_scope: "",
         dept: "",
     })
+
+    const dataScopeSelectChange = (value) => {
+        if (value !== 3) {
+            formData.value.dept = []
+        }
+    }
     
     // 验证规则
     let rules = {
@@ -105,20 +111,8 @@
     const submit = () => {
         dialogForm.value.validate(async (valid) => {
             if (valid) {
-                isSaveing.value = true
-                let apiObj = crudOptions.value.request.add
-                if(mode.value == "edit"){
-                    apiObj = crudOptions.value.request.edit
-                }
-                const res = await apiObj(formData.value)
-                isSaveing.value = false
-                if(res.code == 2000) {
-                    emits('refreshData')
-                    visible.value = false
-                    ElMessage.success("操作成功")
-                } else {
-                    ElMessageBox.alert(res.msg, "提示", {type: 'error'})
-                }
+                emits('refreshData',formData.value)
+                visible.value = false
             }
         })
     }

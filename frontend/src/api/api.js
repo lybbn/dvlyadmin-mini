@@ -97,4 +97,10 @@ Api.apiSystemRoleSetStatus = params => ajaxPost({url: `/api/system/role/set_stat
 // 角色管理 -- 根据角色获取菜单
 Api.apiSystemRoleIdToMenuid = (id) => ajaxGet({url: `/api/system/role_id_to_menu/`+id+'/'})
 
+// 权限管理 - 获取角色+权限列表
+Api.apiSystemRolePermission = params => ajaxGet({url: `/api/system/role_permission/`,params})
+
+// 权限管理 - 保存
+Api.apiSystemRolePermissionSave = params => ajaxPost({url: `/api/system/role_permission/save_permission/`,params})
+
 export default Api

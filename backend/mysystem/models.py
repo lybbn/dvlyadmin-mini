@@ -70,8 +70,8 @@ class Role(CoreModel):
         ordering = ('sort',)
 
 class RoleMenuPermission(models.Model):
-    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_permissions",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
-    menu = models.ForeignKey(to="Menu",db_constraint=False,related_name="menu_permissions",on_delete=models.CASCADE,verbose_name="关联菜单",help_text="关联菜单")
+    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu_permission",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
+    menu = models.ForeignKey(to="Menu",db_constraint=False,related_name="menu_permission",on_delete=models.CASCADE,verbose_name="关联菜单",help_text="关联菜单")
     data_scope = models.SmallIntegerField(default=4, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#菜单全局接口数据权限，默认全部数据权限
     dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=4时会使用
 
@@ -82,7 +82,7 @@ class RoleMenuPermission(models.Model):
         ordering = ("-id",)
 
 class RoleMenuButtonPermission(models.Model):
-    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_menu_button",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
+    role = models.ForeignKey(to="Role",db_constraint=False,related_name="role_button_permission",on_delete=models.CASCADE,verbose_name="关联角色",help_text="关联角色")
     menu_button = models.ForeignKey(to="MenuButton",db_constraint=False,related_name="menu_button_permission",on_delete=models.CASCADE,verbose_name="关联菜单按钮",help_text="关联菜单按钮",null=True,blank=True)
     data_scope = models.SmallIntegerField(default=5, choices=DATASCOPE_CHOICES, verbose_name="数据权限",help_text="数据权限")#局部接口按钮数据权限，默认同菜单接口权限
     dept = models.ManyToManyField(to="Dept", blank=True, db_constraint=False, verbose_name="数据权限-关联部门",help_text="数据权限-关联部门")#data_scope=3时会使用
@@ -316,7 +316,7 @@ class MenuField(models.Model):
         ordering = ("id",)
 
 class FieldPermission(models.Model):
-    role = models.ForeignKey(to='Role', on_delete=models.CASCADE, verbose_name='关联角色', db_constraint=False)
+    role = models.ForeignKey(to='Role', on_delete=models.CASCADE, verbose_name='关联角色',related_name='role_field_permission', db_constraint=False)
     field = models.ForeignKey(to='MenuField', on_delete=models.CASCADE,related_name='menu_field_permission', verbose_name='字段', db_constraint=False)
     can_view = models.BooleanField(default=True, verbose_name='查看权限')
     can_create = models.BooleanField(default=True, verbose_name='创建权限')

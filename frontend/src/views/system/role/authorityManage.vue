@@ -19,7 +19,7 @@
                                             :value="role.id"
                                         />
                                     </el-select>
-                                    <el-button type="primary" :icon="Check" @click="savePermissions" :loading="saving" class="save-btn">
+                                    <el-button type="primary" :icon="Check" @click="submitPermisson" :loading="saving" class="save-btn">
                                     保存配置
                                     </el-button>
                                 </div>
@@ -67,14 +67,14 @@
                                                 :value="item.value"
                                             />
                                         </el-select>
-                                        <el-button type="primary" size="small" v-if="data.type === 1" @click.stop.prevent="handleMenuDataScopeClick(item)">数据权限</el-button>
+                                        <el-button type="primary" size="small" :disabled="!isNodeChecked(data.id)" v-if="data.type === 1" @click.stop.prevent="handleMenuDataScopeClick(data)">数据权限</el-button>
                                     </div>
                                     <div class="button-permissions" v-if="data.type === 1">
                                         <el-button type="primary" :disabled="!data.menu_fields || data.menu_fields.length<1" size="small" @click.stop="handleFeildNodeClick(data)">列权限</el-button>
                                     </div>
                                     <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length" @click.stop.prevent="">
                                         <el-tag type="primary" size="small">按钮权限:</el-tag>
-                                        <el-checkbox-group v-model="data.menuPermissionChecked" @click.stop="">
+                                        <el-checkbox-group v-model="data.buttonPermissionChecked" @change="(val) => handleButtonPermissonChange(data, val)" @click.stop="">
                                             <el-checkbox
                                                 v-for="item in data.menu_buttons"
                                                 :key="item.id"
@@ -83,7 +83,7 @@
                                                 class="button-checkbox"
                                             >
                                                 <span @click.stop.prevent="">{{item.name}}</span>
-                                                <el-icon @click.stop.prevent="handleJuDataScopeClick(item)" v-if="data.menuPermissionChecked.includes(item.id)" style="margin-left:5px;"><Setting /></el-icon>
+                                                <el-icon @click.stop.prevent="handleJuDataScopeClick(item)" v-if="data.buttonPermissionChecked.includes(item.id)" style="margin-left:5px;"><Setting /></el-icon>
                                             </el-checkbox>
                                         </el-checkbox-group>
                                     </div>
@@ -107,12 +107,7 @@
                         <el-scrollbar v-loading="loadingPage">
                             <el-empty description="请先选择角色" v-if="!roleObj.name" />
                             <div style="padding:10px;" v-else>
-                                <el-table
-                                :data="columnData"
-                                style="width: 100%"
-                                :row-class-name="tableRowClassName"
-                                @select-all="handleSelectAll"
-                                >
+                                <el-table :data="columnData" style="width: 100%">
                                     <el-table-column prop="field_name" label="字段" min-width="120" />
                                     <el-table-column prop="title" label="列名" min-width="120" />
                                     <!-- 可见列 - 带表头复选框 -->
@@ -134,15 +129,15 @@
                                     <el-table-column label="可创建" min-width="90">
                                         <template #header>
                                             <el-checkbox
-                                                v-model="allEditableSelected"
-                                                :indeterminate="isIndeterminateEditable"
-                                                @change="toggleAllEditable"
+                                                v-model="allCreateableSelected"
+                                                :indeterminate="isIndeterminateCreateable"
+                                                @change="toggleAllCreateable"
                                             >可创建</el-checkbox>
                                         </template>
                                         <template #default="{ row }">
                                         <el-checkbox
                                             v-model="row.can_create"
-                                            @change="updateEditableSelection"
+                                            @change="updateCreateableSelection"
                                         />
                                         </template>
                                     </el-table-column>
@@ -168,11 +163,11 @@
                     </template>
                     <template #footer>
                         <el-button @click="feildDrawer=false">取消</el-button>
-                        <el-button type="primary" @click="confirmClick">确认</el-button>
+                        <el-button type="primary" @click="confirmFeildClick">确认</el-button>
                     </template>
                 </el-drawer>
-                <moduleDataScope ref="dataScopeDialogRef" @refreshData="" v-if="isDialogDataScopeVisible" @closed="isDialogDataScopeVisible = false"></moduleDataScope>
-                <moduleMenuDataScope ref="menuDataScopeDialogRef" @refreshData="" v-if="isDialogMenuDataScopeVisible" @closed="isDialogMenuDataScopeVisible = false"></moduleMenuDataScope>
+                <moduleDataScope ref="dataScopeDialogRef" @refreshData="handleConfirmDataScope" v-if="isDialogDataScopeVisible" @closed="isDialogDataScopeVisible = false"></moduleDataScope>
+                <moduleMenuDataScope ref="menuDataScopeDialogRef" @refreshData="handleConfirmMenuDataScope" v-if="isDialogMenuDataScopeVisible" @closed="isDialogMenuDataScopeVisible = false"></moduleMenuDataScope>
             </div>
         </div>
     </div>
@@ -182,6 +177,7 @@
     import { ref, computed, onMounted, nextTick } from 'vue'
     import { Check, Lock, QuestionFilled } from '@element-plus/icons-vue'
     import { ElMessage } from 'element-plus'
+    import {deepClone,isEmpty} from "@/utils/util.js"
     import moduleDataScope from './components/moduleDataScope.vue'
     import moduleMenuDataScope from './components/moduleMenuDataScope.vue'
     import XEUtils from 'xe-utils'
@@ -190,6 +186,7 @@
     // 响应式数据
     const currentRole = ref(null)
     let currentMenu = ref(null)
+    let currentButton = ref(null)
     const roleList = ref([])
     const roleTreeData = ref([])
     const roleObj = ref({ name: null, data_scope: null })
@@ -220,32 +217,36 @@
     const dataScopeOptions = [
         { value: 0, label: '仅本人数据权限' },
         { value: 1, label: '本部门数据权限' },
-        { value: 2, label: '本部门及以下数据权限' },
+        { value: 2, label: '本部门及以下' },
         { value: 3, label: '自定义部门数据权限' },
         { value: 4, label: '全部数据权限' }
     ]
 
-    const dataScopeOptionsMenu = [
-        { value: 0, label: '仅本人数据权限' },
-        { value: 1, label: '本部门数据权限' },
-        { value: 2, label: '本部门及以下数据权限' },
-        { value: 4, label: '全部数据权限' },
-        { value: 5, label: '同全局数据权限' }
-    ]
+    let allVisibleSelected = ref(false);
+    let isIndeterminateVisible = ref(false);
+    let allEditableSelected = ref(false);
+    let allCreateableSelected = ref(false)
+    let isIndeterminateEditable = ref(false);
+    let isIndeterminateCreateable = ref(false)
 
-    const allVisibleSelected = ref(false);
-    const isIndeterminateVisible = ref(false);
-    const allEditableSelected = ref(false);
-    const isIndeterminateEditable = ref(false);
     let dataScopeDialogRef = ref(null)
     let isDialogDataScopeVisible = ref(false)
     let menuDataScopeDialogRef = ref(null)
     let isDialogMenuDataScopeVisible = ref(false)
 
+    function resetECU(){
+        allVisibleSelected.value = false
+        isIndeterminateVisible.value = false
+        allEditableSelected.value = false
+        allCreateableSelected.value = false
+        isIndeterminateEditable.value = false
+        isIndeterminateCreateable.value = false
+    }
+
     // 切换所有可见状态
     const toggleAllVisible = (val) => {
         columnData.value.forEach(row => {
-            row.visible = val;
+            row.can_view = val;
         });
         updateVisibleSelection();
     };
@@ -253,31 +254,38 @@
     // 切换所有可编辑状态
     const toggleAllEditable = (val) => {
         columnData.value.forEach(row => {
-            if(row.visible) {
-                row.editable = val;
-            }
+            row.can_update = val;
         });
         updateEditableSelection();
+    };
+    // 切换所有可编辑状态
+    const toggleAllCreateable = (val) => {
+        columnData.value.forEach(row => {
+            row.can_create = val;
+        });
+        updateCreateableSelection();
     };
 
     // 更新可见选择状态
     const updateVisibleSelection = () => {
-        const visibleRows = columnData.value.filter(row => row.visible);
+        const visibleRows = columnData.value.filter(row => row.can_view);
         allVisibleSelected.value = visibleRows.length === columnData.value.length;
         isIndeterminateVisible.value = visibleRows.length > 0 && visibleRows.length < columnData.value.length;
-        
-        // 如果取消可见，同时取消可编辑
-        if(!allVisibleSelected.value) {
-            toggleAllEditable(false);
-        }
     };
 
     // 更新可编辑选择状态
     const updateEditableSelection = () => {
-        const editableRows = columnData.value.filter(row => row.editable);
-        allEditableSelected.value = editableRows.length === columnData.value.filter(row => row.visible).length;
-        isIndeterminateEditable.value = editableRows.length > 0 && editableRows.length < columnData.value.filter(row => row.visible).length;
+        const editableRows = columnData.value.filter(row => row.can_update);
+        allEditableSelected.value = editableRows.length === columnData.value.length;
+        isIndeterminateEditable.value = editableRows.length > 0 && editableRows.length < columnData.value.length;
     };
+
+    function updateCreateableSelection(){
+        const editableRows = columnData.value.filter(row => row.can_create);
+        allCreateableSelected.value = editableRows.length === columnData.value.length;
+        isIndeterminateCreateable.value = editableRows.length > 0 && editableRows.length < columnData.value.length;
+
+    }
 
     // 生命周期钩子
     onMounted(() => {
@@ -288,7 +296,7 @@
     const fetchRoleList = async () => {
         try {
             loadingPage.value = true
-            const res = await Api.apiSystemRole({ page: 1, limit: 999 })
+            const res = await Api.apiSystemRolePermission({ page: 1, limit: 999 })
             roleList.value = res.data.data
             roleTreeData.value = res.data.data.map((item, index) => {
                 return { ...item, node_id: index }
@@ -304,7 +312,6 @@
             }
         } catch (error) {
             ElMessage.error('获取角色列表失败')
-            console.error('获取角色列表失败:', error)
         } finally {
             loadingPage.value = false
         }
@@ -315,8 +322,7 @@
         if (selectedRole) {
             roleObj.value = { ...selectedRole }
             fetchMenuData(selectedRole)
-            fetchDeptData()
-            fetchColumnPermissions(roleId)
+            // fetchDeptData()
         }
     }
 
@@ -324,37 +330,73 @@
         try {
             loadingPage.value = true
             const res = await Api.apiSystemRoleIdToMenuid(role.id)
-            
+            if(res.code !=2000){
+                ElMessage.warning(res.msg)
+                loadingPage.value = false
+                return
+            }
+            menuCheckedKeys.value = []
             // 处理菜单数据
             const menuData = res.data.map(menu => {
-            // 处理按钮权限选中状态
-            const menuPermissionChecked = []
-            menu.menu_buttons.forEach(btn => {
-                if (role.permission && role.permission.includes(parseInt(btn.id))) {
-                    menuPermissionChecked.push(btn.id)
+                menu.checked = false
+                // 处理按钮权限选中状态
+                const buttonPermissionChecked = []
+                menu.menu_buttons.forEach(btn => {
+                    btn.data_scope = 5
+                    btn.dept = []
+                    btn.checked = false
+                    for (var i=0;i<role.role_button_permission.length;i++){
+                        let temp_role_button_permission = role.role_button_permission[i]
+                        if(btn.id === temp_role_button_permission.menu_button){
+                            btn.data_scope = temp_role_button_permission.data_scope
+                            btn.dept = temp_role_button_permission.dept
+                            btn.checked = true
+                            buttonPermissionChecked.push(btn.id)
+                            break
+                        }
+                    }
+                })
+                menu.menu_fields.forEach(fds => {
+                    fds.can_view = false
+                    fds.can_create = false
+                    fds.can_update = false
+                    for (var i=0;i<role.role_field_permission.length;i++){
+                        let temp_role_field_permission = role.role_field_permission[i]
+                        if(fds.field_name === temp_role_field_permission.field){
+                            fds.can_view = temp_role_field_permission.can_view
+                            fds.can_create = temp_role_field_permission.can_create
+                            fds.can_update = temp_role_field_permission.can_update
+                            break
+                        }
+                    }
+                })
+                
+                // 处理数据范围
+                menu.data_scope = 4 // 默认全部数据权限
+                menu.dept = []
+
+                for (var i=0;i<role.role_menu_permission.length;i++){
+                    let temp_role_menu_permission = role.role_menu_permission[i]
+                    if(menu.id === temp_role_menu_permission.menu){
+                        menu.data_scope = temp_role_menu_permission.data_scope
+                        menu.dept = temp_role_menu_permission.dept
+                        menu.checked = true
+                        menuCheckedKeys.value.push(menu.id)
+                        break
+                    }
                 }
-            })
-            
-            // 处理数据范围
-            let dataRange = 5 // 默认同全局
-            if (role.menuDataRange) {
-                const range = role.menuDataRange.find(item => item.menu_id.toString() === menu.id.toString())
-                if (range) dataRange = range.data_scope
-            }
-            
-            return {
-                ...menu,
-                data_scope: dataRange,
-                menuPermissionChecked
-            }
+                
+                return {
+                    ...menu,
+                    buttonPermissionChecked
+                }
             })
             
             // 转换为树形结构
             menuOptions.value = XEUtils.toArrayTree(menuData, { parentKey: 'parent' })
-            menuCheckedKeys.value = role.menu || []
+
         } catch (error) {
             ElMessage.error('获取菜单权限失败')
-            console.error('获取菜单权限失败:', error)
         } finally {
             loadingPage.value = false
         }
@@ -371,20 +413,6 @@
             deptCheckedKeys.value = roleObj.value.dept || []
         } catch (error) {
             ElMessage.error('获取部门数据失败')
-            console.error('获取部门数据失败:', error)
-        }
-    }
-
-    const fetchColumnPermissions = async (roleId) => {
-        try {
-            loadingPage.value = true
-            const res = await apiGetColumnPermissions(roleId)
-            columnData.value = res.data.data || []
-        } catch (error) {
-            ElMessage.error('获取列权限失败')
-            console.error('获取列权限失败:', error)
-        } finally {
-            loadingPage.value = false
         }
     }
 
@@ -392,18 +420,11 @@
         currentRole.value = data.id
         roleObj.value = data
         fetchMenuData(data)
-        fetchDeptData()
-        // fetchColumnPermissions(data.id)
-    }
-
-    const dataScopeSelectChange = (value) => {
-        if (value !== 4) {
-            deptCheckedKeys.value = []
-        }
+        // fetchDeptData()
     }
 
     const dataScopeMenuSelectChange = (value) => {
-    // 处理菜单数据范围变更
+        // 处理菜单数据范围变更
     }
 
     function handleNodeClick(data, node, component){
@@ -413,20 +434,58 @@
     function handleFeildNodeClick(data){
         if(data.type == 1){
             currentMenu.value = data
-            columnData.value = data?.menu_fields || []
+            columnData.value = deepClone(data?.menu_fields) || []
+            resetECU()
             feildDrawer.value = true
         }
     }
 
+    function confirmFeildClick(){
+        if (!currentMenu.value) return;
+        if(columnData.value && columnData.value.length>0){
+             currentMenu.value = {
+                ...currentMenu.value,
+                menu_fields: [...columnData.value]
+            };
+            const updateTreeData = (nodes) => {
+                nodes.forEach(node => {
+                // 找到目标菜单节点
+                if (node.id === currentMenu.value.id) {
+                    node.menu_fields = columnData.value;
+                }
+                // 递归处理子节点
+                if (node.children?.length) {
+                    updateTreeData(node.children);
+                }
+                });
+            };
+             //执行更新
+            updateTreeData(menuOptions.value);
+        }
+        feildDrawer.value = false;
+    }
+
     const handleCheckClick = (data, checked) => {
+        data.checked = checked
         const { menu_buttons, children } = data
         if (menu_buttons) {
-            data.menuPermissionChecked = checked ? menu_buttons.map(btn => btn.id) : []
-        }
-        if (children) {
-            children.forEach(item => {
-            menuTree.value.setChecked(item.id, checked)
+            data.buttonPermissionChecked = checked ? menu_buttons.map(btn => btn.id) : []
+            menu_buttons.forEach(item=>{
+                item.checked = checked
             })
+        }
+        // 递归处理所有子节点
+        const setChildrenChecked = (node, checkStatus) => {
+            if (node.children && node.children.length) {
+                node.children.forEach(child => {
+                    menuTree.value.setChecked(child.id, checkStatus);
+                    setChildrenChecked(child, checkStatus); // 递归调用
+                });
+            }
+        };
+        // 处理子节点
+        if (children) {
+            setChildrenChecked(data, checked);
         }
     }
 
@@ -434,6 +493,13 @@
         const checkedKeys = menuTree.value?.getCheckedKeys() || []
         const halfCheckedKeys = menuTree.value?.getHalfCheckedKeys() || []
         return [...checkedKeys, ...halfCheckedKeys]
+    }
+
+    function isNodeChecked(nodeId) {
+        // 获取所有选中的节点key
+        const checkedKeys = getMenuAllCheckedKeys()
+        // 检查当前节点是否在选中列表中
+        return checkedKeys.includes(nodeId);
     }
 
     const getDeptAllCheckedKeys = () => {
@@ -450,46 +516,46 @@
             data_scope: node.data_scope
         }))
     }
-
-    const hasMenuPermission = (menuId) => {
-        return menuCheckedKeys.value.includes(menuId)
-    }
-
-    const getMenuName = (menuId) => {
-        const menu = XEUtils.findTree(menuOptions.value, item => item.id === menuId)
-        return menu ? menu.item.name : '未知菜单'
-    }
-
-    const tableRowClassName = ({ row }) => {
-        return !hasMenuPermission(row.menuId) ? 'disabled-row' : ''
-    }
-
-    const editColumnConfig = (row) => {
-        currentColumnConfig.value = { ...row }
-        columnConfigDialogVisible.value = true
-    }
-
-    const saveColumnConfig = async () => {
-        // 更新列数据
-        const index = columnData.value.findIndex(col => col.id === currentColumnConfig.value.id)
-        if (index !== -1) {
-            columnData.value[index] = { ...currentColumnConfig.value }
-        }
-        columnConfigDialogVisible.value = false
-    }
-
+    
     function handleJuDataScopeClick (item){
         isDialogDataScopeVisible.value = true
+        currentButton.value = item
         nextTick(() => {
             dataScopeDialogRef.value.handleOpen(item)
         })
     }
 
     function handleMenuDataScopeClick(item){
+        currentMenu.value = item
         isDialogMenuDataScopeVisible.value = true
         nextTick(() => {
             menuDataScopeDialogRef.value.handleOpen(item)
         })
+    }
+
+    function handleConfirmDataScope(item){
+        if (currentButton.value) {
+            // 直接修改原对象属性
+            currentButton.value.data_scope = item.data_scope;
+            currentButton.value.dept = item.dept;
+        }
+    }
+
+    function handleConfirmMenuDataScope(item){
+        if (currentMenu.value) {
+            // 直接修改原对象属性
+            currentMenu.value.data_scope = item.data_scope;
+            currentMenu.value.dept = item.dept;
+        }
+    }
+
+    function handleButtonPermissonChange(menuData, checkedIds){
+        if (!menuData.menu_buttons) return;
+  
+        // 同步更新每个按钮的 checked 状态
+        menuData.menu_buttons.forEach(button => {
+            button.checked = checkedIds.includes(button.id);
+        });
     }
 
     const submitPermisson = async () => {
@@ -502,40 +568,65 @@
         try {
             // 准备菜单权限数据
             const menuData = XEUtils.toTreeArray(menuOptions.value)
-            const permissionData = []
-            menuData.forEach(menu => {
-            if (menu.menuPermissionChecked && menu.menuPermissionChecked.length > 0) {
-                permissionData.push(...menu.menuPermissionChecked)
-            }
+            let RoleMenuPermission = []
+            let RoleMenuButtonPermission = []
+            let FieldPermission = []
+            menuData.forEach(item=>{
+                if(item.checked){
+                    RoleMenuPermission.push({
+                        role:roleObj.value.id,
+                        menu:item.id,
+                        data_scope:item.data_scope,
+                        dept:item.dept
+                    })
+                }
+                item.menu_buttons.forEach(nitem=>{
+                    if(nitem.checked){
+                        RoleMenuButtonPermission.push({
+                            role:roleObj.value.id,
+                            menu_button:nitem.id,
+                            data_scope:nitem.data_scope,
+                            dept:nitem.dept
+                        })
+                    }
+                })
+                if(item.menu_fields && item.menu_fields.length>0){
+                    const allDisabled = item.menu_fields.every(item => 
+                        item.can_create === false && 
+                        item.can_update === false && 
+                        item.can_view === false
+                    );
+                    if(!allDisabled){//如果都为false默认表示没配置列权限
+                        item.menu_fields.forEach(fitem=>{
+                            FieldPermission.push({
+                                role:roleObj.value.id,
+                                field:fitem.id,
+                                can_create:fitem.can_create,
+                                can_update:fitem.can_update,
+                                can_view:fitem.can_view
+                            })
+                        })
+                    }
+                }
             })
-
             // 准备角色数据
             const roleData = {
-            ...roleObj.value,
-            menu: getMenuAllCheckedKeys(),
-            dept: getDeptAllCheckedKeys(),
-            permission: permissionData,
-            menuDataRange: getMenuDataRangeChecked()
+                role_id:roleObj.value.id,
+                RoleMenuPermission: RoleMenuPermission,
+                RoleMenuButtonPermission:RoleMenuButtonPermission,
+                FieldPermission:FieldPermission,
             }
-
             // 保存角色权限
-            const res = await apiPermissionSave(roleData)
+            const res = await Api.apiSystemRolePermissionSave(roleData)
             if (res.code === 2000) {
-            // 保存列权限
-            await apiSaveColumnPermissions({
-                roleId: currentRole.value,
-                columns: columnData.value
-            })
-            
-            ElMessage.success('权限保存成功')
-            history.state.id = roleObj.value.id
-            fetchRoleList()
+                ElMessage.success('保存成功')
+                history.state.id = roleObj.value.id
+                fetchRoleList()
             } else {
-            ElMessage.warning(res.msg)
+                ElMessage.warning(res.msg)
             }
         } catch (error) {
             ElMessage.error('保存权限失败')
-            console.error('保存权限失败:', error)
         } finally {
             saving.value = false
         }

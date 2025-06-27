@@ -11,7 +11,7 @@ from mysystem.views.dept import DeptViewSet
 from mysystem.views.menu import MenuViewSet
 from mysystem.views.menu_button import MenuButtonViewSet
 from mysystem.views.operation_log import OperationLogViewSet
-from mysystem.views.role import RoleViewSet
+from mysystem.views.role import RoleViewSet,RolePermissionViewSet
 from mysystem.views.user import UserViewSet
 from mysystem.views.menu_field import MenuFieldViewSet
 
@@ -21,6 +21,7 @@ system_url.register(r'button', ButtonViewSet)
 system_url.register(r'menu_button', MenuButtonViewSet)
 system_url.register(r'menu_field', MenuFieldViewSet)
 system_url.register(r'role', RoleViewSet)
+system_url.register(r'role_permission', RolePermissionViewSet,basename="role_permission")
 system_url.register(r'dept', DeptViewSet)
 system_url.register(r'user', UserViewSet)
 system_url.register(r'operation_log', OperationLogViewSet)
@@ -40,7 +41,8 @@ urlpatterns = [
     re_path('role/set_status/', RoleViewSet.as_view({'post': 'set_status'})),
 
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),
-    re_path('role_data/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'role_data'})),
+    re_path('role_permission/save_permission/', RolePermissionViewSet.as_view({'post': 'save_permission'})),
+    
     
     re_path('operation_log/deletealllogs/',OperationLogViewSet.as_view({'delete':'deletealllogs'})),
 
