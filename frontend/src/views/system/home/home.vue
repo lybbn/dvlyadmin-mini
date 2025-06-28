@@ -138,6 +138,12 @@
         { name: '数据导出', icon: 'Download', action: 'exportData' },
         { name: '消息通知', icon: 'Bell', action: 'notify' },
         { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
+        { name: '系统设置', icon: 'Setting', action: 'settings' },
     ])
 
     // 消息列表
