@@ -22,8 +22,8 @@ class Users(AbstractBaseUser, CoreModel):
     mobile = models.CharField(max_length=30,verbose_name="电话", null=True, blank=True, help_text="电话")
     avatar = models.CharField(max_length=200,verbose_name="头像", null=True, blank=True, help_text="头像")
     name = models.CharField(max_length=40, verbose_name="姓名", help_text="姓名")
-    nickname = models.CharField(max_length=100, help_text="用户昵称", verbose_name="用户昵称",default="")
-    gender = models.SmallIntegerField(choices=GENDER_CHOICES, verbose_name="性别", null=True, blank=True, help_text="性别")
+    nickname = models.CharField(max_length=100, help_text="用户昵称", verbose_name="用户昵称",default="", null=True, blank=True)
+    gender = models.SmallIntegerField(choices=GENDER_CHOICES, verbose_name="性别", null=True, blank=True, help_text="性别",default=0)
     role = models.ManyToManyField(to='Role', verbose_name='关联角色', db_constraint=False,related_name="role_users", help_text="关联角色")
     dept = models.ForeignKey(to='Dept', verbose_name='所属部门', on_delete=models.PROTECT, db_constraint=False, null=True,blank=True, help_text="关联部门")
     

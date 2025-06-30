@@ -42,21 +42,23 @@ export function createCrudConfig(options = {}){
         {
             label: "邮箱",
             prop: "email",
-            minWidth: "110"
+            minWidth: "170"
         },
         {
             label: "联系电话",
             prop: "mobile",
-            minWidth: "130"
+            minWidth: "150"
         },
         {
             label: "部门",
             prop: "dept",
+            exportField:"deptName",
             minWidth: "120"
         },
         {
             label: "角色",
             prop: "role",
+            exportField:"roleNames",
             minWidth: "130"
         },
         {

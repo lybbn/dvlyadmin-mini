@@ -199,10 +199,52 @@ class ImportExportMixin:
         """
         pass
 
-    def process_nested_field(self, field_name, value, data_dict):
+    def process_nested_field(self, field_name, value, data_dict, is_many=False, separator=','):
         """
-        处理嵌套字段 (如 'user.name' -> {'user': {'name': value}})
+        处理嵌套字段和多对多字段
+        
+        参数:
+            field_name: 字段名，可以是普通字段或嵌套字段(如 'user.name')
+            value: 字段值
+            data_dict: 要填充的数据字典
+            is_many: 是否多对多字段
+            separator: 多值分隔符
         """
+        if not field_name:
+            return
+        
+        # 处理空值
+        if value is None:
+            value = ""
+        value = str(value).strip()
+        
+        # 处理多对多字段
+        if is_many:
+            try:
+                related_ids = []
+                if value:
+                    # 分割多值
+                    values = [v.strip() for v in value.split(separator) if v.strip()]
+                    
+                    for val in values:
+                        related_ids.append(val)
+                
+                # 如果是嵌套的多对多字段
+                if '.' in field_name:
+                    parts = field_name.split('.')
+                    current = data_dict
+                    for part in parts[:-1]:
+                        if part not in current:
+                            current[part] = {}
+                        current = current[part]
+                    current[parts[-1]] = related_ids
+                else:
+                    data_dict[field_name] = related_ids
+                return
+            except Exception as e:
+                raise ValueError(f"处理多对多字段'{field_name}'错误: {str(e)}")
+        
+        # 处理普通嵌套字段
         if '.' in field_name:
             parts = field_name.split('.')
             current = data_dict
@@ -286,11 +328,18 @@ class ImportExportMixin:
                         try:
                             for part in parts:
                                 value = value[part]
-                            row_data.append(value)
+                            # 处理数组/列表类型值
+                            if isinstance(value, (list, tuple)):
+                                value = ",".join(str(v) for v in value)
+                            row_data.append(str(value) if value is not None else "")
                         except (KeyError, TypeError):
                             row_data.append("")
                     else:
-                        row_data.append(item.get(field, ""))
+                        value = item.get(field, "")
+                        # 处理数组/列表类型值
+                        if isinstance(value, (list, tuple)):
+                            value = ", ".join(str(v) for v in value)
+                        row_data.append(str(value) if value is not None else "")
                 
                 # 写入一行数据
                 ws.append(row_data)
@@ -390,6 +439,13 @@ class ImportExportMixin:
                         if excel_col_name in self.import_field_dict:
                             field_info = self.import_field_dict[excel_col_name]
                             model_field = field_info if isinstance(field_info, str) else field_info['field']
+
+                            # 获取字段配置
+                            is_many = False
+                            separator = ","
+                            if isinstance(field_info, dict):
+                                is_many = field_info.get('many', False)
+                                separator = field_info.get('separator', ',')
                             
                             # 处理图片字段
                             if hasattr(self, 'import_image_fields') and (
@@ -399,7 +455,7 @@ class ImportExportMixin:
                             
                             # 处理普通字段
                             cell_value = "" if cell_value is None else cell_value
-                            self.process_nested_field(model_field, cell_value, row_data)
+                            self.process_nested_field(model_field, cell_value, row_data, is_many, separator)
                     
                     # 预处理
                     processed_data = self.before_import_row(row_data, row_idx)
@@ -412,7 +468,6 @@ class ImportExportMixin:
             
             # 批量导入
             if valid_data:
-                print(valid_data)
                 serializer = self.import_serializer_class(data=valid_data, many=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()

@@ -62,14 +62,13 @@ class UserSerializer(CustomModelSerializer):
         read_only_fields = ["id"]
         exclude = ['password']
 
-
-class UserCreateSerializer(CustomModelSerializer):
+class UserImportSerializer(CustomModelSerializer):
     """
-    管理员用户新增-序列化器
+    用户管理导入-序列化器
     """
     username = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
     password = serializers.CharField(required=False, default=make_password("123456"))
-
+    nickname = serializers.CharField(required=False, allow_blank=True)
     is_staff = serializers.BooleanField(required=False,default=True)#是否允许登录后台
 
     def create(self, validated_data):
@@ -77,6 +76,36 @@ class UserCreateSerializer(CustomModelSerializer):
             if validated_data['password']:
                 validated_data['password'] = make_password(validated_data['password'])
         validated_data['identity'] = 1
+        validated_data['nickname'] = validated_data['name']
+        return super().create(validated_data)
+
+    class Meta:
+        model = Users
+        read_only_fields = ["id"]
+        fields = '__all__'
+        extra_kwargs = {
+            'role': {
+                'required': False,
+                'allow_empty': True
+            }
+        }
+
+
+class UserCreateSerializer(CustomModelSerializer):
+    """
+    管理员用户新增-序列化器
+    """
+    username = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
+    password = serializers.CharField(required=False, default=make_password("123456"))
+    nickname = serializers.CharField(required=False, allow_blank=True)
+    is_staff = serializers.BooleanField(required=False,default=True)#是否允许登录后台
+
+    def create(self, validated_data):
+        if "password" in validated_data.keys():
+            if validated_data['password']:
+                validated_data['password'] = make_password(validated_data['password'])
+        validated_data['identity'] = 1
+        validated_data['nickname'] = validated_data['name']
         return super().create(validated_data)
 
     def save(self, **kwargs):
@@ -95,11 +124,13 @@ class UserUpdateSerializer(CustomModelSerializer):
     """
     username = serializers.CharField(max_length=50,validators=[UniqueValidator(queryset=Users.objects.all(), message="账号必须唯一")])
     password = serializers.CharField(required=False, allow_blank=True)
+    nickname = serializers.CharField(required=False, allow_blank=True)
 
     def update(self, instance, validated_data):
         if "password" in validated_data.keys():
             if validated_data['password']:
                 validated_data['password'] = make_password(validated_data['password'])
+        validated_data['nickname'] = validated_data['name']
         return super().update(instance,validated_data)
 
     def save(self, **kwargs):
@@ -110,7 +141,9 @@ class UserUpdateSerializer(CustomModelSerializer):
         model = Users
         read_only_fields = ["id"]
         fields = "__all__"
-
+        extra_kwargs = {
+            'nickname': {'required': False}
+        }
 
 class UserViewSet(CustomModelViewSet):
     """
@@ -122,6 +155,19 @@ class UserViewSet(CustomModelViewSet):
     update_serializer_class = UserUpdateSerializer
     # filterset_fields = ('name','is_active','username')
     filterset_class = UsersManageTimeFilter
+    import_field_dict={
+        "ID":"id",
+        "账号": {'field': 'username', 'example': 'test'},
+        "姓名": {'field': 'name', 'example': 'lybbn'},
+        "头像": {'field': 'avatar', 'example': "URL地址"},
+        "电话":"mobile",
+        "邮箱":"email",
+        "密码":{'field': 'password', 'example': "123456"},
+        "部门":{'field': 'dept', 'example': "部门ID"},
+        "角色":{'field': 'role', 'example': "角色ID（可为空，如有多个用逗号分隔）",'many':True,'separator':','}, # 'many': True 标记为多对多字段，'separator': ',' # 多值分隔符
+        "状态":{'field': 'is_active', 'example': 1}
+    }
+    import_serializer_class = UserImportSerializer
 
     def set_status(self,request,*args, **kwargs):
         """禁用/启用"""

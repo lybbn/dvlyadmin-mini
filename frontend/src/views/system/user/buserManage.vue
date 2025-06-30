@@ -52,7 +52,7 @@
                             <el-tag v-if="!!scope.row.deptName">{{scope.row.deptName}}</el-tag>
                         </template>
                         <template #role="scope">
-                            <el-tag v-for="(item,index) in scope.row.roleNames" :key="index" v-if="scope.row.roleNames">{{item}}</el-tag>
+                            <el-tag v-for="(item,index) in scope.row.roleNames" :key="index" v-if="!isEmpty(scope.row.roleNames)">{{item}}</el-tag>
                         </template>
                         <template #is_active="scope">
                             <el-switch v-model="scope.row.is_active" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
@@ -95,6 +95,7 @@
     import Api from '@/api/api.js'
     import XEUtils from 'xe-utils'
     import defaultAvatar from '@/assets/lybbn/imgs/avatar.jpg'
+    import {isEmpty} from "@/utils/util.js"
 
     const route = useRoute()
     const userState = useUserState()
@@ -306,7 +307,7 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    width: 200px;
+    width: 210px;
     :deep(.el-card__body){
         padding:0 !important;
     }
