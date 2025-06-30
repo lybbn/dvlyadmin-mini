@@ -24,7 +24,7 @@
                                     </el-button>
                                 </div>
                             </div>
-                            <el-tooltip raw-content content="<div>1、授权角色在菜单中可操作的范围、数据权限、按钮权限、列权限（点击配置）</div><div>2、数据权限支持具体按钮的配置，点击按钮后的settings配置即可</div><div>3、列权限如不可点击，则先需要在【菜单管理】中配置列权限</div>" placement="bottom">
+                            <el-tooltip raw-content content="<div>1、授权角色在菜单中可操作的范围、数据权限、按钮权限、列权限（点击配置）</div><div>2、数据权限支持具体按钮的配置，点击按钮后的settings配置即可</div><div>3、列权限如不可点击，则先需要在【菜单管理】中配置列权限</div><div>4、数据权限优先级：按钮 大于 菜单</div>" placement="bottom">
                                 <el-icon><QuestionFilled /></el-icon>
                             </el-tooltip>
                         </div>

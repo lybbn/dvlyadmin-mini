@@ -18,6 +18,7 @@ from django_filters import utils
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from utils.export_import_mixin import ImportExportMixin
+from utils.field_permission import FieldPermissionMixin
 
 def get_object_or_404(queryset, *filter_args, **filter_kwargs):
     """
@@ -80,7 +81,7 @@ class CustomDjangoFilterBackend(DjangoFilterBackend):
 
         return None
 
-class CustomModelViewSet(ModelViewSet,ImportExportMixin):
+class CustomModelViewSet(ModelViewSet,ImportExportMixin,FieldPermissionMixin):
     """
     自定义的ModelViewSet:
     统一标准的返回格式;新增,查询,修改可使用不同序列化器

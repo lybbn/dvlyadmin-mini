@@ -16,7 +16,6 @@ class Users(AbstractBaseUser, CoreModel):
         (0, "超级管理员"),
         (1, "系统管理员"),
         (2, "前端用户"),
-
     )
     username = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='用户账号', help_text="用户账号")
     email = models.EmailField(max_length=60, verbose_name="邮箱", null=True, blank=True, help_text="邮箱")

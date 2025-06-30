@@ -12,12 +12,13 @@
         :inline="true"
         :model="model"
         label-position="left"
+        label-width="auto"
         class="search-bar-form"
         :class="{ 'is-collapsed': isCollapsed && hasOverflow }"
         >
             <div class="search-content-wrapper" :class="{ 'single-line-layout': !hasOverflow }">
                 <!-- 所有搜索项 -->
-                <div class="search-items-container" :style="containerStyle">
+                <div class="search-items-container">
                     <slot name="default">
                     <!-- 默认搜索项 -->
                     </slot>
@@ -202,11 +203,17 @@
         .search-item {
             width: 100%;
         }
-        
-        .el-input,
-        .el-select {
+        :deep(.el-form-item) {
+            width:47% !important;
+        }
+        :deep(.el-input) {
             width: 100% !important;
         }
-    
+        :deep(.el-select) {
+            width: 100% !important;
+        }
+        :deep(.el-form-item__label-wrap){
+            display:none;
+        }
     }
 </style>

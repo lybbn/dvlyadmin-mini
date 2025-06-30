@@ -14,6 +14,7 @@ from mysystem.views.operation_log import OperationLogViewSet
 from mysystem.views.role import RoleViewSet,RolePermissionViewSet
 from mysystem.views.user import UserViewSet
 from mysystem.views.menu_field import MenuFieldViewSet
+from mysystem.views.frontend import SysImagesUploadView
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
@@ -27,6 +28,8 @@ system_url.register(r'user', UserViewSet)
 system_url.register(r'operation_log', OperationLogViewSet)
 
 urlpatterns = [
+    path('sys_image_upload/', SysImagesUploadView.as_view()),
+
     re_path('menu/update_sort/', MenuViewSet.as_view({'post': 'update_sort'})),
     re_path('menu_tree/', MenuViewSet.as_view({'get': 'menu_tree'})),
     
@@ -39,6 +42,7 @@ urlpatterns = [
     
     re_path('dept/set_status/', DeptViewSet.as_view({'post': 'set_status'})),
     re_path('role/set_status/', RoleViewSet.as_view({'post': 'set_status'})),
+    re_path('user/set_status/', UserViewSet.as_view({'post': 'set_status'})),
 
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),
     re_path('role_permission/save_permission/', RolePermissionViewSet.as_view({'post': 'save_permission'})),

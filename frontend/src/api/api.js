@@ -11,6 +11,8 @@ Api.refreshToken = params => ajaxPost({url: `/api/token/refresh/`,params})
 Api.apiSystemWebRouter = params => ajaxGet({url: `/api/system/menu/web_router/`,params})
 // 获取路由json
 Api.apiSchemeJson = params => ajaxGet({url: `/api/schema/lyjson/`,params})
+// 上传图片
+Api.apiSysImgUpload = params => uploadImg({url: `/api/system/sys_image_upload/`,params})
 
 /**
  *个人中心
@@ -102,5 +104,8 @@ Api.apiSystemRolePermission = params => ajaxGet({url: `/api/system/role_permissi
 
 // 权限管理 - 保存
 Api.apiSystemRolePermissionSave = params => ajaxPost({url: `/api/system/role_permission/save_permission/`,params})
+
+// 用户管理 - 列表
+Api.apiSystemUser = params => ajaxGet({url: `/api/system/user/`,params})
 
 export default Api

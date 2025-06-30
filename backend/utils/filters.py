@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
+@EditDate: 2025-06-28
 @Remark: 自定义过滤器
 """
 from rest_framework.filters import BaseFilterBackend
@@ -10,7 +11,6 @@ from mysystem.models import Dept,MenuButton,RoleMenuButtonPermission,RoleMenuPer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.constants import LOOKUP_SEP
 from django_filters import utils
-from django_filters.filters import CharFilter
 import operator
 from functools import reduce
 from django.db.models import Q
@@ -72,7 +72,7 @@ class DataLevelPermissionsFilter(BaseFilterBackend):
 
     4. 只为仅本人数据权限时只返回过滤本人数据，并且部门为自己本部门(考虑到用户会变部门，只能看当前用户所在的部门数据)
     5. 自定数据权限 获取部门，根据部门过滤
-    6. 如果具体按钮接口配置了数据权限，则优先使用此权限，
+    6. 如果具体按钮接口配置了数据权限，则优先使用此权限，否则使用菜单的数据权限（默认为全部数据权限）
     """
 
     def filter_queryset(self, request, queryset, view):

@@ -14,6 +14,7 @@ from utils.viewset import CustomModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.validators import UniqueValidator
 import django_filters
+from utils.common import get_parameter_dic
 
 class UsersManageTimeFilter(django_filters.rest_framework.FilterSet):
     """
@@ -115,6 +116,19 @@ class UserViewSet(CustomModelViewSet):
     update_serializer_class = UserUpdateSerializer
     # filterset_fields = ('name','is_active','username')
     filterset_class = UsersManageTimeFilter
+
+    def set_status(self,request,*args, **kwargs):
+        """禁用/启用"""
+        reqData = get_parameter_dic(request)
+        id=reqData.get("id","")
+        queryset = self.filter_queryset(self.get_queryset())
+        instance = queryset.filter(id=id).first()
+        if instance:
+            instance.is_active = False if instance.is_active else True
+            instance.save()
+            return DetailResponse(data=None, msg="设置成功")
+        else:
+            return ErrorResponse(msg="未获取到数据")
 
     def user_info(self,request):
         """获取当前用户信息"""
