@@ -1,6 +1,6 @@
 <template>
     <ly-dialog :title="titleMap[mode]" v-model="visible" width="500px" destroy-on-close @closed="emits('closed')">
-        <el-form :model="formData" :rules="rules" :disabled="mode=='show'" ref="dialogForm" label-width="auto">
+        <el-form :model="formData" :rules="rules" :disabled="mode=='detail'" ref="dialogForm" label-width="auto">
             <el-form-item label="" prop="data_scope">
                 <el-select v-model="formData.data_scope" @change="dataScopeSelectChange">
                     <el-option

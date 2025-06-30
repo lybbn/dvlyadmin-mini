@@ -1,7 +1,7 @@
 <template>
     <div :class="{'ly-is-full':isFull}" class="lycontainer">
         <div class="lycontainer-wrapper">
-            <el-card shadow="hover" class="ly-aside" width="200px" v-loading="showDeptloading">
+            <el-card shadow="hover" class="ly-aside" v-loading="showDeptloading">
                 <el-container>
                     <el-header>
                         <el-input placeholder="输入关键字" v-model="groupFilterText" clearable style="width:180px;" @change="handelFilterDept">
@@ -45,8 +45,17 @@
                             <el-button type="primary" icon="plus"  @click="handleAddClick" v-auth="'Create'">新增</el-button>
                             <el-button type="danger" plain icon="delete" :disabled="selection.length==0" title="批量删除" @click="batch_del" v-auth="'Delete'"></el-button>
                         </template>
-                        <template #status="scope">
-                            <el-switch v-model="scope.row.status" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
+                        <template #avatar="scope">
+                            <el-image  :src="scope.row.avatar ? scope.row.avatar : defaultAvatar" :preview-src-list="[scope.row.avatar]" style="width: 30px;height: 30px" preview-teleported v-if="scope.row.avatar"></el-image>
+                        </template>
+                        <template #dept="scope">
+                            <el-tag v-if="!!scope.row.deptName">{{scope.row.deptName}}</el-tag>
+                        </template>
+                        <template #role="scope">
+                            <el-tag v-for="(item,index) in scope.row.roleNames" :key="index" v-if="scope.row.roleNames">{{item}}</el-tag>
+                        </template>
+                        <template #is_active="scope">
+                            <el-switch v-model="scope.row.is_active" active-color="#13ce66" inactive-color="#ff4949" @change="changeStatus(scope.row)" :disabled="!hasBtnPermission('SetStatus')"></el-switch>
                         </template>
                         <el-table-column label="操作" :fixed="crudOptions.rowHandle.fixed" :width="crudOptions.rowHandle.width">
                             <template #header>
@@ -62,6 +71,7 @@
                             <template #default="scope">
                                 <span class="table-operate-btn" @click="handleEdit(scope.row,'edit')" v-auth="'Update'">编辑</span>
                                 <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">删除</span>
+                                <span class="table-operate-btn" @click="handleEdit(scope.row,'resetpass')" v-auth="'ResetPass'">重置密码</span>
                             </template>
                         </el-table-column>
                     </ly-table>
@@ -69,6 +79,7 @@
             </div>
         </div>
         <saveDialog ref="saveDialogRef" @refreshData="getData" v-if="isDialogVisible" @closed="isDialogVisible = false"></saveDialog>
+        <passDialog ref="passDialogRef" v-if="isDialogPassVisible" @closed="isDialogPassVisible = false"></passDialog>
     </div>
 </template>
 
@@ -76,12 +87,14 @@
     import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
     import { ElMessage, ElMessageBox } from 'element-plus'
     import saveDialog from "./components/moduleSave.vue"
+    import passDialog from "./components/modulePass.vue"
     import lySearchBar from '@/components/lySearchBar.vue'
     import { createCrudConfig } from './crud.js'
     import { useUserState } from '@/store/userState' 
     import { useRoute } from 'vue-router'
     import Api from '@/api/api.js'
     import XEUtils from 'xe-utils'
+    import defaultAvatar from '@/assets/lybbn/imgs/avatar.jpg'
 
     const route = useRoute()
     const userState = useUserState()
@@ -100,6 +113,8 @@
     const tableref = ref(null)
     const saveDialogRef = ref(null)
     let selection = ref([])
+    let isDialogPassVisible = ref(false)
+    let passDialogRef = ref(null)
 
     let showDeptloading = ref(false)
     let groupFilterText = ref("")
@@ -141,6 +156,14 @@
             saveDialogRef.value.handleOpen(null, "add")
         })
     }
+
+    const handleResetPassClick = (item) => {
+        isDialogPassVisible.value = true
+        nextTick(() => {
+            passDialogRef.value.handleOpen(item)
+        })
+    }
+
 
     function batch_del(){
         ElMessageBox.confirm(`确定删除选中的 ${selection.value.length} 项吗？`, '提示', {
@@ -185,6 +208,9 @@
                     })
                 }).catch(() => {})
                 break
+            case 'resetpass':
+                handleResetPassClick(row)
+                break
             case 'reset':
                 formInline.value = {}
                 search()
@@ -193,8 +219,8 @@
     }
 
     const changeStatus = (row) => {
-        let originalStatus = row.status
-        row.status = !row.status
+        let originalStatus = row.is_active
+        row.is_active = !row.is_active
         
         ElMessageBox.confirm('确定修改状态吗？', '提醒', {
             closeOnClickModal: false,
@@ -202,7 +228,7 @@
         }).then(() => {
             crudOptions.value.request.setStatus({ id: row.id }).then(res => {
                 if (res.code == 2000) {
-                    originalStatus ? row.status = true : row.status = false
+                    originalStatus ? row.status = true : row.is_active = false
                     ElMessage.success(res.msg)
                     getData()
                 } else {
@@ -269,7 +295,7 @@
 .lycontainer-wrapper {
     display: flex;
     flex: 1;
-    overflow: auto;
+    overflow-x: hidden;
     flex-direction: row;
     gap: 10px;
 }
@@ -279,6 +305,8 @@
     overflow: auto;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    width: 200px;
     :deep(.el-card__body){
         padding:0 !important;
     }
@@ -288,7 +316,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    // overflow: auto;
+    overflow: auto;
 }
 
 .tableSelect {

@@ -45,7 +45,7 @@
                     <el-button
                         v-if="hasOverflow"
                         @click="toggleCollapse"
-                        type="text"
+                        link
                         class="toggle-btn"
                     >
                         {{ isCollapsed ? '展开' : '收起' }}

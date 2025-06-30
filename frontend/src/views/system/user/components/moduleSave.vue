@@ -1,6 +1,6 @@
 <template>
     <ly-dialog :title="titleMap[mode]" v-model="visible" width="50%" destroy-on-close @closed="emits('closed')">
-        <el-form :model="formData" :rules="rules" :disabled="mode=='show'" ref="dialogForm" label-width="auto">
+        <el-form :model="formData" :rules="rules" :disabled="mode=='detail'" ref="dialogForm" label-width="auto">
             <el-row :gutter="20">
                 <el-col :span="12">
                     <el-form-item label="用户账号" prop="username">
@@ -12,8 +12,8 @@
                         <el-input v-model="formData.name" placeholder="请输入用户姓名" clearable></el-input>
                     </el-form-item>
                 </el-col>
-                <el-col :span="12">
-                    <el-form-item label="登录密码" prop="password" v-if="mode=='add'" :rules="mode=='add'?loginpassword:[]">
+                <el-col :span="12" v-if="mode=='add'">
+                    <el-form-item label="登录密码" prop="password" :rules="mode=='add'?loginpassword:[]">
                         <el-input v-model.trim="formData.password" clearable show-password placeholder="请输入登录密码"></el-input>
                     </el-form-item>
                 </el-col>
@@ -85,7 +85,7 @@
 <script setup>
     import { ref, onMounted } from 'vue'
     import lyDialog from "@/components/dialog/dialog.vue"
-    import {deepClone} from "@/utils/util.js"
+    import {deepClone,safeDelete} from "@/utils/util.js"
     import Api from "@/api/api.js"
     import { ElMessage, ElMessageBox } from 'element-plus'
     import XEUtils from "xe-utils";
@@ -117,6 +117,7 @@
         email:"",
         mobile:"",
         gender:2,
+        password:"",
         status: true,
     })
 
@@ -135,6 +136,7 @@
     let genderList = [
         {id:2,name:"男"},
         {id:1,name:"女"},
+        {id:0,name:"未知"},
     ]
     
     // 方法
@@ -169,6 +171,7 @@
                 let apiObj = crudOptions.value.request.add
                 if(mode.value == "edit"){
                     apiObj = crudOptions.value.request.edit
+                    safeDelete(formData.value,'password')
                 }
                 const res = await apiObj(formData.value)
                 isSaveing.value = false

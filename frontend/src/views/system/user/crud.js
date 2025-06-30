@@ -19,6 +19,7 @@ export function createCrudConfig(options = {}){
         import:api.import,
         dltemplate:api.downloadTemplate,
         setStatus:api.setStatus,
+        resetPass:api.resetPass,
         ...(options.request || {}) // 允许覆盖请求方法
     }
     //table列配置
@@ -44,19 +45,19 @@ export function createCrudConfig(options = {}){
             minWidth: "110"
         },
         {
-            label: "手机号",
+            label: "联系电话",
             prop: "mobile",
-            minWidth: "110"
+            minWidth: "130"
         },
         {
             label: "部门",
             prop: "dept",
-            minWidth: "100"
+            minWidth: "120"
         },
         {
             label: "角色",
             prop: "role",
-            minWidth: "100"
+            minWidth: "130"
         },
         {
             label: "状态",
@@ -86,7 +87,7 @@ export function createCrudConfig(options = {}){
             },
             //crud按钮配置
             rowHandle:{
-                width: 170,//操作列宽度,0表示不显示表格操作列
+                width: 205,//操作列宽度,0表示不显示表格操作列
                 fixed:"right",//固定操作列在右侧
                 ...(options.rowHandle || {})
             },

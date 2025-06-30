@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.validators import UniqueValidator
 import django_filters
 from utils.common import get_parameter_dic
+from django.db import transaction
 
 class UsersManageTimeFilter(django_filters.rest_framework.FilterSet):
     """
@@ -44,10 +45,17 @@ class UserSerializer(CustomModelSerializer):
     """
     用户管理-序列化器
     """
-    rolekey = serializers.SerializerMethodField(read_only=True)  # 新增自定义字段
+    roleNames = serializers.SerializerMethodField(read_only=True)  # 新增自定义字段
+    deptName = serializers.SerializerMethodField(read_only=True)  # 新增自定义字段
 
-    def get_rolekey(self,obj):
-        return list(obj.role.values_list('key', flat=True))
+    def get_deptName(self,obj):
+        try:
+            return obj.dept.name
+        except:
+            return ""
+
+    def get_roleNames(self,obj):
+        return list(obj.role.values_list('name', flat=True))
 
     class Meta:
         model = Users
@@ -73,7 +81,6 @@ class UserCreateSerializer(CustomModelSerializer):
 
     def save(self, **kwargs):
         data = super().save(**kwargs)
-        data.post.set(self.initial_data.get('post', []))
         return data
 
     class Meta:
@@ -97,7 +104,6 @@ class UserUpdateSerializer(CustomModelSerializer):
 
     def save(self, **kwargs):
         data = super().save(**kwargs)
-        data.post.set(self.initial_data.get('post', []))
         return data
 
     class Meta:
@@ -150,6 +156,39 @@ class UserViewSet(CustomModelViewSet):
         if not user.identity in [0,1]:return ErrorResponse(msg="用户类型错误")
         Users.objects.filter(id=user.id).update(**request.data)
         return DetailResponse(data=None, msg="修改成功")
+    
+    def reset_password(self, request, pk):
+        """重置用户密码
+        
+        Args:
+            request: HTTP请求对象
+            pk: 用户主键ID
+            
+        Returns:
+            Response: 操作结果响应
+        """
+        # 1. 权限验证
+        if not request.user.is_superuser:
+            return ErrorResponse(msg="只允许超级管理员进行密码重置操作")
+        
+        try:
+            # 2. 获取用户实例
+            user = Users.objects.get(id=pk)
+            
+            data = request.data
+            new_pwd = data.get('newPassword')
+            user.password = make_password(new_pwd)
+            # 3. 保存
+            with transaction.atomic():
+                user.save()
+            
+            # 4. 返回成功响应
+            return DetailResponse(msg="设置成功")
+            
+        except Users.DoesNotExist:
+            return ErrorResponse(msg="指定用户不存在")
+        except Exception as e:
+            return ErrorResponse(msg=f"密码重置错误：{str(e)}")
 
 
     def change_password(self,request,*args, **kwargs):

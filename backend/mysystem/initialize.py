@@ -75,11 +75,12 @@ class Initialize:
             {"id": "6", "name": "保存", "value": "Save"},
             {"id": "7", "name": "导出", "value": "Export"},
             {"id": "8", "name": "导入", "value": "Import"},
-            {"id": "9", "name": "修改密码", "value": "ChangePass"},
-            {"id": "10", "name": "禁用", "value": "Disable"},
-            {"id": "11", "name": "日志", "value": "Logs"},
-            {"id": "12", "name": "移动", "value": "Move"},
-            {"id": "13", "name": "设置状态", "value": "SetStatus"},
+            {"id": "9", "name": "重置密码", "value": "ResetPass"},
+            {"id": "10", "name": "修改密码", "value": "ChangePass"},
+            {"id": "11", "name": "禁用", "value": "Disable"},
+            {"id": "12", "name": "日志", "value": "Logs"},
+            {"id": "13", "name": "移动", "value": "Move"},
+            {"id": "14", "name": "设置状态", "value": "SetStatus"},
         ]
         self.save(Button, self.button_data, "权限表标识")
 

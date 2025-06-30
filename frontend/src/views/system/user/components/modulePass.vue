@@ -1,22 +1,26 @@
 <template>
-    <ly-dialog :title="titleMap[mode]" v-model="visible" width="500px" destroy-on-close @closed="emits('closed')">
+    <ly-dialog :title="titleMap[mode]" v-model="visible" width="568px" destroy-on-close @closed="emits('closed')">
         <el-form :model="formData" :rules="rules" :disabled="mode=='detail'" ref="dialogForm" label-width="auto">
-            <el-form-item label="角色名称" prop="name">
-                <el-input v-model="formData.name" placeholder="请输入角色名称" clearable></el-input>
+            <el-form-item label="新密码" prop="password">
+                <el-input
+                v-model="formData.password"
+                type="password"
+                show-password
+                placeholder="请输入新密码"
+                />
             </el-form-item>
-            <el-form-item label="权限字符" prop="key">
-                <el-input v-model="formData.key" placeholder="请输入权限标识，如：admin" clearable></el-input>
-            </el-form-item>
-            <el-form-item label="排序" prop="sort">
-                <el-input-number v-model="formData.sort" controls-position="right" :min="1" style="width: 100%;"></el-input-number>
-            </el-form-item>
-            <el-form-item label="状态" prop="status">
-                <el-switch v-model="formData.status" inline-prompt active-text="启用" inactive-text="禁用"></el-switch>
+            <el-form-item label="确认密码" prop="confirmPassword">
+                <el-input
+                v-model="formData.confirmPassword"
+                type="password"
+                show-password
+                placeholder="请再次输入新密码"
+                />
             </el-form-item>
         </el-form>
         <template #footer>
             <el-button @click="visible=false">取 消</el-button>
-            <el-button v-if="mode!='detail'" type="primary" :loading="isSaveing" @click="submit()">保 存</el-button>
+            <el-button v-if="mode!='detail'" type="primary" :loading="isSaveing" @click="submit()">确 定</el-button>
         </template>
     </ly-dialog>
 </template>
@@ -34,6 +38,7 @@
 
     let mode = ref("add")
     const titleMap = {
+        pass:"重置密码",
         add: '新增',
         edit: '编辑',
         detail: '查看'
@@ -44,48 +49,42 @@
     
     // 表单数据
     let formData = ref({
-        key: "",
-        name: "",
-        sort: 1,
-        status: true,
+        password:"",
+        confirmPassword: "",
     })
     
     // 验证规则
     let rules = {
-        sort: [
-            {required: true, message: '请输入排序', trigger: 'change'}
-        ],
-        name: [
-            {required: true, message: '请输入角色名称'}
-        ],
-        key: [
-            {required: true, message: '请输入权限字符'}
-        ]
+        password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+        confirmPassword: [{required: true, message: '请输入确认密码', trigger: 'blur' }],
     }
     
+    
     // 方法
-    const handleOpen = (item = null,modeType = 'add') => {
+    const handleOpen = (item = null,modeType = 'pass') => {
         mode.value = modeType
         visible.value = true
         if(item){
-            formData.value = deepClone(item)
+            formData.value.id = deepClone(item).id
         }
     }
+    
     
     const submit = () => {
         dialogForm.value.validate(async (valid) => {
             if (valid) {
-                isSaveing.value = true
-                let apiObj = crudOptions.value.request.add
-                if(mode.value == "edit"){
-                    apiObj = crudOptions.value.request.edit
+                if (formData.value.password !== formData.value.confirmPassword) {
+                    ElMessage.error('两次输入的密码不一致')
+                    return
                 }
+                isSaveing.value = true
+                let apiObj = crudOptions.value.request.resetPass
                 const res = await apiObj(formData.value)
                 isSaveing.value = false
                 if(res.code == 2000) {
                     emits('refreshData')
                     visible.value = false
-                    ElMessage.success("操作成功")
+                    ElMessage.success("设置成功")
                 } else {
                     ElMessageBox.alert(res.msg, "提示", {type: 'error'})
                 }

@@ -24,6 +24,7 @@
         :show-close="false"
         @closed="closed"
         ref="lyDialogRef"
+        :body-class="`lybody-padding-${bodyPadding}`"
         >
         <template #header="{ close, titleId, titleClass }">
             <div>
@@ -52,7 +53,7 @@
 </template>
   
 <script setup>
-    import { ref,watch,onMounted,computed,onUnmounted } from 'vue';
+    import { ref,watch,onMounted,computed } from 'vue';
     import { useSiteThemeStore } from "@/store/siteTheme";
     import 'element-plus/es/components/dialog/style/css'
     const emits = defineEmits(['closed','onChangeFullScreen'])
@@ -113,7 +114,7 @@
         },
         bodyPadding: {
             type: Number,
-            default: 20
+            default: 20,
         },
         beforeClose:Function// 关闭回调函数
     });
@@ -146,16 +147,6 @@
         screeFull.value = props.fullscreen
         visible.value = props.modelValue
         emits('onChangeFullScreen',screeFull.value)
-        // 动态设置样式
-        document.documentElement.style.setProperty(
-            '--lydialog-body-padding', 
-            props.bodyPadding + 'px'
-        );
-    })
-
-    onUnmounted(()=>{
-        // 清理样式
-        document.documentElement.style.removeProperty('--lydialog-body-padding');
     })
 
     watch(()=>props.modelValue,(nval)=>{
@@ -189,9 +180,6 @@
     }
     .ly-dialog__headerbtn button:hover .el-dialog__close {
         color: var(--el-color-primary);
-    }
-    .ly-dialog:deep(.el-dialog) .el-dialog__body {
-        padding: var(--lydialog-body-padding, 20px);
     }
     .ly-dialog:deep(.el-dialog).is-fullscreen {
         display: flex;

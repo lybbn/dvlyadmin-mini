@@ -18,5 +18,7 @@ api.export = (queryParams,params) => ajaxDownloadExcel({url: `/api/system/user/e
 api.import = params => uploadFileParams({url: `/api/system/user/import_data/`,params})
 // 用户管理 -- 下载导入模板
 api.downloadTemplate = params => downloadFile({url: `/api/system/user/download_template/`,params})
+// 用户管理 -- 编辑
+api.resetPass = params => ajaxPut({url: `/api/system/user/reset_password/`,params})
 
 export default api

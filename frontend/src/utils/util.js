@@ -14,6 +14,16 @@ const { toClipboard } = useClipboard();
 import { MsgError, MsgOk,MsgWarn } from '@/utils/message';
 import Api from '@/api/api';
 
+export function safeDelete(obj, key) {
+	try {
+		if (obj && typeof obj === 'object') {
+			delete obj[key]
+		}
+	} catch (e) {
+		console.warn('删除属性失败:', e)
+	}
+}
+
 //拷贝文字
 export const copyText = async function (content) {
     try {

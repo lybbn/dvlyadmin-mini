@@ -43,7 +43,9 @@ urlpatterns = [
     re_path('dept/set_status/', DeptViewSet.as_view({'post': 'set_status'})),
     re_path('role/set_status/', RoleViewSet.as_view({'post': 'set_status'})),
     re_path('user/set_status/', UserViewSet.as_view({'post': 'set_status'})),
-
+    
+    re_path('user/reset_password/(?P<pk>.*?)/', UserViewSet.as_view({'put': 'reset_password'})),
+    
     re_path('role_id_to_menu/(?P<pk>.*?)/', RoleViewSet.as_view({'get': 'roleId_to_menu'})),
     re_path('role_permission/save_permission/', RolePermissionViewSet.as_view({'post': 'save_permission'})),
     
