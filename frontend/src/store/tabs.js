@@ -73,6 +73,12 @@ export const useTabsStore = defineStore('tabs', () => {
         }
     }
 
+    // 清除缓存
+    const clearCache = () => {
+        tabsList.value = []
+        activeTab.value = ""
+    }
+
     return {
         tabsList,
         activeTab,

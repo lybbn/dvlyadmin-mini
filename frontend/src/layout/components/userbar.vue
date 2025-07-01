@@ -162,7 +162,7 @@
 				cancelButtonText: '取消',
 				type: 'warning'
 			}).then(() => {
-				autoStorage.clear()
+				autoStorage.clearAll()
 				router.push('/login')
 				ElMessage.success('已退出登录!')
 			})

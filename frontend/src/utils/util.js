@@ -85,6 +85,10 @@ export const autoStorage = {
         appConfig.STORAGE_METHOD === "localStorage" ? window.localStorage.clear():window.sessionStorage.clear()
 		Cookies.remove('logintoken');
 	},
+	clearAll(){
+		window.localStorage.clear()
+		window.sessionStorage.clear()
+	}
 }
 
 export const getToken = function(key = 'logintoken') {

@@ -1,9 +1,9 @@
 <template>
     <ly-dialog :title="titleMap[mode]" v-model="visible" width="568px" destroy-on-close @closed="emits('closed')">
         <el-form :model="formData" :rules="rules" :disabled="mode=='detail'" ref="dialogForm" label-width="auto">
-            <el-form-item label="新密码" prop="password">
+            <el-form-item label="新密码" prop="newPassword">
                 <el-input
-                v-model="formData.password"
+                v-model="formData.newPassword"
                 type="password"
                 show-password
                 placeholder="请输入新密码"
@@ -49,13 +49,13 @@
     
     // 表单数据
     let formData = ref({
-        password:"",
+        newPassword:"",
         confirmPassword: "",
     })
     
     // 验证规则
     let rules = {
-        password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+        newPassword: [{required: true, message: '请输入密码', trigger: 'blur'}],
         confirmPassword: [{required: true, message: '请输入确认密码', trigger: 'blur' }],
     }
     
@@ -73,7 +73,7 @@
     const submit = () => {
         dialogForm.value.validate(async (valid) => {
             if (valid) {
-                if (formData.value.password !== formData.value.confirmPassword) {
+                if (formData.value.newPassword !== formData.value.confirmPassword) {
                     ElMessage.error('两次输入的密码不一致')
                     return
                 }

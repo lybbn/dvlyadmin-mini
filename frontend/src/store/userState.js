@@ -5,6 +5,7 @@ import XEUtils from "xe-utils";
 import {dynamicRoutes} from '@/router/routes.js';
 import { generateLocalRoutes,initRoutes } from '@/utils/routeGenerator'
 import { useKeepAliveStore } from "@/store/keepAlive";
+import { ElMessage } from 'element-plus';
 
 export const useUserState = defineStore('userState', {
 	state:() => {
@@ -168,6 +169,10 @@ export const useUserState = defineStore('userState', {
                 let tmpdata = this.transformMenuToRoutes(res.data)
                 this.permissions.menus = res.data
                 this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: true })
+                await this.updateDynamicRoutes(router)
+            }else{
+                this.permissions.menus = []
+                this.menus = []
                 await this.updateDynamicRoutes(router)
             }
         },
