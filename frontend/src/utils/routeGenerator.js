@@ -66,3 +66,19 @@ async function setFilterRoute(router,dRoutes=dynamicRoutes) {
     filterRoute = withAutoBreadcrumb(filterRoute)
 	return filterRoute;
 }
+
+// 重置动态路由
+export async function resetDynamicRoutes(router) {
+    const routes = router.getRoutes();
+    
+    routes.forEach(route => {
+        // 确保满足所有条件再删除
+        if (route.name && route.meta?.isDynamic) {
+            try {
+                router.removeRoute(route.name);
+            } catch (err) {
+                console.warn(`删除路由失败: ${route.name}`, err);
+            }
+        }
+    });
+}

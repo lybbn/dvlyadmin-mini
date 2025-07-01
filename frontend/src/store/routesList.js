@@ -14,5 +14,5 @@ export const useRoutesList = defineStore('routesList', {
 		setRoutesList(data) {
 			this.routesList = data;
 		},
-	},
+	}
 });

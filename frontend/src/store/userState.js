@@ -3,9 +3,8 @@ import Api from '@/api/api'
 import config from '@/config'
 import XEUtils from "xe-utils";
 import {dynamicRoutes} from '@/router/routes.js';
-import { generateLocalRoutes,initRoutes } from '@/utils/routeGenerator'
+import { generateLocalRoutes,initRoutes,resetDynamicRoutes } from '@/utils/routeGenerator'
 import { useKeepAliveStore } from "@/store/keepAlive";
-import { ElMessage } from 'element-plus';
 
 export const useUserState = defineStore('userState', {
 	state:() => {
@@ -45,10 +44,6 @@ export const useUserState = defineStore('userState', {
             let pcode = `${menuName}:${buttonCode}`
             return state.permissions.buttons.includes(pcode)
         },
-        // 获取列权限
-        getColumnPermission: (state) => (tableName, columnName) => {
-            return state.permissions.columns[tableName]?.[columnName] || 'write' // 默认可写
-        }
     },
 	actions: {
 		/**
@@ -73,6 +68,13 @@ export const useUserState = defineStore('userState', {
                 }
             })
         },
+        getComponentPath(component) {
+            if (typeof component !== 'function') return null;
+
+            // 匹配动态导入的路径
+            const match = component.toString().match(/import\(["'](.*)["']\)/);
+            return match ? match[1] : null;
+        },
         /**
          * 转换后端菜单为路由配置
          * @param {Array} menus 后端菜单数据
@@ -96,6 +98,7 @@ export const useUserState = defineStore('userState', {
                         hidden : !menu.visible,
                         requiresAuth: true,
                         isKeepAlive:menu.cache,
+                        isDynamic:true,
                         affix:false,//默认全部为非固定，如果要固定则可扩展或反馈dvlyadmin-mini的作者lybbn
                     }
                 }
@@ -141,6 +144,7 @@ export const useUserState = defineStore('userState', {
                         route.redirect = `${route.path}/${route.children[0].path}`
                     }
                 }
+                route.meta.componentPath = this.getComponentPath(route.component)
                 return route
             })
         },
@@ -150,6 +154,8 @@ export const useUserState = defineStore('userState', {
          */
         async updateDynamicRoutes(router) {
             try {
+                // 清理旧路由
+                resetDynamicRoutes(router)
                 dynamicRoutes[0].children = this.menus
                 let newdynamicRoutes = dynamicRoutes
                 await initRoutes(router,newdynamicRoutes)

@@ -9,6 +9,10 @@ from rest_framework.permissions import BasePermission
 
 from config import IS_DEMO
 
+from mysystem.models import RoleMenuButtonPermission
+
+from django.db.models import F
+
 
 def ValidationApi(reqApi, validApi):
     """
@@ -59,13 +63,13 @@ class CustomPermission(BasePermission):
         if request.user.is_superuser:
             return True
         else:
-            # api = request.path  # 当前请求接口
-            # method = request.method  # 当前请求方法
             methodList = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
             method = methodList.index(method)
             if not hasattr(request.user, "role"):
                 return False
-            userApiList = request.user.role.values('permission__api', 'permission__method')  # 获取当前用户的角色拥有的所有接口
+            role_id_list = request.user.role.values_list('id', flat=True)
+            userApiList = RoleMenuButtonPermission.objects.filter(role__in=role_id_list).values(
+                permission__api=F('menu_button__api'), permission__method=F('menu_button__method'))  # 获取当前用户的角色拥有的所有接口
             for item in userApiList:
                 valid = ValidationApi(api, item.get('permission__api'))
                 if valid and (method == item.get('permission__method')):

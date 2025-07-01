@@ -31,6 +31,7 @@
             siteThemeStore.setMenuHeaderColor01(menuHeaderColor01)
             siteThemeStore.setMenuHeaderColor02(menuHeaderColor02)
         }
+
     })
 
     // 监听宽度变化，更新全局 CSS 变量

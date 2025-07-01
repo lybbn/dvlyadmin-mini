@@ -102,6 +102,8 @@ class DataLevelPermissionsFilter(BaseFilterBackend):
 
         api = request.path  # 当前请求的URL路径
         method = request.method  # 当前HTTP请求方法
+        methodList = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
+        method = methodList.index(method)
         re_api = api  # 默认使用原始路径
 
         # 从URL参数中提取主键`pk`（如果存在）
@@ -113,6 +115,7 @@ class DataLevelPermissionsFilter(BaseFilterBackend):
         # 先匹配接口数据权限，如果按钮接口配置了数据权限优先处理
         menu_button_ids = []
         menu_ids = []
+
         menu_button_data = MenuButton.objects.filter(api=re_api, method=method).values_list('id', 'menu_id', named=True)
         if menu_button_data:
             menu_button_ids = [item.id for item in menu_button_data]

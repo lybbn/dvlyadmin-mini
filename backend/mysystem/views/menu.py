@@ -5,7 +5,7 @@
 """
 from rest_framework import serializers
 
-from mysystem.models import Menu, MenuButton, Button
+from mysystem.models import Menu, MenuButton, Button,RoleMenuPermission
 from mysystem.views.menu_button import MenuButtonSerializer
 from utils.jsonResponse import SuccessResponse,DetailResponse,ErrorResponse
 from utils.serializers import CustomModelSerializer
@@ -138,7 +138,8 @@ class MenuViewSet(CustomModelViewSet):
         if user.is_superuser:
             queryset = self.queryset.filter(status=True).order_by("sort")
         else:
-            menuIds = user.role.values_list('menu__id', flat=True)
+            role_ids = user.role.values_list('id', flat=True)
+            menuIds  = RoleMenuPermission.objects.filter(role__in=role_ids).values_list('menu_id', flat=True)
             queryset = self.filter_queryset(Menu.objects.filter(id__in=menuIds, status=True))
         serializer = WebRouterSerializer(queryset, many=True, request=request)
         return DetailResponse(data=serializer.data, msg="获取成功")

@@ -6,8 +6,8 @@ import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/display.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import lyIntall from './lycustom.js'
-import router from './router'
 import store from './store'
+import router from './router'
 import i18n from './locales/index.js'
 import registerSvgIcon from '@/components/icons/index.js'
 //引入注册脚本
@@ -39,3 +39,5 @@ app.use(router);
 // app.use(directivePlugin)
 
 app.mount('#app')
+
+

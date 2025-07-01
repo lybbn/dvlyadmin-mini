@@ -1,7 +1,7 @@
 import {createRouter, createWebHashHistory} from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import {staticRoutes,dynamicRoutes} from './routes';
+import {staticRoutes,dynamicRoutes,CustomStaticRoutes,NotFound,RedirectRoute} from './routes';
 import config from "@/config/index";
 import {getToken,autoStorage} from '@/utils/util'
 import {storeToRefs} from 'pinia';
@@ -10,6 +10,7 @@ import {ElNotification} from "element-plus"
 import { cancelRequestState } from "@/store/cancelRequest";
 import { useUserState } from "@/store/userState";
 import { useTabsStore } from '@/store/tabs'
+import { withAutoBreadcrumb } from '@/router/autoBreadcrumb.js'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -19,7 +20,18 @@ const router = createRouter({
 //设置标题
 document.title = config.APP_TITLE
 
+//加载注册缓存后台路由
+await updateDynamicRoutes()
+
 router.beforeEach(async (to, from, next) => {
+    // 处理根路径重定向
+    if (to.path === '/') {
+        // 检查是否是从/home来的重定向
+        if (from.path === '/home') {
+            return next(false) // 取消导航，避免循环
+        }
+        return next('/home') // 正常重定向
+    }
     NProgress.configure({ showSpinner: false });
     if (to.meta.title) NProgress.start();
     
@@ -31,14 +43,8 @@ router.beforeEach(async (to, from, next) => {
 
     // 1. 处理登录页面的特殊情况
     if (to.path === '/login') {
-        if (token) {
-            // 已登录却访问登录页，重定向到首页
-            NProgress.done();
-            return next('/home');
-        }
-        // 未登录访问登录页，直接放行
         NProgress.done();
-        return next();
+        return token ? next('/home') : next();
     }
     
     // 2. 处理未认证情况
@@ -47,10 +53,7 @@ router.beforeEach(async (to, from, next) => {
         NProgress.done();
         // 如果需要认证且没有token，重定向到登录页
         let mustAuth = (to.meta?.requireAuth || to.name == "notFound" || to.name == undefined) ? true :false
-        if (mustAuth) {
-            return next(`/login`);
-        }
-        return next();
+        return mustAuth ? next('/login') : next();
     }
     const storesRoutesList = useRoutesList();
     const { routesList } = storeToRefs(storesRoutesList);
@@ -65,19 +68,23 @@ router.beforeEach(async (to, from, next) => {
             await userState.getSystemWebRouter(router);
             isGetBackendRoute = true
         }
-
         // 检查目标路由是否存在
-        const hasRoute = router.getRoutes().some(r => 
-        r.path === to.path || 
-        (r.name && r.name === to.name && to.name != "notFound")
-        );
+        const hasRoute = checkRouteExists(router, to);
         // 处理首页特殊情况
         if (to.path === '/home') {
-            const hasHome = router.getRoutes().some(r => r.path === '/home' && to.name != "notFound");
+            const hasHome = router.getRoutes().some(r => {
+                // 检查路径是否包含 '/home'（包括子路由）
+                const pathMatches  =  r.path == '/home' ? true : false;
+                // 检查名称条件
+                const nameCondition = to.name !== "notFound";
+                return pathMatches && nameCondition;
+            });
             if (!hasHome) {
                 const firstRoute = getFirstMenuRoutePath(routesList.value);
                 NProgress.done();
-                return firstRoute ? next(firstRoute) : next('/404');
+                // 确保不会重定向回/home
+                const target = firstRoute && firstRoute !== '/home' ? firstRoute : '/404';
+                return next(target)
             }
         }
         // 如果路由不存在
@@ -95,7 +102,7 @@ router.beforeEach(async (to, from, next) => {
             const retryHasRoute = router.getRoutes().some(r => r.path === to.path);
             return retryHasRoute ? next() : next('/404');
         }
-
+        
         next();
     } catch (error) {
         console.error('路由守卫错误:', error);
@@ -104,58 +111,75 @@ router.beforeEach(async (to, from, next) => {
     }
 });
 
-// router.beforeEach(async (to, from, next) => {
-//     NProgress.configure({showSpinner: false});
-//     if (to.meta.title) NProgress.start();
-//     const cancelReques = cancelRequestState();
-//     cancelReques.clearAllCancelToken()
-//     //动态标题
-// 	//document.title = to.meta.title ? `${to.meta.title} - ${config.APP_TITLE}` : `${config.APP_TITLE}`
-//     const token = getToken()
-//     if (to.path === '/login' && !token) {
-//         next();
-//         NProgress.done();
-//     } else {
-//         if (!token && to.meta.requireAuth) {
-//             next(`/login`);
-//             autoStorage.clear();
-//             NProgress.done();
-//         } else if (token && to.path === '/login') {
-//             next('/home');
-//             NProgress.done();
-//         } else if(!token){
-//             next(`/login`);
-//             autoStorage.clear();
-//             NProgress.done();
-//         }else {
-//             const storesRoutesList = useRoutesList();
-//             const {routesList} = storeToRefs(storesRoutesList);
-//             if (routesList.value.length === 0) {
-//                 let userState = useUserState()
-//                 await userState.getSystemWebRouter(router);
-//                 if (to.path === '/home') {//避免没有home首页时，跳转到第一个可用路由
-//                     const hasHomePath = userState.permissions.menus.some(route => route.web_path === '/home');
-//                     if (!hasHomePath) {
-//                         // 跳转到第一个路由
-//                         const firstRoute = getFirstMenuRoutePath(routesList.value)
-//                         return next(firstRoute); // 重定向到第一个路由
-//                     }
-//                 }
-//                 next({...to, replace: true});
-//             } else {
-//                 if (to.path === '/home') {//避免没有home首页时，跳转到第一个可用路由
-//                     const hasHomePath = router.getRoutes().some(route => route.path === '/home');
-//                     if (!hasHomePath) {
-//                         // 跳转到第一个路由
-//                         const firstRoute = getFirstMenuRoutePath(routesList.value)
-//                         return next(firstRoute); // 重定向到第一个路由
-//                     }
-//                 }
-//                 next();
-//             }
-//         }
-//     }
-// })
+
+async function updateDynamicRoutes() {
+    let userState = sessionStorage.getItem('userState') || null
+    let jsonUserState = userState?JSON.parse(userState) : null
+    let menus = jsonUserState?jsonUserState?.menus : null
+    if(menus){
+        
+        dynamicRoutes[0].children = transformMenuComponents(menus)
+        let newdynamicRoutes = dynamicRoutes
+        await initRoutes(router,newdynamicRoutes)
+    }
+}
+
+/**
+ * 将菜单数据中的 componentPath 转换为动态导入的 component
+ * @param {Array} menus - 本地存储的菜单数据（含 componentPath）
+ * @returns {Array} - 转换后的菜单数据（含 component 动态导入）
+ */
+function transformMenuComponents(menus) {
+    return menus.map((menu) => {
+        // 深拷贝当前菜单项（避免污染原数据）
+        const transformedMenu = { ...menu };
+
+        // 如果有 componentPath，转换为动态导入
+        if (menu.meta?.componentPath) {
+        transformedMenu.component = () => import(/* @vite-ignore */ `${menu.meta.componentPath}`);
+        }
+
+        // 递归处理子菜单
+        if (menu.children && menu.children.length > 0) {
+        transformedMenu.children = transformMenuComponents(menu.children);
+        }
+
+        return transformedMenu;
+    });
+}
+
+export async function initRoutes(dRoutes=dynamicRoutes){
+    let newrouter = await setAddRoute(dRoutes);
+    return newrouter
+}
+
+async function setAddRoute(dRoutes=dynamicRoutes) {
+	let routeChildren = await setFilterRoute(dRoutes=dynamicRoutes)
+    routeChildren.forEach((route) => {
+		router.addRoute(route);
+	});
+    router.addRoute(RedirectRoute);
+    router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
+    
+    return router
+}
+
+//保留嵌套路由层级
+async function setFilterRoute(dRoutes=dynamicRoutes) {
+    let filterRoute = dRoutes
+	filterRoute[0].children = [...filterRoute[0].children,...CustomStaticRoutes, ...NotFound];
+    filterRoute = withAutoBreadcrumb(filterRoute)
+	return filterRoute;
+}
+
+//检查路由是否存在
+function checkRouteExists(router, to) {
+  // 精确匹配路径或名称（排除notFound）
+  return router.getRoutes().some(r => 
+    r.path === to.path || 
+    (r.name && r.name === to.name && to.name !== "notFound")
+  );
+}
 
 function getCacheActiveTab(){
     let tabsStore = useTabsStore()
@@ -164,14 +188,14 @@ function getCacheActiveTab(){
 
 function getFirstMenuRoutePath(menuList) {
     let c_tab_path = getCacheActiveTab()
-    if(c_tab_path){
+    if(c_tab_path && c_tab_path !="/404" && c_tab_path !="/500"){
         return c_tab_path
     }
     const firstMenu = findFirstAvailableMenu(menuList)
     if (firstMenu) {
         return firstMenu.path
     }
-    return '/'
+    return ''
 }
 
 // 递归查找第一个可用菜单
