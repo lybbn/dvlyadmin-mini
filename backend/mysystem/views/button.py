@@ -23,5 +23,5 @@ class ButtonViewSet(CustomModelViewSet):
     """
     按钮权限接口:
     """
-    queryset = Button.objects.all()
+    queryset = Button.objects.all().order_by("create_datetime")
     serializer_class = ButtonSerializer

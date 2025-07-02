@@ -5,7 +5,7 @@
             <!-- 右侧面板 -->
             <div class="right-panel">
                 <!-- 菜单权限卡片 -->
-                <el-card class="panel-card" shadow="hover">
+                <el-card class="panel-card" shadow="hover" >
                     <template #header>
                         <div class="card-header">
                             <div class="permission-header">
@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length" @click.stop.prevent="">
                                         <el-tag type="primary" size="small">按钮权限:</el-tag>
-                                        <el-checkbox-group v-model="data.buttonPermissionChecked" @change="(val) => handleButtonPermissonChange(data, val)" @click.stop="">
+                                        <el-checkbox-group v-model="data.buttonPermissionChecked" @change="(val) => handleButtonPermissonChange(data, val)" @click.stop="" style="padding:20px;">
                                             <el-checkbox
                                                 v-for="item in data.menu_buttons"
                                                 :key="item.id"
@@ -176,7 +176,7 @@
 <script setup name="authorityManage">
     import { ref, computed, onMounted, nextTick } from 'vue'
     import { Check, Lock, QuestionFilled } from '@element-plus/icons-vue'
-    import { ElMessage } from 'element-plus'
+    import { ElMessage,ElMessageBox } from 'element-plus'
     import {deepClone,isEmpty} from "@/utils/util.js"
     import moduleDataScope from './components/moduleDataScope.vue'
     import moduleMenuDataScope from './components/moduleMenuDataScope.vue'
@@ -563,72 +563,80 @@
             ElMessage.warning('请先选择角色')
             return
         }
-
-        saving.value = true
         try {
-            // 准备菜单权限数据
-            const menuData = XEUtils.toTreeArray(menuOptions.value)
-            let RoleMenuPermission = []
-            let RoleMenuButtonPermission = []
-            let FieldPermission = []
-            menuData.forEach(item=>{
-                if(item.checked){
-                    RoleMenuPermission.push({
-                        role:roleObj.value.id,
-                        menu:item.id,
-                        data_scope:item.data_scope,
-                        dept:item.dept
-                    })
-                }
-                item.menu_buttons.forEach(nitem=>{
-                    if(nitem.checked){
-                        RoleMenuButtonPermission.push({
+            await ElMessageBox.confirm('确定要保存吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+            saving.value = true
+            try {
+                // 准备菜单权限数据
+                const menuData = XEUtils.toTreeArray(menuOptions.value)
+                let RoleMenuPermission = []
+                let RoleMenuButtonPermission = []
+                let FieldPermission = []
+                menuData.forEach(item=>{
+                    if(item.checked){
+                        RoleMenuPermission.push({
                             role:roleObj.value.id,
-                            menu_button:nitem.id,
-                            data_scope:nitem.data_scope,
-                            dept:nitem.dept
+                            menu:item.id,
+                            data_scope:item.data_scope,
+                            dept:item.dept
                         })
+                    }
+                    item.menu_buttons.forEach(nitem=>{
+                        if(nitem.checked){
+                            RoleMenuButtonPermission.push({
+                                role:roleObj.value.id,
+                                menu_button:nitem.id,
+                                data_scope:nitem.data_scope,
+                                dept:nitem.dept
+                            })
+                        }
+                    })
+                    if(item.menu_fields && item.menu_fields.length>0){
+                        const allDisabled = item.menu_fields.every(item => 
+                            item.can_create === false && 
+                            item.can_update === false && 
+                            item.can_view === false
+                        );
+                        if(!allDisabled){//如果都为false默认表示没配置列权限
+                            item.menu_fields.forEach(fitem=>{
+                                FieldPermission.push({
+                                    role:roleObj.value.id,
+                                    field:fitem.id,
+                                    can_create:fitem.can_create,
+                                    can_update:fitem.can_update,
+                                    can_view:fitem.can_view
+                                })
+                            })
+                        }
                     }
                 })
-                if(item.menu_fields && item.menu_fields.length>0){
-                    const allDisabled = item.menu_fields.every(item => 
-                        item.can_create === false && 
-                        item.can_update === false && 
-                        item.can_view === false
-                    );
-                    if(!allDisabled){//如果都为false默认表示没配置列权限
-                        item.menu_fields.forEach(fitem=>{
-                            FieldPermission.push({
-                                role:roleObj.value.id,
-                                field:fitem.id,
-                                can_create:fitem.can_create,
-                                can_update:fitem.can_update,
-                                can_view:fitem.can_view
-                            })
-                        })
-                    }
+                // 准备角色数据
+                const roleData = {
+                    role_id:roleObj.value.id,
+                    RoleMenuPermission: RoleMenuPermission,
+                    RoleMenuButtonPermission:RoleMenuButtonPermission,
+                    FieldPermission:FieldPermission,
                 }
-            })
-            // 准备角色数据
-            const roleData = {
-                role_id:roleObj.value.id,
-                RoleMenuPermission: RoleMenuPermission,
-                RoleMenuButtonPermission:RoleMenuButtonPermission,
-                FieldPermission:FieldPermission,
-            }
-            // 保存角色权限
-            const res = await Api.apiSystemRolePermissionSave(roleData)
-            if (res.code === 2000) {
-                ElMessage.success('保存成功')
-                history.state.id = roleObj.value.id
-                fetchRoleList()
-            } else {
-                ElMessage.warning(res.msg)
+                // 保存角色权限
+                const res = await Api.apiSystemRolePermissionSave(roleData)
+                if (res.code === 2000) {
+                    ElMessage.success('保存成功')
+                    history.state.id = roleObj.value.id
+                    fetchRoleList()
+                } else {
+                    ElMessage.warning(res.msg)
+                }
+            } catch (error) {
+                ElMessage.error('保存权限失败')
+            } finally {
+                saving.value = false
             }
         } catch (error) {
-            ElMessage.error('保存权限失败')
-        } finally {
-            saving.value = false
+            // console.log('用户取消保存', error);
         }
     }
 </script>
@@ -689,10 +697,7 @@
     }
 
     .right-panel {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        width:100%;
     }
 
     .panel-card {
@@ -749,11 +754,12 @@
     .tree-scroll-container {
         width: 100%;
         height: 100%;
+        overflow:auto;
         
         /* 关键样式 - 使滚动容器可以水平滚动 */
         :deep(.el-scrollbar__wrap) {
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-x: auto !important;
+            overflow-y: auto !important;
         }
         
         :deep(.el-scrollbar__view) {
@@ -807,7 +813,6 @@
     .button-permissions {
         display: flex;
         align-items: center;
-        gap: 8px;
         padding-left: 24px;
     }
 

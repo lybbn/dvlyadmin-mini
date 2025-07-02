@@ -41,10 +41,10 @@
                                     <span class="node-label">{{ node.label }}</span>
                                     <div class="actions">
                                         <el-button link type="info" size="small" @click.stop="">排序({{ data.sort }})</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="editMenu(data)">编辑</el-button>
-                                        <el-button link type="danger" size="small" @click.stop="deleteMenu(data)">删除</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="moveUp(data)">上移</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="moveDown(data)">下移</el-button>
+                                        <el-button link type="primary" size="small" @click.stop="editMenu(data)" v-auth="'Update'">编辑</el-button>
+                                        <el-button link type="danger" size="small" @click.stop="deleteMenu(data)" v-auth="'Delete'">删除</el-button>
+                                        <el-button link type="primary" size="small" @click.stop="moveUp(data)" v-auth="'Move'">上移</el-button>
+                                        <el-button link type="primary" size="small" @click.stop="moveDown(data)" v-auth="'Move'">下移</el-button>
                                     </div>
                                     </span>
                                 </span>
@@ -65,7 +65,7 @@
                         <el-tabs v-model="activeTab" :stretch="isMobile" @tab-change="handlePMChage">
                             <!-- 按钮权限 -->
                             <el-tab-pane label="按钮权限配置" name="button">
-                                <el-button type="primary" icon="Plus" @click="openButtonDialog">添加按钮权限</el-button>
+                                <el-button type="primary" icon="Plus" @click="openButtonDialog" v-auth="'MenuButtonCreate'">添加按钮权限</el-button>
                                 <el-button type="primary" @click="buttonBatchCreate">批量生成</el-button>
                                 <el-button @click="getMenuButtonList" circle icon="refresh"></el-button>
                                 <el-table :data="menuButtonList" row-key="id" border stripe style="margin-top: 10px;" v-loading="isMenuButtonListLoading">
@@ -84,8 +84,8 @@
                                     </el-table-column>
                                     <el-table-column label="操作" width="150">
                                         <template #default="scope">
-                                            <el-button link type="primary" @click="editButton(scope.row)">编辑</el-button>
-                                            <el-button link type="danger" @click="deleteButton(scope.row)">删除</el-button>
+                                            <el-button link type="primary" @click="editButton(scope.row)" v-auth="'MenuButtonUpdate'">编辑</el-button>
+                                            <el-button link type="danger" @click="deleteButton(scope.row)" v-auth="'MenuButtonDelete'">删除</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -93,7 +93,7 @@
 
                             <!-- 列权限 -->
                             <el-tab-pane label="列权限配置" name="column">
-                                <el-button type="primary" icon="Plus" @click="openColumnDialog">添加列权限</el-button>
+                                <el-button type="primary" icon="Plus" @click="openColumnDialog" v-auth="'MenuFieldCreate'">添加列权限</el-button>
                                 <el-button type="primary" @click="FeildBatchCreate">自动生成</el-button>
                                 <el-button @click="getMenuFieldList" circle icon="refresh"></el-button>
                                 <el-table :data="menuFieldList" row-key="id" border stripe style="margin-top: 10px;" v-loading="loadingMenuField">
@@ -107,8 +107,8 @@
                                     <el-table-column prop="title" label="字段显示名" min-width="150" />
                                     <el-table-column label="操作" width="150">
                                         <template #default="scope">
-                                            <el-button link type="primary" @click="editColumn(scope.row)">编辑</el-button>
-                                            <el-button link type="danger" @click="deleteColumn(scope.row)">删除</el-button>
+                                            <el-button link type="primary" @click="editColumn(scope.row)" v-auth="'MenuFieldDelete'">编辑</el-button>
+                                            <el-button link type="danger" @click="deleteColumn(scope.row)" v-auth="'MenuFieldDelete'">删除</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -217,7 +217,7 @@
                                     :value="item.name">
                                 </el-option>
                             </el-select>
-                            <el-button type="primary" circle style="margin-left: 20px"  @click="addMenuButtonTemplateTable"><el-icon><circle-plus /></el-icon></el-button>
+                            <el-button type="primary" v-auth="'ButtonCreate'" circle style="margin-left: 20px"  @click="addMenuButtonTemplateTable"><el-icon><circle-plus /></el-icon></el-button>
                         </el-form-item>
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
