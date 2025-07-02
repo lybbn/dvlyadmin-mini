@@ -36,3 +36,15 @@ LOGIN_ERROR_RETRY_TIMES = 0 #登录错误次数限制，0表示不限制
 LOGIN_ERROR_RETRY_TIMEOUT = 60 #登录错误次数过期时间，单位秒
 FRONTEND_API_LIST = ['/api/app/','/api/xcx/','/api/h5/']#微服务前端接口前缀
 DOMAIN_HOST = "http://127.0.0.1:8000"#控制图片上传后保存所使用到的url前缀
+
+#自定义接口权限
+CUSTOM_PERMISSION_CAHCE = False #是否启用权限缓存，增强性能
+CUSTOM_PERMISSION_CAHCE_TIME = 60 * 60 #缓存时间 1 小时
+CUSTOM_PERMISSION_WHITELIST = {
+    ('/api/system/menu/web_router/', 'GET'),
+    ('/api/system/menu_button/menu_button_permission/', 'GET'),
+}
+
+#自定义数据权限
+DATA_FILTER_CACHE = False #是否启用数据权限缓存，增强性能
+DATA_FILTER_CAHCE_TIME = 60 * 60 #缓存时间 1 小时

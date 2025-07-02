@@ -131,7 +131,7 @@ class MenuViewSet(CustomModelViewSet):
         serializer = MenuTreeSerializer(queryset, many=True)
         return SuccessResponse(data=serializer.data, msg="获取成功")
 
-    # @action(methods=['get'],extra_filter_backends=[],detail=False)#会自动生成/api/system/menu/web_router/的路由
+    # @action(methods=['get'],extra_filter_backends=[],detail=False,step_permission=True)#会自动生成/api/system/menu/web_router/的路由
     def web_router(self, request):
         """用于前端获取当前角色的路由"""
         user = request.user

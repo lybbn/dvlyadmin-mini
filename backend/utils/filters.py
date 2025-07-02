@@ -15,22 +15,25 @@ import operator
 from functools import reduce
 from django.db.models import Q
 from django.core.cache import cache
+from config import DATA_FILTER_CACHE,DATA_FILTER_CAHCE_TIME
 
 def get_dept_children_ids(dept_id, include_self=False):
     """
     获取部门的所有子部门ID(包括自身可选)
     使用缓存优化性能，递归获取所有层级子部门
     """
-    
-    cache_key = f'lyadmin_mini_dept_children:{dept_id}'
-    result = cache.get(cache_key)
+    result = None
+    if DATA_FILTER_CACHE:
+        cache_key = f'lyadmin_mini_dept_children:{dept_id}'
+        result = cache.get(cache_key)
     
     if result is None:
         # 获取所有部门数据，避免多次查询
         dept_all_list = list(Dept.objects.filter(status=True).values('id', 'parent_id'))
         # 递归获取所有子部门
         result = _get_dept_children_recursive(dept_id, dept_all_list)
-        cache.set(cache_key, result, timeout=3600)
+        if DATA_FILTER_CACHE:
+            cache.set(cache_key, result, timeout=DATA_FILTER_CAHCE_TIME)
     
     if not include_self:
         result = [id for id in result if id != dept_id]
