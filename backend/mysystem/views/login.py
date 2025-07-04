@@ -114,6 +114,8 @@ class LoginView(CustomAPIView):
         if user and user.check_password(password):  # check_password() 对明文进行加密,并验证
             data = LoginSerializer.get_token(user)
             msg="登录成功"
+            user.last_login = datetime.now()
+            user.save()
             save_login_log(request=request,status=True,msg=msg)
             # 缓存用户的jwt token
             if IS_SINGLE_TOKEN:

@@ -22,7 +22,9 @@ Api.systemUserUserInfo= params => ajaxGet({url: `/api/system/user/user_info/`,pa
 // 更新修改当前个人用户信息
 Api.systemUserUserInfoEdit= params => ajaxPut({url: `/api/system/user/user_info/`,params})
 // 用户重置个人密码
-Api.systemUserChangePassword= params => ajaxPut({url: `/api/system/user/change_password/`,params})
+Api.systemUserChangePassword= params => ajaxPost({url: `/api/system/user/change_password/`,params})
+// 用户修改头像
+Api.systemUserChangeAvatar= params => ajaxPost({url: `/api/system/user/change_avatar/`,params})
 
 /**
  *菜单管理
@@ -107,5 +109,17 @@ Api.apiSystemRolePermissionSave = params => ajaxPost({url: `/api/system/role_per
 
 // 用户管理 - 列表
 Api.apiSystemUser = params => ajaxGet({url: `/api/system/user/`,params})
+
+/**
+ *日志管理
+ * */
+// 日志管理 查询
+Api.systemOperationlog= params => ajaxGet({url: `/api/system/operation_log/`,params})
+// 日志管理 自己的操作日志
+Api.systemGetOwnerLogs= params => ajaxGet({url: `/api/system/operation_log/getOwnerLogs/`,params})
+// 日志管理 删除
+Api.systemOperationlogDelete= params => ajaxDelete({url: `/api/system/operation_log/`,params})
+// 日志管理 清空全部日志
+Api.systemOperationlogDeletealllogsDelete= params => ajaxDelete({url: `/api/system/operation_log/deletealllogs/`,params})
 
 export default Api

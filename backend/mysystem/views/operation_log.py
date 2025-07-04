@@ -3,7 +3,7 @@
 """
 @Remark: 操作日志管理
 """
-
+from rest_framework import serializers
 from mysystem.models import OperationLog
 from utils.serializers import CustomModelSerializer
 from utils.viewset import CustomModelViewSet
@@ -37,22 +37,11 @@ class OperationLogSerializer(CustomModelSerializer):
     """
     操作日志-序列化器
     """
-
+    
     class Meta:
         model = OperationLog
         fields = "__all__"
         read_only_fields = ["id"]
-
-
-class OperationLogCreateUpdateSerializer(CustomModelSerializer):
-    """
-    操作日志  创建/更新时的列化器
-    """
-
-    class Meta:
-        model = OperationLog
-        fields = '__all__'
-
 
 class OperationLogViewSet(CustomModelViewSet):
     """
@@ -67,7 +56,7 @@ class OperationLogViewSet(CustomModelViewSet):
     serializer_class = OperationLogSerializer
     # filterset_fields = '__all__'
     filterset_class = OperationLogTimeFilter
-    search_fields = ('request_modular','request_path','request_ip','request_os','request_body')
+    search_fields = ('req_modular','req_path','req_ip','req_os','req_body')
 
     def deletealllogs(self,request):
         user = request.user

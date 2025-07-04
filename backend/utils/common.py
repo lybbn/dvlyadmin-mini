@@ -31,6 +31,10 @@ REGEX_MOBILE = r"^1[356789]\d{9}$|^147\d{8}$|^176\d{8}$"
 #身份证正则
 IDCARD_MOBILE = r"^[1-9]\d{5}(18|19|20|(3\d))\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$"
 
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.fullmatch(pattern, email))
+
 #微信GMT+8 转换成标准时间字符串
 def format_wechat_gmt_8_to_normal(wgmt8):
     """

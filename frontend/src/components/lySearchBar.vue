@@ -40,7 +40,7 @@
                             v-auth="'Search'"
                         >重置</el-button>
                     </slot>
-
+                    <slot name="actions-right"></slot>
                     <!-- 展开/收起按钮 -->
                     <el-button
                         v-if="hasOverflow"

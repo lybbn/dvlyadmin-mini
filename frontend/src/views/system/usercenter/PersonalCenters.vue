@@ -70,7 +70,7 @@
             <template #header>
               <div class="card-header">
                 <span>消息通知</span>
-                <el-button type="text" @click="gotoMessageList">查看更多</el-button>
+                <el-button link type="primary" @click="gotoMessageList">查看更多</el-button>
               </div>
             </template>
             <el-scrollbar height="250px">

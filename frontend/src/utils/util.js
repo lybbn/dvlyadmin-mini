@@ -594,3 +594,34 @@ export function extractFilenameFromHeaders(headers) {
 
 	return null;
 }
+
+/**
+ * 时间日期格式化
+ * @param dateObj 如果为字符串 则原样返回，如果为date时间对象则返回格式化后的结果
+ * @param format
+ * @returns {*}
+ */
+export const dateFormats = (dateObj, format) => {
+	if(typeof(dateObj) =='string'){
+		return dateObj
+	}
+	let date = {
+		'M+': dateObj.getMonth() + 1,
+		'd+': dateObj.getDate(),
+		'h+': dateObj.getHours(),
+		'm+': dateObj.getMinutes(),
+		's+': dateObj.getSeconds(),
+		'q+': Math.floor((dateObj.getMonth() + 3) / 3),
+		'S+': dateObj.getMilliseconds()
+	};
+	if (/(y+)/i.test(format)) {
+		format = format.replace(RegExp.$1, (dateObj.getFullYear() + '').substr(4 - RegExp.$1.length))
+	}
+	for (let k in date) {
+		if (new RegExp('(' + k + ')').test(format)) {
+			format = format.replace(RegExp.$1, RegExp.$1.length === 1
+			? date[k] : ('00' + date[k]).substr(('' + date[k]).length))
+		}
+	}
+	return format
+}

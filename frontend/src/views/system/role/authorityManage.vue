@@ -39,6 +39,7 @@
                             node-key="id"
                             default-expand-all
                             show-checkbox
+                            :highlight-current="false"
                             :check-on-click-node="false"
                             :expand-on-click-node="false"
                             :default-checked-keys="menuCheckedKeys"
@@ -74,7 +75,7 @@
                                     </div>
                                     <div class="button-permissions" v-if="data.type === 1&&data.menu_buttons && data.menu_buttons.length" @click.stop.prevent="">
                                         <el-tag type="primary" size="small">按钮权限:</el-tag>
-                                        <el-checkbox-group v-model="data.buttonPermissionChecked" @change="(val) => handleButtonPermissonChange(data, val)" @click.stop="" style="padding:20px;">
+                                        <el-checkbox-group v-model="data.buttonPermissionChecked" @change="(val) => handleButtonPermissonChange(data, val)" @click.stop="" style="padding-left:20px;padding-right:20px;">
                                             <el-checkbox
                                                 v-for="item in data.menu_buttons"
                                                 :key="item.id"
@@ -175,7 +176,7 @@
 
 <script setup name="authorityManage">
     import { ref, computed, onMounted, nextTick } from 'vue'
-    import { Check, Lock, QuestionFilled } from '@element-plus/icons-vue'
+    import { Check, Lock, QuestionFilled,ZoomIn, ZoomOut} from '@element-plus/icons-vue'
     import { ElMessage,ElMessageBox } from 'element-plus'
     import {deepClone,isEmpty} from "@/utils/util.js"
     import moduleDataScope from './components/moduleDataScope.vue'
@@ -698,6 +699,7 @@
 
     .right-panel {
         width:100%;
+        height:100%;
     }
 
     .panel-card {
@@ -771,6 +773,9 @@
     .menu-permission-tree {
         padding: 8px;
         flex: 1;
+        :deep(.el-tree-node__content){
+            height:32px;
+        }
     }
 
     .menu-node-container {

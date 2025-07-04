@@ -26,6 +26,11 @@ REDIS_URL = f'redis://:{REDIS_PASSWORD or ""}@{REDIS_HOST}:{REDIS_PORT}'
 # ================================================= #
 # ************** 服务器基本 配置  ************** #
 # ================================================= #
+
+#全局控制日志记录
+API_LOG_ENABLE = True
+API_LOG_METHODS = ['POST', 'UPDATE', 'DELETE', 'PUT']  # ['POST', 'DELETE']
+
 IS_DEMO = False #是否演示模式（演示模式只能查看无法保存、编辑、删除、新增）
 DEBUG = True #是否调试模式
 ALLOWED_HOSTS = ["*"]
@@ -43,6 +48,7 @@ CUSTOM_PERMISSION_CAHCE_TIME = 60 * 60 #缓存时间 1 小时
 CUSTOM_PERMISSION_WHITELIST = {
     ('/api/system/menu/web_router/', 'GET'),
     ('/api/system/menu_button/menu_button_permission/', 'GET'),
+    ('/api/schema/lyjson/', 'GET'),
 }
 
 #自定义数据权限

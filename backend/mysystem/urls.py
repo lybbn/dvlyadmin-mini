@@ -53,6 +53,7 @@ urlpatterns = [
     re_path('operation_log/deletealllogs/',OperationLogViewSet.as_view({'delete':'deletealllogs'})),
 
     path('user/user_info/',UserViewSet.as_view({'get':'user_info','put':'update_user_info'})),
-    re_path('user/change_password/(?P<pk>.*?)/',UserViewSet.as_view({'put':'change_password'})),
+    re_path('user/change_password/',UserViewSet.as_view({'post':'change_password'})),
+    re_path('user/change_avatar/',UserViewSet.as_view({'post':'change_avatar'})),
 ]
 urlpatterns += system_url.urls

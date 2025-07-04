@@ -584,7 +584,7 @@
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() => {
-            Api.apiSystemMenuDelete().then(res=>{
+            Api.apiSystemMenuDelete({id:data.id}).then(res=>{
                 if(res.code === 2000){
                     removeNode(menus.value, data.id)
                     selectedMenu.value = null

@@ -365,6 +365,7 @@ class Dictionary(CoreModel):
 
 
 class OperationLog(CoreModel):
+    creator_name = models.CharField(max_length=30, verbose_name="操作人", null=True, blank=True, help_text="操作人")
     req_modular = models.CharField(max_length=64, verbose_name="请求模块", null=True, blank=True, help_text="请求模块")
     req_path = models.TextField(verbose_name="请求地址", null=True, blank=True, help_text="请求地址")
     req_body = models.TextField(verbose_name="请求参数", null=True, blank=True, help_text="请求参数")

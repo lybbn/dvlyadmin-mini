@@ -154,7 +154,7 @@
 		if(command == "clearCache"){
 		}
 		else if(command == "personCenter"){
-			
+			router.push({name:"PersonalCenter"})
 		}
 		else if(command == "outLogin"){
 			ElMessageBox.confirm('退出登录, 是否继续?', '提示', {

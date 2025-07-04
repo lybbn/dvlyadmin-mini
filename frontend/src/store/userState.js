@@ -51,11 +51,10 @@ export const useUserState = defineStore('userState', {
          * @methods getSystemUserInfo
          */
         async getSystemUserInfo(){
-            Api.systemUserUserInfo().then(res => {
-                if (res.code == 2000) {
-					this.userInfo = res.data
-                }
-            })
+            const res = await Api.systemUserUserInfo()
+            if (res.code == 2000) {
+                this.userInfo = res.data
+            }
         },
         /**
          * 获取菜单按钮权限
