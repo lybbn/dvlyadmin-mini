@@ -19,6 +19,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from utils.export_import_mixin import ImportExportMixin
 from utils.field_permission import FieldPermissionMixin
+from utils.models import get_all_models_objects
 
 def get_object_or_404(queryset, *filter_args, **filter_kwargs):
     """
@@ -81,7 +82,7 @@ class CustomDjangoFilterBackend(DjangoFilterBackend):
 
         return None
 
-class CustomModelViewSet(ModelViewSet,ImportExportMixin,FieldPermissionMixin):
+class CustomModelViewSet(ModelViewSet,FieldPermissionMixin,ImportExportMixin):
     """
     自定义的ModelViewSet:
     统一标准的返回格式;新增,查询,修改可使用不同序列化器
@@ -123,6 +124,12 @@ class CustomModelViewSet(ModelViewSet,ImportExportMixin,FieldPermissionMixin):
         if action_serializer_class:
             return action_serializer_class
         return super().get_serializer_class()
+    
+    def get_serializer(self, *args, **kwargs):
+        """重写序列化器获取，自动应用字段权限"""
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        return self.apply_field_permissions(serializer_class, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, request=request)

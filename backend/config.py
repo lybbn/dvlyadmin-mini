@@ -49,8 +49,12 @@ CUSTOM_PERMISSION_WHITELIST = {
     ('/api/system/menu/web_router/', 'GET'),
     ('/api/system/menu_button/menu_button_permission/', 'GET'),
     ('/api/schema/lyjson/', 'GET'),
+    ('/api/system/menu_field/get_models/','GET')
 }
 
 #自定义数据权限
 DATA_FILTER_CACHE = False #是否启用数据权限缓存，增强性能
 DATA_FILTER_CAHCE_TIME = 60 * 60 #缓存时间 1 小时
+
+#列权限
+FIELD_PERMISSION_CACHE = False #是否开启列权限缓存

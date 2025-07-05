@@ -2,7 +2,6 @@ import axios from 'axios';
 import { ElMessage,ElMessageBox } from 'element-plus'
 import {getToken,autoStorage,getRereshToken,setToken,setRefreshToken} from '@/utils/util'
 import sysConfig from "@/config"
-import { useUserState } from "@/store/userState";
 import { cancelRequestState } from "@/store/cancelRequest";
 
 let API_BASE_URL = sysConfig.API_URL
@@ -15,6 +14,8 @@ if (import.meta.env.PROD) {
 
 var request = axios.create({
     timeout: sysConfig.TIMEOUT,
+    retry: 3, // 重试次数
+    retryDelay: 1000, // 重试间隔
 });
 
 request.interceptors.request.use(config => {
@@ -73,7 +74,6 @@ request.interceptors.response.use(
         }
     },
     error => {
-        const userState = useUserState()
         if(error.response && error.response.status == 404){
             if (import.meta.env.PROD) {
                 window.location.href="/404"
@@ -99,8 +99,6 @@ request.interceptors.response.use(
                 ElMessage.error('接口路径找不到')
             } 
 		}
-        userState.loadingInfo.isLoading = false
-        userState.loadingInfo.content = ""
 		return Promise.reject(error);
 	}
 )

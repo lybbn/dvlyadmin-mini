@@ -75,14 +75,14 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" label="按钮名称" width="120" />
-                                    <el-table-column prop="value" label="权限值" min-width="150" />
+                                    <el-table-column prop="value" label="权限值" min-width="140" />
                                     <el-table-column prop="api" label="接口地址" min-width="170"/>
-                                    <el-table-column prop="method" label="请求方法" width="100">
+                                    <el-table-column prop="method" label="请求方法" width="90">
                                         <template #default="{ row }">
                                             <el-tag :type="getMethodTagType(row.method)">{{ getMethodName(row.method) }}</el-tag>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="操作" width="150">
+                                    <el-table-column label="操作" width="120">
                                         <template #default="scope">
                                             <el-button link type="primary" @click="editButton(scope.row)" v-auth="'MenuButtonUpdate'">编辑</el-button>
                                             <el-button link type="danger" @click="deleteButton(scope.row)" v-auth="'MenuButtonDelete'">删除</el-button>
@@ -805,6 +805,8 @@
         dialogTitle.value = '编辑按钮权限'
         formData.value = deepClone(row)
         dialogVisible.value = true
+        getSchemeJson()
+        getButtonTemplateData()
     }
 
     function deleteButton(row) {

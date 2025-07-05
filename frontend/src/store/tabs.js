@@ -92,7 +92,7 @@ export const useTabsStore = defineStore('tabs', () => {
     persist: [
         {
             pick: ['tabsList','activeTab'],
-            storage: sessionStorage,
+            storage: localStorage,//sessionStorage
         }
     ],
 })

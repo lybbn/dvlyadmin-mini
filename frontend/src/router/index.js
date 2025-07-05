@@ -46,6 +46,11 @@ router.beforeEach(async (to, from, next) => {
         NProgress.done();
         return token ? next('/home') : next();
     }
+
+    if(["/500","/404"].includes(to.path)){
+        NProgress.done();
+        return next()
+    }
     
     // 2. 处理未认证情况
     if (!token) {
@@ -55,12 +60,12 @@ router.beforeEach(async (to, from, next) => {
         let mustAuth = (to.meta?.requireAuth || to.name == "notFound" || to.name == undefined) ? true :false
         return mustAuth ? next('/login') : next();
     }
+
     const storesRoutesList = useRoutesList();
     const { routesList } = storeToRefs(storesRoutesList);
     const userState = useUserState();
 
     let isGetBackendRoute = false;
-
     // 3. 已认证用户处理动态路由
     try {
         // 加载动态路由（如果尚未加载）
@@ -105,7 +110,6 @@ router.beforeEach(async (to, from, next) => {
         
         next();
     } catch (error) {
-        console.error('路由守卫错误:', error);
         NProgress.done();
         next('/500');
     }
@@ -113,7 +117,7 @@ router.beforeEach(async (to, from, next) => {
 
 
 async function updateDynamicRoutes() {
-    let userState = sessionStorage.getItem('userState') || null
+    let userState = localStorage.getItem('userState') || null
     let jsonUserState = userState?JSON.parse(userState) : null
     let menus = jsonUserState?jsonUserState?.menus : null
     if(menus){

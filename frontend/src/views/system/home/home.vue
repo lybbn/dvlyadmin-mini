@@ -124,27 +124,34 @@
 </template>
 
 <script setup>
-    import { ref, onMounted,nextTick } from 'vue'
+    import { ref, onMounted,nextTick,computed } from 'vue'
     import * as echarts from 'echarts'
+    import {useUserState} from "@/store/userState";
+    import { useRouter } from 'vue-router'
+
+    const router = useRouter()
+    const userState = useUserState()
 
     // 图表类型
     const chartType = ref('week')
 
     // 快捷操作
-    const quickActions = ref([
-        { name: '新增用户', icon: 'User', action: 'addUser' },
-        { name: '发布商品', icon: 'Goods', action: 'addGoods' },
-        { name: '订单处理', icon: 'List', action: 'processOrder' },
-        { name: '数据导出', icon: 'Download', action: 'exportData' },
-        { name: '消息通知', icon: 'Bell', action: 'notify' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-        { name: '系统设置', icon: 'Setting', action: 'settings' },
-    ])
+    // const quickActions = ref([
+    //     { name: '新增用户', icon: 'User', action: 'addUser' },
+    // ])
+    let quickActions = computed(() => {
+        let tmparr = []
+        userState.permissions.menus.forEach(item=>{
+            if(item.type == 1){
+                tmparr.push({
+                    name:item.name,
+                    icon:item.icon,
+                    action:item.web_path
+                })
+            }
+        })
+        return tmparr
+    })
 
     // 消息列表
     const messages = ref([
@@ -158,7 +165,7 @@
 
     // 处理快捷操作
     const handleQuickAction = (action) => {
-        ElMessage.success(`执行操作: ${action.name}`)
+        router.push({path:action.action})
     }
 
     // 初始化图表

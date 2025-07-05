@@ -43,7 +43,7 @@
         </el-card>
         <div class="table-container">
             <el-table border :data="tableData" v-loading="loadingPage" style="width: 100%;height:100%;" :flexible="true">
-                <el-table-column type="index" width="60" align="center" label="序号" :index="getIndex"/>
+                <!-- <el-table-column type="index" width="60" align="center" label="序号" :index="getIndex"/> -->
 
                 <el-table-column min-width="100" prop="req_modular" label="请求模块" show-overflow-tooltip/>
 
@@ -53,7 +53,7 @@
 
                 <el-table-column min-width="100" prop="req_ip" label="IP地址" show-overflow-tooltip/>
 
-                <el-table-column min-width="130" prop="ip_area" label="IP归属地" show-overflow-tooltip/>
+                <!-- <el-table-column min-width="130" prop="ip_area" label="IP归属地" show-overflow-tooltip/> -->
 
                 <el-table-column min-width="130" prop="req_browser" label="请求浏览器" show-overflow-tooltip/>
 
@@ -62,9 +62,9 @@
                         <div class="json-cell">
                         <el-popover
                             v-if="row.req_body"
-                            placement="left-start"
+                            :placement="ismobile ? 'bottom' : 'left-start'"
                             trigger="click"
-                            width="50%"
+                            :width="ismobile ? '80%' : '50%'"
                             :show-arrow="false"
                         >
                             <template #reference>
@@ -83,9 +83,10 @@
 
                 <el-table-column width="80" prop="resp_code" label="响应码">
                     <template #default="{ row }">
-                        <el-tag :type="row.resp_code === '2000' ? 'success' : 'warning'">
+                        <el-tag v-if="row.resp_code" :type="row.resp_code === '2000' ? 'success' : 'warning'">
                         {{ row.resp_code }}
                         </el-tag>
+                        <span v-else></span>
                     </template>
                 </el-table-column>
 
@@ -94,9 +95,9 @@
                         <div class="json-cell">
                         <el-popover
                             v-if="row.json_result"
-                            placement="left-start"
+                            :placement="ismobile ? 'bottom' : 'left-start'"
                             trigger="click"
-                            width="50%"
+                            :width="ismobile ? '80%' : '50%'"
                             :show-arrow="false"
                         >
                             <template #reference>
@@ -125,216 +126,204 @@
                     </template>
                     <template #default="{ row }">
                         <!-- <span class="table-operate-btn" @click="handleEdit(row,'detail')">详情</span> -->
-                        <span class="table-operate-btn delete" @click="handleEdit(scope.row,'delete')" v-auth="'Delete'">删除</span>
+                        <span class="table-operate-btn delete" @click="handleEdit(row,'delete')" v-auth="'Delete'">删除</span>
                 </template>
                 </el-table-column>
             </el-table>
         </div>
 
-        <Pagination v-bind:child-msg="pageparm"@callFather="callFather"/>
+        <Pagination v-bind:child-msg="pageparm" @callFather="callFather"/>
 
         <journal-manage-detail ref="journalManageDetailFlag" />
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  FullScreen,
-  Warning,
-  ArrowUp,
-  Document
-} from '@element-plus/icons-vue'
-import Pagination from '@/components/Pagination.vue'
-import JournalManageDetail from './components/journalManageDetail.vue'
-import { dateFormats, getTableHeight } from '@/utils/util'
-import lySearchBar from '@/components/lySearchBar.vue'
-import Api from '@/api/api'
+    import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
+    import { useRoute } from 'vue-router'
+    import { ElMessage, ElMessageBox } from 'element-plus'
+    import {
+        FullScreen,
+        Warning,
+        ArrowUp,
+        Document
+    } from '@element-plus/icons-vue'
+    import Pagination from '@/components/Pagination.vue'
+    import JournalManageDetail from './components/journalManageDetail.vue'
+    import { dateFormats, getTableHeight } from '@/utils/util'
+    import lySearchBar from '@/components/lySearchBar.vue'
+    import Api from '@/api/api'
+    import { useSiteThemeStore } from "@/store/siteTheme";
 
-const route = useRoute()
+    const siteThemeStore = useSiteThemeStore()
 
-// Reactive state
-const isFull = ref(false)
-const tableHeight = ref(500)
-const loadingPage = ref(false)
-const tableSelect = ref(null)
-const journalManageDetailFlag = ref(null)
-const tableref = ref(null)
+    const route = useRoute()
 
-const formInline = ref({
-  page: 1,
-  limit: 20,
-})
+    const isFull = ref(false)
+    const tableHeight = ref(500)
+    const loadingPage = ref(false)
+    const tableSelect = ref(null)
+    const journalManageDetailFlag = ref(null)
+    const tableref = ref(null)
 
-const timers = ref([])
-const tableData = ref([])
-const pageparm = ref({
-  page: 1,
-  limit: 20,
-  total: 0
-})
+    const formInline = ref({
+        page: 1,
+        limit: 20,
+    })
 
-// Computed properties
-const hasPermission = (routeName, permission) => {
-  // Implement your permission logic here
-  return true
-}
+    const timers = ref([])
+    const tableData = ref([])
+    const pageparm = ref({
+        page: 1,
+        limit: 20,
+        total: 0
+    })
 
-// Methods
-const getIndex = (index) => {
-  return (pageparm.value.page - 1) * pageparm.value.limit + index + 1
-}
+    let ismobile = computed(() => {
+        return siteThemeStore.ismobile
+    })
 
-const formatBody = (value) => {
-    if (!value) return value;
-    
-    // 如果是对象直接返回
-    if (typeof value === 'object') return value;
-    
-    try {
-        // 尝试直接解析
-        return JSON.parse(value);
-    } catch (err) {
+    const getIndex = (index) => {
+        return (pageparm.value.page - 1) * pageparm.value.limit + index + 1
+    }
+
+    const formatBody = (value) => {
+        if (!value) return value;
+        
+        // 如果是对象直接返回
+        if (typeof value === 'object') return value;
+        
         try {
-            // 尝试替换单引号为双引号
-            const fixedStr = value.replace(/'/g, '"');
-            return JSON.parse(fixedStr);
-        } catch (e) {
-            return value
+            // 尝试直接解析
+            return JSON.parse(value);
+        } catch (err) {
+            try {
+                // 尝试替换单引号为双引号
+                const fixedStr = value.replace(/'/g, '"');
+                return JSON.parse(fixedStr);
+            } catch (e) {
+                return value
+            }
         }
     }
-}
 
-const deleteAlllogs = () => {
-  ElMessageBox.confirm('是否确认清空全部日志数据', '警告', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
-      Api.systemOperationlogDeletealllogsDelete().then((res) => {
-        if (res.code == 2000) {
-          ElMessage.success(res.msg)
-          search()
-        } else {
-          ElMessage.warning(res.msg)
-        }
-      })
-    })
-    .catch(() => {})
-}
+    const deleteAlllogs = () => {
+        ElMessageBox.confirm('是否确认清空全部日志数据', '警告', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+            Api.systemOperationlogDeletealllogsDelete().then((res) => {
+                if (res.code == 2000) {
+                ElMessage.success(res.msg)
+                search()
+                } else {
+                ElMessage.warning(res.msg)
+                }
+            })
+        }).catch(() => {})
+    }
 
-const handleEdit = (row, flag) => {
-  if (flag === 'detail') {
-    journalManageDetailFlag.value.journalManageDetailFn(row)
-  } else if (flag === 'delete') {
-    ElMessageBox.confirm('您确定要删除选中的数据吗？', {
-      closeOnClickModal: false
-    })
-      .then(() => {
-        Api.systemOperationlogDelete({ id: row.id }).then((res) => {
-          if (res.code == 2000) {
-            ElMessage.success(res.msg)
+    const handleEdit = (row, flag) => {
+        if (flag === 'detail') {
+            journalManageDetailFlag.value.journalManageDetailFn(row)
+        } else if (flag === 'delete') {
+            ElMessageBox.confirm('您确定要删除选中的数据吗？', {
+            closeOnClickModal: false
+            })
+            .then(() => {
+                Api.systemOperationlogDelete({ id: row.id }).then((res) => {
+                if (res.code == 2000) {
+                    ElMessage.success(res.msg)
+                    getData()
+                } else {
+                    ElMessage.warning(res.msg)
+                }
+                })
+            })
+            .catch(() => {})
+        } else if (flag === 'reset') {
+            formInline.value = {
+                page: 1,
+                limit: 20,
+            }
+            pageparm.value = {
+                page: 1,
+                limit: 20,
+                total: 0
+            }
+            timers.value = []
             getData()
-          } else {
-            ElMessage.warning(res.msg)
-          }
+        }
+    }
+
+    const callFather = (parm) => {
+        formInline.value.page = parm.page
+        formInline.value.limit = parm.limit
+        getData()
+    }
+
+    const search = () => {
+        formInline.value.page = 1
+        formInline.value.limit = 20
+        getData()
+    }
+
+    const timeChange = (val) => {
+        if (val) {
+            formInline.value.beginAt = dateFormats(val[0], 'yyyy-MM-dd hh:mm:ss')
+            formInline.value.endAt = dateFormats(val[1], 'yyyy-MM-dd hh:mm:ss')
+        } else {
+            formInline.value.beginAt = null
+            formInline.value.endAt = null
+        }
+    }
+
+    const getData = async () => {
+        try {
+            loadingPage.value = true
+            const res = await Api.systemOperationlog(formInline.value)
+            if (res.code == 2000) {
+            tableData.value = res.data.data
+            pageparm.value.page = res.data.page
+            pageparm.value.limit = res.data.limit
+            pageparm.value.total = res.data.total
+            }
+        } finally {
+            loadingPage.value = false
+        }
+    }
+
+    const setFull = () => {
+        isFull.value = !isFull.value
+        nextTick(() => {
+            getTheTableHeight()
         })
-      })
-      .catch(() => {})
-  } else if (flag === 'reset') {
-    formInline.value = {
-      page: 1,
-      limit: 20,
-      search: '',
-      request_modular: '',
-      request_path: '',
-      request_method: '',
-      request_ip: '',
-      beginAt: null,
-      endAt: null
     }
-    pageparm.value = {
-      page: 1,
-      limit: 20,
-      total: 0
+
+    const getTheTableHeight = () => {
+        const tabSelectHeight = tableSelect.value ? tableSelect.value.offsetHeight : 0
+        const adjustedHeight = isFull.value ? tabSelectHeight - 110 : tabSelectHeight
+        tableHeight.value = getTableHeight(adjustedHeight)
     }
-    timers.value = []
-    getData()
-  }
-}
 
-const callFather = (parm) => {
-  formInline.value.page = parm.page
-  formInline.value.limit = parm.limit
-  getData()
-}
-
-const search = () => {
-  formInline.value.page = 1
-  formInline.value.limit = 20
-  getData()
-}
-
-const timeChange = (val) => {
-  if (val) {
-    formInline.value.beginAt = dateFormats(val[0], 'yyyy-MM-dd hh:mm:ss')
-    formInline.value.endAt = dateFormats(val[1], 'yyyy-MM-dd hh:mm:ss')
-  } else {
-    formInline.value.beginAt = null
-    formInline.value.endAt = null
-  }
-  search()
-}
-
-const getData = async () => {
-  try {
-    loadingPage.value = true
-    const res = await Api.systemOperationlog(formInline.value)
-    if (res.code == 2000) {
-      tableData.value = res.data.data
-      pageparm.value.page = res.data.page
-      pageparm.value.limit = res.data.limit
-      pageparm.value.total = res.data.total
+    const listenResize = () => {
+        nextTick(() => {
+            getTheTableHeight()
+        })
     }
-  } finally {
-    loadingPage.value = false
-  }
-}
 
-const setFull = () => {
-  isFull.value = !isFull.value
-  nextTick(() => {
-    getTheTableHeight()
-  })
-}
+    onMounted(() => {
+        window.addEventListener('resize', listenResize)
+        nextTick(() => {
+            getTheTableHeight()
+        })
+        getData()
+    })
 
-const getTheTableHeight = () => {
-  const tabSelectHeight = tableSelect.value ? tableSelect.value.offsetHeight : 0
-  const adjustedHeight = isFull.value ? tabSelectHeight - 110 : tabSelectHeight
-  tableHeight.value = getTableHeight(adjustedHeight)
-}
-
-const listenResize = () => {
-  nextTick(() => {
-    getTheTableHeight()
-  })
-}
-
-// Lifecycle hooks
-onMounted(() => {
-  window.addEventListener('resize', listenResize)
-  nextTick(() => {
-    getTheTableHeight()
-  })
-  getData()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', listenResize)
-})
+    onUnmounted(() => {
+        window.removeEventListener('resize', listenResize)
+    })
 </script>
 
 <style scoped lang="scss">
@@ -395,7 +384,7 @@ onUnmounted(() => {
 
     .json-popover-content {
         background: #1e1e1e;
-        color: #d4d4d4;
+        color: rgb(194, 106, 62);
         max-height: 60vh;
         overflow: auto;
         padding: 12px;

@@ -197,7 +197,7 @@ export const useUserState = defineStore('userState', {
     persist: [
         {
             pick: ['userInfo','msgInfo','sysConfig','menus','permissions'],
-            storage: sessionStorage,
+            storage: localStorage,//sessionStorage
         }
     ],
 });

@@ -51,6 +51,7 @@ urlpatterns = [
     
     
     re_path('operation_log/deletealllogs/',OperationLogViewSet.as_view({'delete':'deletealllogs'})),
+    path('operation_log/getOwnerLogs/',OperationLogViewSet.as_view({'get':'getOwnerLogs'})),
 
     path('user/user_info/',UserViewSet.as_view({'get':'user_info','put':'update_user_info'})),
     re_path('user/change_password/',UserViewSet.as_view({'post':'change_password'})),

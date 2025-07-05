@@ -115,6 +115,8 @@ Api.apiSystemUser = params => ajaxGet({url: `/api/system/user/`,params})
  * */
 // 日志管理 查询
 Api.systemOperationlog= params => ajaxGet({url: `/api/system/operation_log/`,params})
+// 日志管理 我的日志
+Api.getOwnerOperationLogs= params => ajaxGet({url: `/api/system/operation_log/getOwnerLogs/`,params})
 // 日志管理 自己的操作日志
 Api.systemGetOwnerLogs= params => ajaxGet({url: `/api/system/operation_log/getOwnerLogs/`,params})
 // 日志管理 删除

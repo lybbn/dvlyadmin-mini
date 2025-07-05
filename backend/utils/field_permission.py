@@ -12,6 +12,7 @@ from django.core.cache import cache
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from utils.jsonResponse import SuccessResponse,DetailResponse,ErrorResponse
+from config import FIELD_PERMISSION_CACHE
 
 class FieldPermissionMixin:
     """
@@ -53,18 +54,20 @@ class FieldPermissionMixin:
 
         # 普通用户从缓存或数据库获取
         role_ids = tuple(user.role.values_list('id', flat=True))
-        cache_key = self.get_permission_cache_key(model_name, role_ids)
         
-        permissions = cache.get(cache_key)
-        if permissions is None:
+        if FIELD_PERMISSION_CACHE:
+            cache_key = self.get_permission_cache_key(model_name, role_ids)
+            permissions = cache.get(cache_key)
+            if permissions is None:
+                permissions = self.query_database_permissions(model_name, role_ids)
+                cache.set(cache_key, permissions, self.permission_cache_timeout)
+        else:
             permissions = self.query_database_permissions(model_name, role_ids)
-            cache.set(cache_key, permissions, self.permission_cache_timeout)
         
         return permissions
 
     def get_all_fields_permission(self, model_name):
         """获取所有字段的完全权限"""
-        
         fields = MenuField.objects.filter(model=model_name).values('field_name')
         return {
             field['field_name']: {
@@ -118,36 +121,57 @@ class FieldPermissionMixin:
         permissions = self.get_field_permissions(request)
         return DetailResponse(data=permissions)
 
-    def get_serializer(self, *args, **kwargs):
-        """重写序列化器获取，自动应用字段权限"""
-        serializer = super().get_serializer(*args, **kwargs)
-        return self.apply_field_permissions(serializer, self.request)
-
-    def apply_field_permissions(self, serializer, request):
+    def apply_field_permissions(self, serializer_class, *args, **kwargs):
         """
-        动态应用字段权限到序列化器
-        规则:
-        1. 无查询权限(can_view=False)的字段会被移除
-        2. 无创建权限(can_create=False)的字段在create动作时设为read_only
-        3. 无更新权限(can_update=False)的字段在update动作时设为read_only
-        """
-        if not hasattr(serializer, 'fields'):
-            return serializer
-
-        permissions = self.get_field_permissions(request)
-        for field_name, field in list(serializer.fields.items()):
-            if field_name in permissions:
-                perm = permissions[field_name]
-                
-                # 1. 移除无查询权限的字段
-                if not perm['can_view']:
-                    serializer.fields.pop(field_name, None)
-                    continue
-                
-                # 2. 控制写权限
-                if self.action == 'create' and not perm['can_create']:
-                    field.read_only = True
-                elif self.action in ['update', 'partial_update'] and not perm['can_update']:
-                    field.read_only = True
+        动态应用字段权限到序列化器类
         
-        return serializer
+        参数:
+            serializer_class: 要修改的序列化器类
+            *args, **kwargs: 传递给序列化器构造函数的参数
+        
+        返回:
+            修改后的序列化器实例
+        """
+        # 1. 获取请求对象
+        request = kwargs.get('context', {}).get('request') or kwargs.get('request')
+        if not request:
+            return serializer_class(*args, **kwargs)
+        
+        # 2. 获取权限规则
+        permissions = self.get_field_permissions(request)
+        if not permissions:
+            return serializer_class(*args, **kwargs)
+        
+        # 3. 创建动态序列化器子类
+        class DynamicSerializer(serializer_class):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                
+                # 处理 ListSerializer 情况
+                actual_serializer = self.child if hasattr(self, 'child') else self
+                
+                # 获取所有字段
+                fields = getattr(actual_serializer, 'fields', {})
+                
+                # 应用权限控制
+                for field_name, field in list(fields.items()):
+                    if field_name in permissions:
+                        perm = permissions[field_name]
+                        
+                        # 无查看权限则移除字段
+                        if not perm['can_view']:
+                            fields.pop(field_name, None)
+                            continue
+
+                        # 控制写权限
+                        if self.context.get('action') == 'create' and not perm['can_create']:
+                            field.read_only = True
+                        elif self.context.get('action') in ['update', 'partial_update'] and not perm['can_update']:
+                            field.read_only = True
+        
+        # 4. 确保 action 信息传递到上下文
+        kwargs.setdefault('context', {})
+        kwargs['context'].setdefault('action', self.action)
+        kwargs['context']['request'] = request
+        
+        return DynamicSerializer(*args, **kwargs)

@@ -37,7 +37,7 @@ class OperationLogSerializer(CustomModelSerializer):
     """
     操作日志-序列化器
     """
-    
+
     class Meta:
         model = OperationLog
         fields = "__all__"
@@ -56,7 +56,18 @@ class OperationLogViewSet(CustomModelViewSet):
     serializer_class = OperationLogSerializer
     # filterset_fields = '__all__'
     filterset_class = OperationLogTimeFilter
-    search_fields = ('req_modular','req_path','req_ip','req_os','req_body')
+    search_fields = ('req_modular','req_path','req_ip','req_os','req_body','creator_name')
+
+    def getOwnerLogs(self, request, *args, **kwargs):
+        user = request.user
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(creator=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, request=request)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True, request=request)
+        return SuccessResponse(data=serializer.data, msg="获取成功")
 
     def deletealllogs(self,request):
         user = request.user

@@ -51,7 +51,7 @@
             </div>
 
             <!-- 内容标签页 -->
-            <el-tabs v-model="activeTab" class="profile-tabs">
+            <el-tabs v-model="activeTab" class="profile-tabs" @tab-change="handleTabClick">
                 <el-tab-pane label="基本信息" name="basic">
                     <div class="info-section">
                         <el-descriptions :column="isMobile ? 1 : 2" border>
@@ -102,30 +102,83 @@
                     </div>
                 </el-tab-pane>
                 
-                <el-tab-pane label="操作日志" name="logs">
+                <el-tab-pane label="操作日志" name="logs" v-auth="'GetOPLog'">
                     <div class="log-section">
-                        <el-table :data="operationLogs" style="width: 100%" border>
-                            <el-table-column prop="time" label="时间" width="180" />
-                            <el-table-column prop="module" label="模块" width="120" />
-                            <el-table-column prop="action" label="操作" />
-                            <el-table-column prop="ip" label="IP地址" width="150" />
-                            <el-table-column prop="status" label="状态" width="100">
-                                <template #default="{row}">
-                                    <el-tag :type="row.status === '成功' ? 'success' : 'danger'">
-                                    {{ row.status }}
-                                    </el-tag>
+                        <el-table :data="tableData" style="width: 100%" border v-loading="loadingBPage">
+                            <el-table-column min-width="100" prop="req_modular" label="请求模块" show-overflow-tooltip/>
+
+                            <el-table-column min-width="160" prop="req_path" label="请求地址" show-overflow-tooltip/>
+
+                            <el-table-column width="90" prop="req_method" label="请求方法" show-overflow-tooltip/>
+
+                            <el-table-column min-width="100" prop="req_ip" label="IP地址" show-overflow-tooltip/>
+
+                            <!-- <el-table-column min-width="130" prop="ip_area" label="IP归属地" show-overflow-tooltip/> -->
+
+                            <el-table-column min-width="130" prop="req_browser" label="请求浏览器" show-overflow-tooltip/>
+
+                            <el-table-column width="90" prop="req_body" label="请求数据">
+                                <template #default="{ row }">
+                                    <div class="json-cell">
+                                    <el-popover
+                                        v-if="row.req_body"
+                                        :placement="isMobile ? 'bottom' : 'left-start'"
+                                        trigger="click"
+                                        :width="isMobile ? '80%' : '50%'"
+                                        :show-arrow="false"
+                                    >
+                                        <template #reference>
+                                        <el-tag class="json-tag" size="small" effect="dark">
+                                            <el-icon><Warning /></el-icon>
+                                        </el-tag>
+                                        </template>
+                                        <div class="json-popover-content">
+                                        <pre>{{ formatBody(row.req_body) }}</pre>
+                                        </div>
+                                    </el-popover>
+                                    <span v-else>无</span>
+                                    </div>
                                 </template>
                             </el-table-column>
+
+                            <el-table-column width="80" prop="resp_code" label="响应码">
+                                <template #default="{ row }">
+                                    <el-tag v-if="row.resp_code" :type="row.resp_code === '2000' ? 'success' : 'warning'">
+                                    {{ row.resp_code }}
+                                    </el-tag>
+                                    <span v-else></span>
+                                </template>
+                            </el-table-column>
+
+                            <el-table-column width="90" prop="json_result" label="返回信息">
+                                <template #default="{ row }">
+                                    <div class="json-cell">
+                                    <el-popover
+                                        v-if="row.json_result"
+                                        :placement="isMobile ? 'bottom' : 'left-start'"
+                                        trigger="click"
+                                        :width="isMobile ? '80%' : '50%'"
+                                        :show-arrow="false"
+                                    >
+                                        <template #reference>
+                                            <el-tag class="json-tag" size="small" effect="dark">
+                                                <el-icon><Warning /></el-icon>
+                                            </el-tag>
+                                        </template>
+                                        <div class="json-popover-content">
+                                            <pre>{{ formatBody(row.json_result) }}</pre>
+                                        </div>
+                                    </el-popover>
+                                    <span v-else>无</span>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <!-- <el-table-column width="130" prop="creator_name" label="操作人" /> -->
+                            <el-table-column width="160" prop="create_datetime" label="创建时间" show-overflow-tooltip/>
                         </el-table>
                         
-                        <div class="pagination">
-                            <el-pagination
-                            v-model:current-page="logPage.current"
-                            v-model:page-size="logPage.size"
-                            :total="logPage.total"
-                            layout="total, prev, pager, next, jumper"
-                            @current-change="fetchOperationLogs"
-                            />
+                        <div class="lypagination">
+                            <Pagination v-bind:child-msg="pageparm" @callFather="callFather" :border="false" small position="right"/>
                         </div>
                     </div>
                 </el-tab-pane>
@@ -266,6 +319,7 @@
     import Api from '@/api/api.js'
     import lyPasswordStrength from "@/components/password/lyPasswordStrength.vue";
     import pictureSingleUpload from '@/components/upload/single-picture.vue'
+    import Pagination from '@/components/Pagination.vue'
 
     const userState = useUserState()
     // 响应式窗口大小
@@ -330,27 +384,6 @@
         hr: { name: '人事', icon: 'UserFilled', color: '#8E44AD', tagType: '' },
         message: { name: '消息', icon: 'ChatDotRound', color: '#3498DB', tagType: '' }
     }
-
-    // 操作日志数据
-    const operationLogs = ref([
-        { id: 1, time: '2023-06-20 14:25:36', module: '个人中心', action: '查看个人信息', ip: '192.168.1.100', status: '成功' },
-        { id: 2, time: '2023-06-20 13:45:22', module: '项目管理', action: '创建新项目「后台管理系统」', ip: '192.168.1.100', status: '成功' },
-        { id: 3, time: '2023-06-20 11:30:15', module: '任务管理', action: '完成任务「首页改版」', ip: '192.168.1.100', status: '成功' },
-        { id: 4, time: '2023-06-19 16:20:45', module: '系统设置', action: '修改个人密码', ip: '192.168.1.100', status: '成功' },
-        { id: 5, time: '2023-06-19 10:15:33', module: '文档中心', action: '上传文档「需求规格说明书」', ip: '192.168.1.100', status: '成功' },
-        { id: 6, time: '2023-06-18 17:05:12', module: '审批流程', action: '提交请假申请', ip: '192.168.1.100', status: '成功' },
-        { id: 7, time: '2023-06-18 09:40:56', module: '个人中心', action: '更新个人信息', ip: '192.168.1.100', status: '成功' },
-        { id: 8, time: '2023-06-17 14:30:28', module: '项目管理', action: '删除项目「测试项目」', ip: '192.168.1.100', status: '成功' },
-        { id: 9, time: '2023-06-16 16:15:19', module: '任务管理', action: '分配任务给团队成员', ip: '192.168.1.100', status: '成功' },
-        { id: 10, time: '2023-06-16 11:20:42', module: '系统设置', action: '修改通知偏好设置', ip: '192.168.1.100', status: '成功' }
-    ])
-
-    // 分页控制
-    const logPage = reactive({
-        current: 1,
-        size: 10,
-        total: 35
-    })
 
     // 编辑资料对话框
     const editDialogVisible = ref(false)
@@ -434,6 +467,26 @@
             { required: true, message: '请确认密码', trigger: 'blur' },
             { validator: validateConfirmPassword, trigger: 'blur' }
         ]
+    }
+
+    const formatBody = (value) => {
+        if (!value) return value;
+        
+        // 如果是对象直接返回
+        if (typeof value === 'object') return value;
+        
+        try {
+            // 尝试直接解析
+            return JSON.parse(value);
+        } catch (err) {
+            try {
+                // 尝试替换单引号为双引号
+                const fixedStr = value.replace(/'/g, '"');
+                return JSON.parse(fixedStr);
+            } catch (e) {
+                return value
+            }
+        }
     }
 
     // 更换头像对话框
@@ -533,11 +586,6 @@
         })
     }
 
-    const fetchOperationLogs = () => {
-        // 这里应该是API调用获取分页日志
-        ElMessage.info(`加载第${logPage.current}页操作日志`)
-    }
-
     const goToNotificationPage = () => {
         ElMessage.info('跳转到消息列表页面')
         // 实际项目中应该是路由跳转
@@ -551,6 +599,48 @@
                 userInfo.value = res.data
             }
         })
+    }
+
+    let loadingData = ref(false)
+    let formInline = ref({
+        page:1,
+        limit:10
+    })
+    let pageparm = ref({
+        page: 1,
+        limit: 10,
+        total: 0
+    })
+    let tableData = ref([])
+    let loadingBPage = ref(false)
+    const getLogsData = async () => {
+        try {
+            loadingBPage.value = true
+            const res = await Api.getOwnerOperationLogs(formInline.value)
+            if (res.code == 2000) {
+                tableData.value = res.data.data
+                pageparm.value.page = res.data.page
+                pageparm.value.limit = res.data.limit
+                pageparm.value.total = res.data.total
+            }
+        } finally {
+            loadingBPage.value = false
+        }
+    }
+
+    const callFather = (parm) => {
+        formInline.value.page = parm.page
+        formInline.value.limit = parm.limit
+        getData()
+    }
+
+    function handleTabClick(e){
+        if(e == "logs"){
+            formInline.value.page = 1
+            formInline.value.limit = 10
+            tableData.value = []
+            getLogsData()
+        }
     }
 
     // 初始化
@@ -728,12 +818,12 @@
 
     .log-section {
         padding: 20px;
+        padding-bottom:0px;
     }
 
     .pagination {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
+        width:100%;
+        padding-right:20px;
     }
 
     /* 头像编辑 */
