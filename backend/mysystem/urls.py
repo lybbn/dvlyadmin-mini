@@ -15,6 +15,7 @@ from mysystem.views.role import RoleViewSet,RolePermissionViewSet
 from mysystem.views.user import UserViewSet
 from mysystem.views.menu_field import MenuFieldViewSet
 from mysystem.views.frontend import SysImagesUploadView
+from mysystem.views.dictionary import DictionaryViewSet
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
@@ -26,6 +27,7 @@ system_url.register(r'role_permission', RolePermissionViewSet,basename="role_per
 system_url.register(r'dept', DeptViewSet)
 system_url.register(r'user', UserViewSet)
 system_url.register(r'operation_log', OperationLogViewSet)
+system_url.register(r'dictionary', DictionaryViewSet)
 
 urlpatterns = [
     path('sys_image_upload/', SysImagesUploadView.as_view()),
@@ -43,6 +45,7 @@ urlpatterns = [
     re_path('dept/set_status/', DeptViewSet.as_view({'post': 'set_status'})),
     re_path('role/set_status/', RoleViewSet.as_view({'post': 'set_status'})),
     re_path('user/set_status/', UserViewSet.as_view({'post': 'set_status'})),
+    re_path('dictionary/set_status/', DictionaryViewSet.as_view({'post': 'set_status'})),
     
     re_path('user/reset_password/(?P<pk>.*?)/', UserViewSet.as_view({'put': 'reset_password'})),
     

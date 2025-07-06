@@ -350,11 +350,11 @@ class MenuButton(models.Model):
 
 
 class Dictionary(CoreModel):
-    code = models.CharField(max_length=100, unique=True, blank=True, null=True, verbose_name="编码", help_text="编码")
-    name = models.CharField(max_length=100, blank=True, null=True, verbose_name="名称", help_text="名称")
-    status =  models.BooleanField(default=True, verbose_name="角色状态", help_text="角色状态")
+    label = models.CharField(max_length=100, blank=True, null=True, verbose_name="字典名称", help_text="字典名称")
+    value = models.CharField(max_length=200, blank=True, null=True, verbose_name="字典编号", help_text="字典编号/实际值")
+    status = models.BooleanField(default=True, verbose_name="状态", help_text="状态")
     sort = models.IntegerField(default=1, verbose_name="显示排序", null=True, blank=True, help_text="显示排序")
-    parent = models.ForeignKey(to='Dictionary',related_name="subdicts", db_constraint=False, on_delete=models.PROTECT, blank=True, null=True,verbose_name="父级", help_text="父级")
+    parent = models.ForeignKey(to="self",related_name="sublist",db_constraint=False,on_delete=models.PROTECT,blank=True,null=True,verbose_name="父级",help_text="父级")
     remark = models.CharField(max_length=255, blank=True, null=True, verbose_name="备注", help_text="备注")
 
     class Meta:
@@ -405,3 +405,28 @@ class LoginLog(CoreModel):
         verbose_name = '登录日志'
         verbose_name_plural = verbose_name
         ordering = ('-create_datetime',)
+
+class Notification(CoreModel):
+    title = models.CharField(max_length=100,verbose_name="标题")
+    content = models.TextField(verbose_name="内容")
+    target_type = models.SmallIntegerField(default=0, verbose_name="目标类型")
+    users = models.ManyToManyField(Users, through='NotificationUsers', blank=True, related_name='notifications_users',verbose_name="关联用户")
+    dept = models.ManyToManyField(Dept, blank=True, db_constraint=False,verbose_name="关联部门")
+    role = models.ManyToManyField(Role, blank=True, db_constraint=False,verbose_name="关联角色")
+
+    class Meta:
+        db_table = table_prefix + 'message'
+        verbose_name = '消息通知'
+        verbose_name_plural = verbose_name
+        ordering = ('-create_datetime',)
+
+class NotificationUsers(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, db_constraint=False,verbose_name="关联用户表")
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE,db_constraint=False,verbose_name="关联消息")
+    is_read = models.BooleanField(default=False, blank=True, null=True, verbose_name="是否已读")
+    read_at = models.DateTimeField(null=True, blank=True, verbose_name="已读时间")
+    
+    class Meta:
+        db_table = table_prefix + 'message_users'
+        verbose_name = '消息用户'
+        verbose_name_plural = verbose_name

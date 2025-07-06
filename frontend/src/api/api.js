@@ -124,4 +124,19 @@ Api.systemOperationlogDelete= params => ajaxDelete({url: `/api/system/operation_
 // 日志管理 清空全部日志
 Api.systemOperationlogDeletealllogsDelete= params => ajaxDelete({url: `/api/system/operation_log/deletealllogs/`,params})
 
+/**
+*字典管理
+ * */
+
+// 字典管理
+Api.systemDictionary = params => ajaxGet({url: `/api/system/dictionary/`,params})
+// 字典管理 -- 新增
+Api.systemDictionaryAdd = params => ajaxPost({url: `/api/system/dictionary/`,params})
+// 字典管理 -- 编辑
+Api.systemDictionaryEdit = params => ajaxPut({url: `/api/system/dictionary/`,params})
+// 字典管理 -- 删除
+Api.systemDictionaryDelete = params => ajaxDelete({url: `/api/system/dictionary/`,params})
+// 字典管理 -- 设置状态
+Api.systemDictionarySetStatus = params => ajaxPost({url: `/api/system/dictionary/set_status/`,params})
+
 export default Api
