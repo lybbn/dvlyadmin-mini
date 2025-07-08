@@ -103,12 +103,12 @@ class LoginView(CustomAPIView):
 
         if user and not user.is_staff:#判断是否允许登录后台
             msg="您没有权限登录后台"
-            save_login_log(request=request,status=False,msg=msg)
+            save_login_log(request=request,status=False,msg=msg,user=user)
             return ErrorResponse(msg=msg)
         
         if user and not user.is_active:
             msg="该账号已被禁用"
-            save_login_log(request=request,status=False,msg=msg)
+            save_login_log(request=request,status=False,msg=msg,user=user)
             return ErrorResponse(msg=msg)
 
         if user and user.check_password(password):  # check_password() 对明文进行加密,并验证
@@ -116,7 +116,7 @@ class LoginView(CustomAPIView):
             msg="登录成功"
             user.last_login = datetime.now()
             user.save()
-            save_login_log(request=request,status=True,msg=msg)
+            save_login_log(request=request,status=True,msg=msg,user=user)
             # 缓存用户的jwt token
             if IS_SINGLE_TOKEN:
                 redis_conn = get_redis_connection("singletoken")
@@ -128,5 +128,5 @@ class LoginView(CustomAPIView):
             return DetailResponse(data=data,msg=msg)
         else:
             msg="账号/密码错误"
-            save_login_log(request=request,status=False,msg=msg)
+            save_login_log(request=request,status=False,msg=msg,user=user)
             return ErrorResponse(msg=msg)

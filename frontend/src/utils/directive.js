@@ -22,10 +22,15 @@ export default {
                     }
                 } else if (typeof value === 'string') {
                     let menuName, buttonCode
-                     if (value.includes(':')) {
+                    if (value.includes(':')) {
                         // 格式2: v-auth="system:Create"
-                        menuName = value.split(':')[0] // 取前一部分作为组件名
-                        buttonCode = value
+                        const parts = value.split(':');
+                         // 确保分割后有且只有两部分
+                        if (parts.length !== 2) {
+                            return
+                        }
+                        menuName = parts[0] // 取前一部分作为组件名
+                        buttonCode = parts[1]
                     } else {
                         // 格式3: v-auth="Create" - 自动使用当前路由route.name作为菜单名
                         menuName = app.config.globalProperties.$router?.currentRoute.value.name || "";

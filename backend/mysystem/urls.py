@@ -16,6 +16,8 @@ from mysystem.views.user import UserViewSet
 from mysystem.views.menu_field import MenuFieldViewSet
 from mysystem.views.frontend import SysImagesUploadView
 from mysystem.views.dictionary import DictionaryViewSet
+from mysystem.views.login_log import LoginLogViewSet
+from mysystem.views.system_config import SystemConfigViewSet
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
@@ -28,6 +30,8 @@ system_url.register(r'dept', DeptViewSet)
 system_url.register(r'user', UserViewSet)
 system_url.register(r'operation_log', OperationLogViewSet)
 system_url.register(r'dictionary', DictionaryViewSet)
+system_url.register(r'login_log', LoginLogViewSet)
+system_url.register(r'sysconfig', SystemConfigViewSet)
 
 urlpatterns = [
     path('sys_image_upload/', SysImagesUploadView.as_view()),
@@ -56,8 +60,14 @@ urlpatterns = [
     re_path('operation_log/deletealllogs/',OperationLogViewSet.as_view({'delete':'deletealllogs'})),
     path('operation_log/getOwnerLogs/',OperationLogViewSet.as_view({'get':'getOwnerLogs'})),
 
+    re_path('login_log/deletealllogs/',LoginLogViewSet.as_view({'delete':'deletealllogs'})),
+    path('login_log/getOwnerLogs/',LoginLogViewSet.as_view({'get':'getOwnerLogs'})),
+
     path('user/user_info/',UserViewSet.as_view({'get':'user_info','put':'update_user_info'})),
     re_path('user/change_password/',UserViewSet.as_view({'post':'change_password'})),
     re_path('user/change_avatar/',UserViewSet.as_view({'post':'change_avatar'})),
+
+    re_path('sysconfig/save_content/(?P<pk>.*?)/', SystemConfigViewSet.as_view({'put': 'save_content'}), name='保存配置'),
+    path('sysconfig/get_models_info_list/', SystemConfigViewSet.as_view({'get': 'get_models_info_list'}), name='获取所有models列表信息'),
 ]
 urlpatterns += system_url.urls

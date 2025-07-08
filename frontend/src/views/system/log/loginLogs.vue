@@ -45,75 +45,21 @@
             <el-table border :data="tableData" v-loading="loadingPage" style="width: 100%;height:100%;" :flexible="true">
                 <!-- <el-table-column type="index" width="60" align="center" label="序号" :index="getIndex"/> -->
 
-                <el-table-column min-width="100" prop="req_modular" label="请求模块" show-overflow-tooltip/>
+                <el-table-column min-width="130" prop="username" label="登录账号" show-overflow-tooltip/>
 
-                <el-table-column min-width="160" prop="req_path" label="请求地址" show-overflow-tooltip/>
-
-                <el-table-column width="90" prop="req_method" label="请求方法" show-overflow-tooltip/>
-
-                <el-table-column min-width="100" prop="req_ip" label="IP地址" show-overflow-tooltip/>
+                <el-table-column min-width="130" prop="ip" label="IP地址" show-overflow-tooltip/>
 
                 <!-- <el-table-column min-width="130" prop="ip_area" label="IP归属地" show-overflow-tooltip/> -->
-
-                <el-table-column min-width="130" prop="req_browser" label="请求浏览器" show-overflow-tooltip/>
-
-                <el-table-column width="90" prop="req_body" label="请求数据">
+                <el-table-column min-width="130" prop="agent" label="agent" show-overflow-tooltip/>
+                <el-table-column min-width="130" prop="os" label="操作系统" show-overflow-tooltip/>
+                <el-table-column width="80" prop="status" label="状态">
                     <template #default="{ row }">
-                        <div class="json-cell">
-                        <el-popover
-                            v-if="row.req_body"
-                            :placement="ismobile ? 'bottom' : 'left-start'"
-                            trigger="click"
-                            :width="ismobile ? '80%' : '50%'"
-                            :show-arrow="false"
-                        >
-                            <template #reference>
-                            <el-tag class="json-tag" size="small" effect="dark">
-                                <el-icon><Warning /></el-icon>
-                            </el-tag>
-                            </template>
-                            <div class="json-popover-content">
-                            <pre>{{ formatBody(row.req_body) }}</pre>
-                            </div>
-                        </el-popover>
-                        <span v-else>无</span>
-                        </div>
-                    </template>
-                </el-table-column>
-
-                <el-table-column width="80" prop="resp_code" label="响应码">
-                    <template #default="{ row }">
-                        <el-tag v-if="row.resp_code" :type="row.resp_code === '2000' ? 'success' : 'warning'">
-                        {{ row.resp_code }}
+                        <el-tag :type="row.status ? 'success' : 'warning'">
+                            {{ row.status  ? '成功' : '失败'}}
                         </el-tag>
-                        <span v-else></span>
                     </template>
                 </el-table-column>
-
-                <el-table-column width="90" prop="json_result" label="返回信息">
-                    <template #default="{ row }">
-                        <div class="json-cell">
-                        <el-popover
-                            v-if="row.json_result"
-                            :placement="ismobile ? 'bottom' : 'left-start'"
-                            trigger="click"
-                            :width="ismobile ? '80%' : '50%'"
-                            :show-arrow="false"
-                        >
-                            <template #reference>
-                                <el-tag class="json-tag" size="small" effect="dark">
-                                    <el-icon><Warning /></el-icon>
-                                </el-tag>
-                            </template>
-                            <div class="json-popover-content">
-                                <pre>{{ formatBody(row.json_result) }}</pre>
-                            </div>
-                        </el-popover>
-                        <span v-else>无</span>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column width="130" prop="creator_name" label="操作人" />
+                <el-table-column min-width="140" prop="msg" label="信息" show-overflow-tooltip/>
                 <el-table-column width="160" prop="create_datetime" label="创建时间" show-overflow-tooltip/>
                 <el-table-column label="操作" fixed="right" width="120">
                     <template #header>
@@ -125,7 +71,6 @@
                         </div>
                     </template>
                     <template #default="{ row }">
-                        <!-- <span class="table-operate-btn" @click="handleEdit(row,'detail')">详情</span> -->
                         <span class="table-operate-btn delete" @click="handleEdit(row,'delete')" v-auth="'Delete'">删除</span>
                 </template>
                 </el-table-column>
@@ -133,23 +78,15 @@
         </div>
 
         <Pagination v-bind:child-msg="pageparm" @callFather="callFather"/>
-
-        <journal-manage-detail ref="journalManageDetailFlag" />
     </div>
 </template>
 
-<script setup name="journalManage">
+<script setup name="loginLogs">
     import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
     import { useRoute } from 'vue-router'
     import { ElMessage, ElMessageBox } from 'element-plus'
-    import {
-        FullScreen,
-        Warning,
-        ArrowUp,
-        Document
-    } from '@element-plus/icons-vue'
+    import {FullScreen} from '@element-plus/icons-vue'
     import Pagination from '@/components/Pagination.vue'
-    import JournalManageDetail from './components/journalManageDetail.vue'
     import { dateFormats, getTableHeight } from '@/utils/util'
     import lySearchBar from '@/components/lySearchBar.vue'
     import Api from '@/api/api'
@@ -163,7 +100,6 @@
     const tableHeight = ref(500)
     const loadingPage = ref(false)
     const tableSelect = ref(null)
-    const journalManageDetailFlag = ref(null)
     const tableref = ref(null)
 
     const formInline = ref({
@@ -213,7 +149,7 @@
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() => {
-            Api.systemOperationlogDeletealllogsDelete().then((res) => {
+            Api.systemLoginlogDeletealllogs().then((res) => {
                 if (res.code == 2000) {
                 ElMessage.success(res.msg)
                 search()
@@ -225,14 +161,12 @@
     }
 
     const handleEdit = (row, flag) => {
-        if (flag === 'detail') {
-            journalManageDetailFlag.value.journalManageDetailFn(row)
-        } else if (flag === 'delete') {
+        if (flag === 'delete') {
             ElMessageBox.confirm('您确定要删除选中的数据吗？', {
             closeOnClickModal: false
             })
             .then(() => {
-                Api.systemOperationlogDelete({ id: row.id }).then((res) => {
+                Api.systemLoginlogDelete({ id: row.id }).then((res) => {
                 if (res.code == 2000) {
                     ElMessage.success(res.msg)
                     getData()
@@ -282,7 +216,7 @@
     const getData = async () => {
         try {
             loadingPage.value = true
-            const res = await Api.systemOperationlog(formInline.value)
+            const res = await Api.systemLoginlog(formInline.value)
             if (res.code == 2000) {
             tableData.value = res.data.data
             pageparm.value.page = res.data.page

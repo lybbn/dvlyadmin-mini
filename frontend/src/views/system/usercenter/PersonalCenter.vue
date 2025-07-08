@@ -101,7 +101,29 @@
                         </div>
                     </div>
                 </el-tab-pane>
-                
+                <el-tab-pane label="登录日志" name="loginlogs" v-auth="'GetLoginLog'">
+                    <div class="log-section">
+                        <el-table :data="tableData" style="width: 100%" border v-loading="loadingBPage">
+                            <el-table-column min-width="130" prop="username" label="登录账号" show-overflow-tooltip/>
+                            <el-table-column min-width="130" prop="ip" label="IP地址" show-overflow-tooltip/>
+                            <!-- <el-table-column min-width="130" prop="ip_area" label="IP归属地" show-overflow-tooltip/> -->
+                            <el-table-column min-width="150" prop="agent" label="agent" show-overflow-tooltip/>
+                            <el-table-column min-width="130" prop="os" label="操作系统" show-overflow-tooltip/>
+                            <el-table-column width="80" prop="status" label="状态">
+                                <template #default="{ row }">
+                                    <el-tag :type="row.status ? 'success' : 'warning'">
+                                        {{ row.status  ? '成功' : '失败'}}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column min-width="140" prop="msg" label="信息" show-overflow-tooltip/>
+                            <el-table-column width="160" prop="create_datetime" label="创建时间" show-overflow-tooltip/>
+                        </el-table>
+                        <div class="lypagination">
+                            <Pagination v-bind:child-msg="pageparm" @callFather="callFather" :border="false" small position="right"/>
+                        </div>
+                    </div>
+                </el-tab-pane>
                 <el-tab-pane label="操作日志" name="logs" v-auth="'GetOPLog'">
                     <div class="log-section">
                         <el-table :data="tableData" style="width: 100%" border v-loading="loadingBPage">
@@ -306,7 +328,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup name="PersonalCenter">
     import { ref, reactive, computed, onMounted } from 'vue'
     import { 
     Edit, Lock, Camera, User, Iphone, Message, OfficeBuilding, 
@@ -627,6 +649,20 @@
             loadingBPage.value = false
         }
     }
+    const getLoginLogsData = async () => {
+        try {
+            loadingBPage.value = true
+            const res = await Api.getOwnerLoginlog(formInline.value)
+            if (res.code == 2000) {
+                tableData.value = res.data.data
+                pageparm.value.page = res.data.page
+                pageparm.value.limit = res.data.limit
+                pageparm.value.total = res.data.total
+            }
+        } finally {
+            loadingBPage.value = false
+        }
+    }
 
     const callFather = (parm) => {
         formInline.value.page = parm.page
@@ -639,7 +675,14 @@
             formInline.value.page = 1
             formInline.value.limit = 10
             tableData.value = []
+            pageparm.value.page = 1
             getLogsData()
+        }else if (e == "loginlogs"){
+            formInline.value.page = 1
+            formInline.value.limit = 10
+            tableData.value = []
+            pageparm.value.page = 1
+            getLoginLogsData()
         }
     }
 

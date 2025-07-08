@@ -117,12 +117,22 @@ Api.apiSystemUser = params => ajaxGet({url: `/api/system/user/`,params})
 Api.systemOperationlog= params => ajaxGet({url: `/api/system/operation_log/`,params})
 // 日志管理 我的日志
 Api.getOwnerOperationLogs= params => ajaxGet({url: `/api/system/operation_log/getOwnerLogs/`,params})
-// 日志管理 自己的操作日志
-Api.systemGetOwnerLogs= params => ajaxGet({url: `/api/system/operation_log/getOwnerLogs/`,params})
 // 日志管理 删除
 Api.systemOperationlogDelete= params => ajaxDelete({url: `/api/system/operation_log/`,params})
 // 日志管理 清空全部日志
 Api.systemOperationlogDeletealllogsDelete= params => ajaxDelete({url: `/api/system/operation_log/deletealllogs/`,params})
+
+/**
+ *登录日志管理
+ * */
+// 登录日志管理 查询
+Api.systemLoginlog= params => ajaxGet({url: `/api/system/login_log/`,params})
+// 登录日志管理 我的日志
+Api.getOwnerLoginlog= params => ajaxGet({url: `/api/system/login_log/getOwnerLogs/`,params})
+// 登录日志管理 删除
+Api.systemLoginlogDelete= params => ajaxDelete({url: `/api/system/login_log/`,params})
+// 登录日志管理 清空全部日志
+Api.systemLoginlogDeletealllogs= params => ajaxDelete({url: `/api/system/login_log/deletealllogs/`,params})
 
 /**
 *字典管理
@@ -138,5 +148,22 @@ Api.systemDictionaryEdit = params => ajaxPut({url: `/api/system/dictionary/`,par
 Api.systemDictionaryDelete = params => ajaxDelete({url: `/api/system/dictionary/`,params})
 // 字典管理 -- 设置状态
 Api.systemDictionarySetStatus = params => ajaxPost({url: `/api/system/dictionary/set_status/`,params})
+
+/**
+*系统配置
+ * */
+
+// 系统配置
+Api.platformsettingsSysconfig = params => ajaxGet({url: `/api/system/sysconfig/`,params})
+// 系统配置 -- 新增
+Api.platformsettingsSysconfigAdd = params => ajaxPost({url: `/api/system/sysconfig/`,params})
+// 系统配置 -- 编辑
+Api.platformsettingsSysconfigEdit = params => ajaxPut({url: `/api/system/sysconfig/`,params})
+// 系统配置 -- 删除
+Api.platformsettingsSysconfigDelete = params => ajaxDelete({url: `/api/system/sysconfig/`,params})
+// 系统配置 -- 保存子项
+Api.platformsettingsSysconfigSavecontent = params => ajaxPut({url: `/api/system/sysconfig/save_content/`,params})
+// 系统配置 -- 获取所有models列表信息
+Api.platformsettingsSysconfigGetmodelsInfoList = params => ajaxGet({url: `/api/system/sysconfig/get_models_info_list/`,params})
 
 export default Api

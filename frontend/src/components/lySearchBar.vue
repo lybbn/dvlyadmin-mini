@@ -136,6 +136,7 @@
         min-width: 0;
         align-items: center;
         flex-wrap: wrap;
+        width: 100%;
     }
 
     .search-items-container {

@@ -176,11 +176,16 @@ def get_verbose_name(queryset=None, view=None, model=None):
         pass
     return model if model else ""
 
-def save_login_log(request,status=True,msg=""):
+def save_login_log(request,status=True,msg="",user=None):
     """
     保存登录日志
     :return:
     """
+    user_id = None
+    if user:
+        user_id = user.id
+    else:
+        user_id = getattr(request.user, 'id', None)
     ip = get_request_ip(request=request)
     username = request.data.get('username',None)
     analysis_data = {}
@@ -189,7 +194,7 @@ def save_login_log(request,status=True,msg=""):
     analysis_data['agent'] = str(parse(request.META['HTTP_USER_AGENT']))
     analysis_data['browser'] = get_browser(request)
     analysis_data['os'] = get_os(request)
-    analysis_data['creator_id'] = request.user.id
+    analysis_data['creator_id'] = user_id
     analysis_data['dept_belong'] = getattr(request.user, 'dept_id', '')
     analysis_data['status'] = status
     analysis_data['msg'] = msg
