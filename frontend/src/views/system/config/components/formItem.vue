@@ -106,7 +106,6 @@
                     </div>
                     <!--     富文本     -->
                     <RichTextEditor v-else-if="row.form_item_type_label === 'richtext'" v-model="formData[row.key]" />
-
                     <!-- 提示文本 -->
                     <span v-if="row.tip" class="tip-text">{{ row.tip }}</span>
                 </template>
@@ -122,15 +121,15 @@
                         placeholder="请输入变量key"
                     >
                         <template #prepend>
-                        <span class="prefix">{{ activeTab.key }}</span>
+                        <span class="prefix">{{ activeTab }}</span>
                         </template>
                     </el-input>
-                    <span v-else class="variable-name">{{ activeTab.key }}.{{ row.key }}</span>
+                    <span v-else class="variable-name">{{ activeTab }}.{{ row.key }}</span>
                 </template>
             </el-table-column>
 
             <!-- 操作列 -->
-            <el-table-column label="操作" fixed="right" width="170" class-name="action-column">
+            <el-table-column label="操作" width="170" class-name="action-column">
                 <template #default="{ row, $index }">
                     <div class="action-buttons">
                         <el-button link type="primary" @click="handleSave(row)">保存</el-button>
@@ -158,7 +157,7 @@
 </template>
 
 <script setup>
-    import { ref, watch, nextTick } from 'vue'
+    import { ref, watch, nextTick,toRefs,onMounted } from 'vue'
     import { ElMessage, ElPopconfirm } from 'element-plus'
     import Api from '@/api/api'
     import RichTextEditor from '@/components/editor/wangEditor.vue'
@@ -171,18 +170,19 @@
             type: Object,
             default: () => ({})
         },
-        editableTabsItem: {
-            type: Object,
-            default: () => ({})
+        activeTab: {
+            type: String,
+            default: ""
         }
     })
+
+    const { activeTab } = toRefs(props)
 
     // 响应式数据
     const loading = ref(false)
     const formList = ref([])
     const formData = ref({})
     const tableRef = ref(null)
-    const activeTab = ref(props.editableTabsItem)
 
     // 获取数据
     const fetchData = async () => {
@@ -211,13 +211,15 @@
             loading.value = false
         }
     }
-
-     // 监听选项变化
-    watch(() => props.options, (newVal) => {
-        if (newVal?.id) {
-            fetchData()
+    
+    watch(
+        () => props.activeTab,
+        (newVal) => {
+            if (newVal === props.options.key) {
+                fetchData()
+            }
         }
-    }, { immediate: true })
+    )
 
     // 保存整个表单
     const handleSubmit = async () => {
@@ -292,6 +294,12 @@
             ElMessage.error('删除失败')
         }
     }
+
+    onMounted(()=>{
+        if (props.activeTab === props.options.key) {
+            fetchData()
+        }
+    })
 </script>
 
 <style lang="scss" scoped>

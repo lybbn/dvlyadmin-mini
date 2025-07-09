@@ -16,31 +16,9 @@
                 :key="index"
                 :label="item.title"
                 :name="item.key"
-            >
-                <FormItem :options="item" :editableTabsItem="item"></FormItem>
-            </el-tab-pane>
-            <el-tab-pane label="Api白名单" name="apiWhiteList">
-                <el-table :data="ApiList" v-loading="loading" style="width: 100%">
-                    <el-table-column min-width="120" label="名称" prop="label"></el-table-column>
-                    <el-table-column min-width="150" label="Api地址" prop="value"></el-table-column>
-                    <el-table-column label="操作" fixed="right" width="140">
-                        <template #header>
-                            <div class="lycaozuol">
-                                <span>操作</span>
-                                <el-button circle  size="small"  type="primary" icon="Plus"></el-button>
-                            </div>
-                        </template>
-                        <template #default="{ row, $index }">
-                            <div>
-                                <el-popconfirm title="确定删除吗？" @confirm="handleApiDelete(row)">
-                                    <template #reference>
-                                        <el-button link type="danger" v-auth="'systemConfig:Delete'">删除</el-button>
-                                    </template>
-                                </el-popconfirm>
-                            </div>
-                        </template>
-                </el-table-column>
-                </el-table>
+            >   
+                <apiWhiteList :options="item" v-if="item.key == 'apiWhiteList'" @refreshData="getGroups"></apiWhiteList>
+                <FormItem :options="item" :activeTab="activeTab" v-else></FormItem>
             </el-tab-pane>
         </el-tabs>
         <el-empty v-else></el-empty>
@@ -55,6 +33,7 @@
     import Api from '@/api/api'
     import AddModuleContent from "./components/addModuleContent.vue";
     import FormItem from "./components/formItem.vue";
+    import apiWhiteList from './components/apiWhiteList.vue';
 
     let activeTab = ref("base")
     let editableTabs = ref([])
@@ -79,9 +58,6 @@
         })
     }
 
-    let loading = ref(false)
-    let ApiList = ref([])
-
     onMounted(() => {
         getGroups()
     })
@@ -93,11 +69,6 @@
 <style scoped lang="scss">
 .lyccontainer{
     margin: 10px;
-}
-.lycaozuol{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 .mobile-button {
     padding: 8px 12px;

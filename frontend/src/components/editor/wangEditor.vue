@@ -87,6 +87,7 @@
         placeholder: '请输入内容...',
         readOnly:props.readOnly,
         lineHeight: '1',
+        scroll:true,
         // 图片上传配置
         MENU_CONF: {
             uploadImage: {
@@ -156,8 +157,7 @@
     }
 
     .editor-content {
-        min-height: 310px;
-        height: 310px;
+        height: 301px !important;
         overflow-y: auto;
     }
 </style>

@@ -1,3 +1,4 @@
+import json
 from rest_framework.views import APIView
 from utils.jsonResponse import SuccessResponse,ErrorResponse,DetailResponse
 from rest_framework.serializers import ModelSerializer
@@ -12,6 +13,15 @@ from django.db.models import Q
 from mysystem.models import SystemConfig
 from utils.common import get_parameter_dic,get_full_image_url,ast_convert
 from utils.models import get_all_models_objects
+
+def safe_parse_json(value):
+    try:
+        # 处理可能的外层引号
+        if isinstance(value, str) and value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return None
 
 class SystemConfigFilter(django_filters.rest_framework.FilterSet):
     """
@@ -32,8 +42,8 @@ class SystemConfigSerializer(CustomModelSerializer):
     def to_representation(self, instance):  # 序列化
         ret = super().to_representation(instance)
         ret['rule'] = ast_convert(ret['rule'])  # 可以保存的修改字段值的方法
-        ret['setting'] = ast_convert(ret['setting'])  # 可以保存的修改字段值的方法
-        ret['data_options'] = ast_convert(ret['data_options'])  # 可以保存的修改字段值的方法
+        ret['setting'] = ast_convert(ret['setting'])
+        ret['data_options'] = ast_convert(ret['data_options']) 
         return ret
     
     class Meta:
@@ -89,6 +99,8 @@ class SystemConfigChildrenSerializer(CustomModelSerializer):
         ret['data_options'] = ast_convert(ret['data_options'])  # 可以保存的修改字段值的方法
         if ret['form_item_type']  == 9:
             ret['value'] = boolValue(ret['value'])
+        if ret['key'] == "apiWhiteList":
+            ret['value'] = safe_parse_json(ret['value'])
         return ret
 
     class Meta:
@@ -96,6 +108,34 @@ class SystemConfigChildrenSerializer(CustomModelSerializer):
         fields = "__all__"
         read_only_fields = ["id"]
 
+class SystemConfigUpdateSerializer(CustomModelSerializer):
+    """
+    系统配置-编辑时使用-序列化器
+    """
+    form_item_type_label = serializers.CharField(source='get_form_item_type_display', read_only=True)
+    rule = serializers.JSONField(allow_null=True,required=False)
+    data_options = serializers.JSONField(allow_null=True,required=False)
+    setting = serializers.JSONField(allow_null=True,required=False)
+
+    class Meta:
+        model = SystemConfig
+        fields = "__all__"
+        read_only_fields = ["id"]
+        extra_kwargs = {
+            'key': {'required': False},
+            'title': {'required': False},
+        }
+
+    def validate_key(self, value):
+        """
+        验证key是否允许重复
+        parent为空时不允许重复,反之允许
+        """
+        ins = getattr(self, 'instance', None)
+        instance = SystemConfig.objects.exclude(id=ins.id).filter(key=value, parent__isnull=True).exists()
+        if instance:
+            raise ValueError('已存在相同变量名')
+        return value
 
 class SystemConfigViewSet(CustomModelViewSet):
     """
@@ -104,7 +144,7 @@ class SystemConfigViewSet(CustomModelViewSet):
     queryset = SystemConfig.objects.order_by('sort', 'create_datetime')
     serializer_class = SystemConfigChildrenSerializer
     create_serializer_class = SystemConfigCreateSerializer
-    update_serializer_class = SystemConfigCreateSerializer
+    update_serializer_class = SystemConfigUpdateSerializer
     filter_class = SystemConfigFilter
 
     def update(self, request, *args, **kwargs):
