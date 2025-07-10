@@ -17,7 +17,7 @@ from mysystem.views.menu_field import MenuFieldViewSet
 from mysystem.views.frontend import SysImagesUploadView
 from mysystem.views.dictionary import DictionaryViewSet
 from mysystem.views.login_log import LoginLogViewSet
-from mysystem.views.system_config import SystemConfigViewSet
+from mysystem.views.system_config import SystemConfigViewSet,GetSystemConfigSettingsView
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
@@ -69,5 +69,6 @@ urlpatterns = [
 
     re_path('sysconfig/save_content/(?P<pk>.*?)/', SystemConfigViewSet.as_view({'put': 'save_content'}), name='保存配置'),
     path('sysconfig/get_models_info_list/', SystemConfigViewSet.as_view({'get': 'get_models_info_list'}), name='获取所有models列表信息'),
+    path('getconfig/', GetSystemConfigSettingsView.as_view()),
 ]
 urlpatterns += system_url.urls

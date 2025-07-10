@@ -50,7 +50,7 @@ CUSTOM_PERMISSION_WHITELIST = {
     ('/api/system/menu_button/menu_button_permission/', 'GET'),
     ('/api/schema/lyjson/', 'GET'),
     ('/api/system/menu_field/get_models/','GET')
-}
+}#前端也可配置，两者建议后端直接配置，更高效
 
 #自定义数据权限
 DATA_FILTER_CACHE = False #是否启用数据权限缓存，增强性能

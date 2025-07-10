@@ -8,12 +8,14 @@
 @Remark: 自定义权限验证模块
 """
 import re
+import json
 from django.core.cache import cache
 from rest_framework.permissions import BasePermission
 from django.db.models import F, Q
 from config import IS_DEMO,CUSTOM_PERMISSION_CAHCE,CUSTOM_PERMISSION_CAHCE_TIME,CUSTOM_PERMISSION_WHITELIST
 from mysystem.models import RoleMenuButtonPermission
 from rest_framework.exceptions import PermissionDenied
+from mysystem.models import SystemConfig
 
 class APIPermissionValidator:
     """API权限验证工具类"""
@@ -134,14 +136,35 @@ class CustomPermission(BasePermission):
                     
         return False
     
+    def _combine_whitelists(self,config_whitelist, db_whitelist):
+        """
+        合并配置白名单和数据库白名单，处理所有边界情况
+        :param config_whitelist: 配置中的白名单，格式为 { (path, method), ... } 或 [ (path, method), ... ]
+        :param db_whitelist: 数据库中的白名单，格式为 [ (path, method), ... ] 或 None
+        :return: 合并后的白名单集合 set( (path, method), ... )
+        """
+        # 处理 config_whitelist
+        config_set = set(config_whitelist) if config_whitelist else set()
+        
+        # 处理 db_whitelist
+        db_set = set(db_whitelist) if db_whitelist else set()
+        
+        # 合并并返回
+        return config_set.union(db_set)
+    
     def _check_whitelist(self, request) -> bool:
         """检查请求是否在白名单中"""
         current_path = request.path
-        current_method = request.method
+        current_method = request.method.upper()
         
-        for (whitelist_path, whitelist_method) in self.WHITELIST:
+        db_whitelist = self._get_db_whitelist()
+
+        # 合并config和数据库的白名单
+        combined_whitelist = self._combine_whitelists(self.WHITELIST,db_whitelist)
+
+        for (whitelist_path, whitelist_method) in combined_whitelist:
             # 方法不匹配则跳过
-            if current_method != whitelist_method:
+            if current_method != whitelist_method or not whitelist_method == "ALL":
                 continue
                 
             # 精确匹配完整路径
@@ -155,6 +178,37 @@ class CustomPermission(BasePermission):
                     return True
                     
         return False
+
+    def safe_parse_json(self,value):
+        try:
+            # 处理可能的外层引号
+            if isinstance(value, str) and value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return None
+    
+    def _get_db_whitelist(self):
+        """从数据库获取白名单列表（带缓存）"""
+        whitelist = []
+        if CUSTOM_PERMISSION_CAHCE:
+            cache_key = 'api_whitelist_cache'
+            whitelist = cache.get(cache_key)
+        wlist = []
+        if whitelist is None:
+            ins = SystemConfig.objects.filter(key="apiWhiteList").first()
+            if not ins:
+                return []
+            else:
+                wlist = self.safe_parse_json(ins.value)
+            if wlist:
+                whitelist = [(item.api, item.method) for item in wlist]
+                if CUSTOM_PERMISSION_CAHCE:
+                    cache.set(cache_key, whitelist, timeout=CUSTOM_PERMISSION_CAHCE_TIME)
+            else:
+                return []
+        
+        return whitelist
 
     def _is_demo_mode_blocked(self, request) -> bool:
         """检查演示模式限制"""

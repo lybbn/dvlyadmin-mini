@@ -18,7 +18,7 @@
                 :name="item.key"
             >   
                 <apiWhiteList :options="item" v-if="item.key == 'apiWhiteList'" @refreshData="getGroups"></apiWhiteList>
-                <FormItem :ref="(el) => setItemRef(el, item)" :options="item" :activeTab="activeTab" v-else></FormItem>
+                <FormItem :ref="(el) => setItemRef(el, item)" :options="item" :activeTab="activeTab" v-else @updateConfig="handleUpdateConfig"></FormItem>
             </el-tab-pane>
         </el-tabs>
         <el-empty v-else></el-empty>
@@ -34,6 +34,9 @@
     import AddModuleContent from "./components/addModuleContent.vue";
     import FormItem from "./components/formItem.vue";
     import apiWhiteList from './components/apiWhiteList.vue';
+    import {useUserState} from "@/store/userState";
+
+	const userState = useUserState()
 
     let activeTab = ref("base")
     let editableTabs = ref([])
@@ -77,6 +80,13 @@
                 targetRef.fetchData(); // 调用子组件方法
             }
         }
+        if(activeTab.value == "base"){
+            handleUpdateConfig()
+        }
+    }
+
+    function handleUpdateConfig(){
+        userState.getSystemConfig()
     }
 
     onMounted(() => {

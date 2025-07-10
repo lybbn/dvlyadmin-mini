@@ -27,7 +27,7 @@
 					<div class="logo-wrapper">
 						<img 
 							:alt="config.APP_NAME" 
-							src="@/assets/lybbn/imgs/logo.png"
+							:src="userState.sysConfig.logo"
 							class="logo-image"
 						>
 					</div>
@@ -89,7 +89,9 @@
 	import ModulePasswordForm from './components/modulePasswordForm.vue'
 	import BeianInfo from './components/beian.vue'
 	import ParticlesBackground from '@/components/tsParticles.vue'
+	import {useUserState} from "@/store/userState";
 
+	const userState = useUserState()
 	const router = useRouter()
 	const siteThemeStore = useSiteThemeStore()
 
@@ -99,6 +101,7 @@
 	}
 
 	onMounted(() => {
+		userState.getSystemConfig()
 		// 动态添加viewport meta标签
 		const viewportMeta = document.querySelector("meta[name='viewport']") || document.createElement('meta')
 		viewportMeta.name = 'viewport'

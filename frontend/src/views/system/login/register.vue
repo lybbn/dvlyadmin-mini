@@ -27,7 +27,7 @@
                     <div class="logo-wrapper">
                         <img 
                             :alt="config.APP_NAME" 
-                            src="@/assets/lybbn/imgs/logo.png"
+                            :src="userState.sysConfig.logo"
                             class="logo-image"
                         >
                     </div>
@@ -52,33 +52,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useSiteThemeStore } from "@/store/siteTheme"
-import config from "@/config"
-import ModuleRegisterForm from './components/moduleRegisterForm.vue'
-import ParticlesBackground from '@/components/tsParticles.vue'
-import BeianInfo from './components/beian.vue'
+    import { ref, onMounted } from 'vue'
+    import { useRouter } from 'vue-router'
+    import { useSiteThemeStore } from "@/store/siteTheme"
+    import config from "@/config"
+    import ModuleRegisterForm from './components/moduleRegisterForm.vue'
+    import ParticlesBackground from '@/components/tsParticles.vue'
+    import BeianInfo from './components/beian.vue'
+    import {useUserState} from "@/store/userState";
 
-const router = useRouter()
-const siteThemeStore = useSiteThemeStore()
+    const userState = useUserState()
 
-// 设置主题
-function setSiteTheme() {
-	siteThemeStore.setSiteTheme(siteThemeStore.siteTheme === 'light' ? 'dark' : 'light')
-}
+    const router = useRouter()
+    const siteThemeStore = useSiteThemeStore()
 
-onMounted(() => {
-	// 动态添加viewport meta标签
-	const viewportMeta = document.querySelector("meta[name='viewport']") || document.createElement('meta')
-	viewportMeta.name = 'viewport'
-	viewportMeta.content = "width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"
-	document.head.appendChild(viewportMeta)
-})
+    // 设置主题
+    function setSiteTheme() {
+        siteThemeStore.setSiteTheme(siteThemeStore.siteTheme === 'light' ? 'dark' : 'light')
+    }
 
-const navigateToLogin = () => {
-    router.push('/login')
-}
+    onMounted(() => {
+        userState.getSystemConfig()
+        // 动态添加viewport meta标签
+        const viewportMeta = document.querySelector("meta[name='viewport']") || document.createElement('meta')
+        viewportMeta.name = 'viewport'
+        viewportMeta.content = "width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"
+        document.head.appendChild(viewportMeta)
+    })
+
+    const navigateToLogin = () => {
+        router.push('/login')
+    }
 
 </script>
 

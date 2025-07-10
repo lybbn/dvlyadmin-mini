@@ -164,6 +164,8 @@
     import pictureSingleUpload from '@/components/upload/single-picture.vue'
     import lyInputNumber from "@/components/lyInputNumber.vue"
 
+    const emit = defineEmits(['updateConfig'])
+
     // 组件属性
     const props = defineProps({
         options: {
@@ -272,6 +274,9 @@
             if (res.code === 2000) {
                 ElMessage.success('保存成功')
                 fetchData()
+                if(props.activeTab == "base"){
+                    emit("updateConfig")
+                }
             } else {
                 ElMessage.warning(res.msg)
             }

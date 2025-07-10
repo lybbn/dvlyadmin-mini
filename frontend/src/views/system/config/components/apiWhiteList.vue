@@ -1,7 +1,10 @@
 <template>
     <div>
-        <el-alert type="info" show-icon>请正确填写，以免请求时被拦截。匹配使用正则,如:/api/xxx/{id}/</el-alert>
+        <el-alert type="info" show-icon>请正确填写（后端config.py也有白名单配置，建议后端配置）,匹配使用正则,如:/api/xxx/{id}/</el-alert>
         <el-table :data="dataList" v-loading="loading" class="lyapitable">
+            <template #empty>
+                <el-empty></el-empty>
+            </template>
             <!-- <el-table-column min-width="120" label="名称" prop="label"></el-table-column> -->
             <el-table-column min-width="150" label="Api地址" prop="api" show-overflow-tooltip></el-table-column>
             <el-table-column min-width="90" label="请求方法" prop="method">
@@ -9,7 +12,7 @@
                     <el-tag :type="getMethodTagType(row.method)">{{ methodLabel(row.method) }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" fixed="right" width="140">
+            <el-table-column label="操作" fixed="right" width="90">
                 <template #header>
                     <div class="lycaozuol">
                         <span>操作</span>
@@ -94,13 +97,12 @@
     let isDialogLoading = ref(false)
     let formData = ref({})
     let methodList = [
-        {value:0,label:"GET"},
-        {value:1,label:"POST"},
-        {value:2,label:"PUT"},
-        {value:3,label:"DELETE"},
-        {value:4,label:"OPTIONS"},
-        {value:5,label:"WS"},
-        {value:-1,label:"ALL"},
+        {value:"GET",label:"GET"},
+        {value:"POST",label:"POST"},
+        {value:"PUT",label:"PUT"},
+        {value:"DELETE",label:"DELETE"},
+        {value:"OPTIONS",label:"OPTIONS"},
+        {value:"ALL",label:"ALL"},
     ]
     let apiRules = {
         api: [
@@ -118,10 +120,10 @@
 
     function getMethodTagType(method) {
         switch (method) {
-            case 0: return 'success'
-            case 1: return 'primary'
-            case 2: return 'warning'
-            case 3: return 'danger'
+            case "GET": return 'success'
+            case "POST": return 'primary'
+            case "PUT": return 'warning'
+            case "DELETE": return 'danger'
             default: return ''
         }
     }

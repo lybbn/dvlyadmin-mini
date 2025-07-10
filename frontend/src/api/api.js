@@ -152,7 +152,8 @@ Api.systemDictionarySetStatus = params => ajaxPost({url: `/api/system/dictionary
 /**
 *系统配置
  * */
-
+// 获取系统配置，无需认证
+Api.getSysConfig = params => ajaxGet({url: `/api/system/getconfig/`,params})
 // 系统配置
 Api.platformsettingsSysconfig = params => ajaxGet({url: `/api/system/sysconfig/`,params})
 // 系统配置 -- 新增

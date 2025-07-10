@@ -20,6 +20,7 @@ from utils.request_util import save_login_log
 from django_redis import get_redis_connection
 from django.conf import settings
 from config import IS_SINGLE_TOKEN
+from mysystem.views.system_config import getSystemConfig
 
 class CaptchaView(CustomAPIView):
     """
@@ -80,21 +81,27 @@ class LoginView(CustomAPIView):
         captchaKey = request.data.get('captchaKey',None)
         captcha = request.data.get('captcha',None)
 
-        image_code = CaptchaStore.objects.filter(id=captchaKey).first()
-        five_minute_ago = datetime.now() - timedelta(hours=0, minutes=5, seconds=0)
-        if image_code and five_minute_ago > image_code.expiration:
-            self.delete_expire_captcha()
-            msg="验证码过期"
-            save_login_log(request=request,status=False,msg=msg)
-            return ErrorResponse(msg=msg)
-        else:
-            if image_code and (image_code.response == captcha or image_code.challenge == captcha):
-                image_code and image_code.delete()
-            else:
+        open_capche = True
+        capche_config = getSystemConfig(key="base.loginCaptcha",group=False)
+        if capche_config:
+            open_capche = capche_config.get("loginCaptcha",True)
+
+        if open_capche:
+            image_code = CaptchaStore.objects.filter(id=captchaKey).first()
+            five_minute_ago = datetime.now() - timedelta(hours=0, minutes=5, seconds=0)
+            if image_code and five_minute_ago > image_code.expiration:
                 self.delete_expire_captcha()
-                msg="图片验证码错误"
+                msg="验证码过期"
                 save_login_log(request=request,status=False,msg=msg)
                 return ErrorResponse(msg=msg)
+            else:
+                if image_code and (image_code.response == captcha or image_code.challenge == captcha):
+                    image_code and image_code.delete()
+                else:
+                    self.delete_expire_captcha()
+                    msg="图片验证码错误"
+                    save_login_log(request=request,status=False,msg=msg)
+                    return ErrorResponse(msg=msg)
             
         user = Users.objects.filter(username=username).first()
 

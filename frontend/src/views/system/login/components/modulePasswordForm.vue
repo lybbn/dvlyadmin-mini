@@ -7,8 +7,8 @@
 		<el-form-item prop="password">
 			<el-input v-model="formData.password" prefix-icon="lock" clearable show-password placeholder="请输入密码"></el-input>
 		</el-form-item>
-		<el-form-item prop="captcha">
-            <el-input type="text" prefix-icon="circle-check" v-model.trim="formData.captcha" auto-complete="off" placeholder="验证码">
+		<el-form-item prop="captcha" v-if="userState.sysConfig.loginCaptcha">
+            <el-input type="text" prefix-icon="circle-check" v-model.trim="formData.captcha" auto-complete="off" placeholder="验证码" :rules="userState.sysConfig.loginCaptcha?captchaRules:[]">
                   <template #append>
                     <img class="login-captcha" :src="image_base" @click="getCaptchas" />
                   </template>
@@ -50,16 +50,16 @@
 		captchaKey: null,
 	})
 	let image_base = ref(null)
+	let captchaRules = [
+		{required: true, message: "请输入验证码", trigger: 'blur'}
+	]
 	let rules = ref({
 		username: [
 			{required: true, message: "请输入账号", trigger: 'blur'}
 		],
 		password: [
 			{required: true, message: "请输入密码", trigger: 'blur'}
-		],
-		captcha: [
-			{required: true, message: "请输入验证码", trigger: 'blur'}
-		],
+		]
 	})
 	let islogining = ref(false)
 

@@ -76,9 +76,17 @@ class SystemConfigCreateSerializer(CustomModelSerializer):
         return value
 
 def boolValue(val):
-    if not val:return False
-    if val in ["true","1"]:return True
-    if val in ["fasle","0"]:return False
+    if isinstance(val, bool):
+        return val
+    if not val:
+        return False
+    elif val.lower() in ["true","1", 't', 'y', 'yes', 'on']:
+        return True
+    elif val.lower() in ["false","0", 'f', 'n', 'no', 'off']:
+        return False
+    else:
+        raise ValueError(f"Cannot convert '{val}' to boolean")
+    
 
 class SystemConfigChildrenSerializer(CustomModelSerializer):
     """
@@ -186,42 +194,37 @@ class SystemConfigViewSet(CustomModelViewSet):
 # ************** 前端用户获取平台配置信息 view  ************** #
 # ================================================= #
 
-class GetSystemConfigSettingsByKeyView(APIView):
+def getSystemConfig(key="base",group = True):
     """
-    get:
-    获取系统配置
-    参数：根据key获取系统具体配置
+    当group=False时，表示查询具体的一个key的信息，这里的key用 base.logo 即 父key.子key 的方式访问
+    当group=True时，表示查询一个parent 为指定key的组信息
     """
-    authentication_classes = []
-    permission_classes = []
-
-    def get(self, request):
-        key = get_parameter_dic(request).get('key',None)
-        if not all([key]):
-            return ErrorResponse(msg="params error")
-        instance = SystemConfig.objects.filter(key=key).first()
-        data = ""
-        if instance:
-            data = instance.value
-        return DetailResponse(data=data)
+    if group:
+        queryset = SystemConfig.objects.filter(parent__key=key).values('value','key','form_item_type')
+    else:
+        keys = key.split('.')  # 拆分成 ["a", "b"]
+        if len(keys) == 2:
+            queryset = SystemConfig.objects.filter(parent__key=keys[0],key=keys[1]).values('value','key','form_item_type')
+        elif len(keys) == 1:
+            queryset = SystemConfig.objects.filter(key=key).values('value','key','form_item_type')
+        else:
+            raise Exception("key格式错误")
+    data = {}
+    if queryset:
+        for m in queryset:
+            if m['form_item_type']  == 9:
+                m['value'] = boolValue(m['value'])
+            data[m['key']] = m['value']
+    return data
 
 class GetSystemConfigSettingsView(APIView):
     """
     get:
     获取系统配置
-    参数：group 分组名称（key）
     """
     authentication_classes = []
     permission_classes = []
 
     def get(self, request):
-        group = get_parameter_dic(request)['group']
-        if not all([group]):
-            return ErrorResponse(msg="params error")
-        # 不返回后端专用配置
-        queryset = SystemConfig.objects.filter(parent_id__isnull=False).values('value','key','title')
-        data = {}
-        if queryset:
-            for m in queryset:
-                data[m['key']] = m['value']
+        data = getSystemConfig()
         return DetailResponse(data=data)

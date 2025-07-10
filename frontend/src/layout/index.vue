@@ -4,7 +4,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<img class="logo" :src="userState.sysConfig.logo">
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
@@ -47,7 +47,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<img class="logo" :src="userState.sysConfig.logo">
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
@@ -80,7 +80,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" src="@/assets/lybbn/imgs/logo.png">
+					<img class="logo" :src="userState.sysConfig.logo">
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
@@ -375,6 +375,7 @@ let menu = computed(()=> {
 });
 
 onMounted(() => {
+	userState.getSystemConfig()
 	onLayoutResize();
 	window.addEventListener('resize', onLayoutResize);
 	// menu.value = filterUrl(storesRoutesList.routesList);

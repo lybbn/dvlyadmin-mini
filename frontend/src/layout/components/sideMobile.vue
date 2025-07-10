@@ -4,7 +4,7 @@
 	<el-drawer ref="mobileNavMenuBox" title="移动端菜单" :size="200" v-model="nav" direction="ltr" :with-header="false" destroy-on-close>
 		<el-container class="mobile-nav">
 			<el-header class="mobileheader">
-				<div class="logo-bar"><img class="logo" src="@/assets/lybbn/imgs/logo.png"></div>
+				<div class="logo-bar"><img class="logo" :src="userState.sysConfig.logo"></div>
 				<span class="headertitle">{{ config.APP_NAME }}</span>
 			</el-header>
 			<el-main>
@@ -27,6 +27,9 @@
 	import { useRouter,useRoute } from 'vue-router'
 	import {useSiteThemeStore} from "@/store/siteTheme";
 	import config from '@/config'
+	import {useUserState} from "@/store/userState";
+
+    const userState = useUserState()
 
 	const siteThemeStore = useSiteThemeStore()
 

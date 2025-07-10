@@ -5,6 +5,7 @@ import XEUtils from "xe-utils";
 import {dynamicRoutes} from '@/router/routes.js';
 import { generateLocalRoutes,initRoutes,resetDynamicRoutes } from '@/utils/routeGenerator'
 import { useKeepAliveStore } from "@/store/keepAlive";
+import defaultLogo from '@/assets/lybbn/imgs/logo.png'
 
 export const useUserState = defineStore('userState', {
 	state:() => {
@@ -17,12 +18,8 @@ export const useUserState = defineStore('userState', {
 			},
             sysConfig:{
                 sysVersion:config.APP_VER,
-                webServer:"",
-                wwwrootPath:"",
-                siteNums:0,
-                dbNums:0,
-                softNums:0,
-                currentOs:"windows",
+                loginCaptcha:false,
+                logo:defaultLogo,
             },
             // 完整菜单树 (用于菜单渲染),是获取后台菜单转换后的路由配置
             menus: [],
@@ -185,11 +182,13 @@ export const useUserState = defineStore('userState', {
          * 取系统配置
          */
         async getSystemConfig(){
-            Api.sysGetSettings().then(res=>{
+            Api.getSysConfig().then(res=>{
                 if(res.code == 2000){
                     this.sysConfig = res.data
-                    this.serverInfo.serverIp = !!res.data.serverIp?res.data.serverIp:"127.0.0.1"
-                    this.userInfo.username = res.data.username
+                    this.sysConfig.sysVersion = config.APP_VER
+                    if(!this.sysConfig.logo){
+                        this.sysConfig.logo = defaultLogo
+                    }
                 }
             })
         }
