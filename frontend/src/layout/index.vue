@@ -5,8 +5,12 @@
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
 					<img class="logo" :src="userState.sysConfig.logo">
-					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
+					<span v-if="!ismobile">{{ userState.sysConfig.systitle}}</span>
 				</div>
+			</div>
+			<div class="lybbn-panel-header-center" v-if="!ismobile">
+				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
+				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
 			</div>
 			<div class="lybbn-panel-header-right">
 				<userbar></userbar>
@@ -51,10 +55,14 @@
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
-			<div v-if="!ismobile" class="lybbn-header-menu" style="margin-left: 20px;">
-				<el-menu mode="horizontal" :default-active="active" router background-color="var(--ly-header-bg)" text-color="#fff" active-text-color="var(--el-color-primary-light-1)">
+			<div v-if="!ismobile" class="lybbn-header-menu" style="margin-left: 20px;margin-right: 20px;">
+				<el-menu mode="horizontal" ellipsis :default-active="active" style="width:100%;overflow-x:auto;overflow-y: hidden;" router background-color="var(--ly-header-bg)" text-color="#fff" active-text-color="var(--el-color-primary-light-1)">
 					<NavMenu :navMenus="menu"></NavMenu>
 				</el-menu>
+			</div>
+			<div class="lybbn-panel-header-center" v-if="!ismobile">
+				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
+				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
 			</div>
 			<SideMobile v-if="ismobile"></SideMobile>
 			<div class="lybbn-panel-header-right">
@@ -83,6 +91,10 @@
 					<img class="logo" :src="userState.sysConfig.logo">
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
+			</div>
+			<div class="lybbn-panel-header-center" v-if="!ismobile">
+				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
+				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
 			</div>
 			<div class="lybbn-panel-header-right">
 				<userbar></userbar>
@@ -374,6 +386,10 @@ let menu = computed(()=> {
     return filterUrl2(storesRoutesList.routesList)
 });
 
+function canUpgradeClick(){
+	window.open("https://doc.lybbn.cn")
+}
+
 onMounted(() => {
 	userState.getSystemConfig()
 	onLayoutResize();
@@ -439,4 +455,6 @@ onBeforeUnmount(() => {
 .lybbn-panel-side-scroll:deep(.el-menu-item:hover){
 	background-color: var(--el-color-primary-light-9) !important;
 }
+.lybbn-panel-header-center {display: flex;align-items: center;}
+.lybbn-panel-header-center a{font-size: 12px;color: #b5afaf;text-decoration: none;letter-spacing: .5px;}
 </style>

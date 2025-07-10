@@ -20,6 +20,7 @@ export const useUserState = defineStore('userState', {
                 sysVersion:config.APP_VER,
                 loginCaptcha:false,
                 logo:defaultLogo,
+                systitle:config.APP_NAME
             },
             // 完整菜单树 (用于菜单渲染),是获取后台菜单转换后的路由配置
             menus: [],
@@ -186,8 +187,11 @@ export const useUserState = defineStore('userState', {
                 if(res.code == 2000){
                     this.sysConfig = res.data
                     this.sysConfig.sysVersion = config.APP_VER
-                    if(!this.sysConfig.logo){
+                    if(!this.sysConfig?.logo){
                         this.sysConfig.logo = defaultLogo
+                    }
+                    if(!this.sysConfig?.systitle){
+                        this.sysConfig.systitle = config.APP_NAME
                     }
                 }
             })
