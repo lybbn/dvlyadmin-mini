@@ -6,7 +6,7 @@
  * @program：dvlyadmin-mini
 -->
 <template>
-    <div class="editor-wrapper">
+    <div class="editor-wrapper" :id="editor_id">
         <Toolbar class="editor-toolbar"
         :editor="editorRef"
         :defaultConfig="toolbarConfig"
@@ -22,10 +22,10 @@
 </template>
 
 <script setup>
-    import { ref, shallowRef, onBeforeUnmount,watch, readonly } from 'vue'
+    import { ref, shallowRef, onBeforeUnmount,watch, nextTick } from 'vue'
     import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
     import '@wangeditor/editor/dist/css/style.css'
-    import {getToken} from '@/utils/util'
+    import {getToken,generateRandomString} from '@/utils/util'
     import sysConfig from "@/config"
     import { ElMessage } from 'element-plus'
 
@@ -33,6 +33,8 @@
     const editorRef = shallowRef()
 
     let jwttoken = getToken()
+
+    let editor_id = "weditor-"+generateRandomString(15)
 
     // 内容 HTML
     const props = defineProps({
@@ -50,7 +52,7 @@
         }
     })
 
-    const emit = defineEmits(['update:modelValue'])
+    const emit = defineEmits(['update:modelValue','fullscreen'])
 
     const editorValue = ref(props.modelValue)
 
@@ -139,8 +141,32 @@
         editor.destroy()
     })
 
-    const handleCreated = (editor) => {
+    let originalParent = ref(null)// 用于保存原始父节点
+
+    const handleCreated = async (editor) => {
+        await nextTick() // 等待下一个DOM更新周期
         editorRef.value = editor // 记录 editor 实例
+        // 监听全屏
+        editor.on('fullScreen', () => { 
+            //获取全屏容器（WangEditor 生成的全屏遮罩层）
+            const fullscreenEl = document.querySelector(`#${editor_id}.w-e-full-screen-container`);
+            // 保存原始父节点（如果尚未记录）
+            if (fullscreenEl && !originalParent.value) {
+                originalParent.value = fullscreenEl.parentNode;
+            }
+            // 如果不在 body 下，则移动到 body
+            if (fullscreenEl && fullscreenEl.parentNode !== document.body) {
+                document.body.appendChild(fullscreenEl);
+            }
+        })
+        editor.on('unFullScreen', () => { 
+            //获取全屏容器（WangEditor 生成的全屏遮罩层）
+            const fullscreenEl = document.querySelector(`#${editor_id}.editor-wrapper`);
+            if (fullscreenEl && originalParent.value) {
+                originalParent.value.appendChild(fullscreenEl);
+                originalParent.value = null; // 清理引用
+            }
+        })
     }
 </script>
 

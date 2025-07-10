@@ -105,7 +105,7 @@
                                 :width="90" :height="90"></pictureSingleUpload>
                     </div>
                     <!--     富文本     -->
-                    <RichTextEditor v-else-if="row.form_item_type_label === 'richtext'" v-model="formData[row.key]" />
+                    <RichTextEditor v-else-if="row.form_item_type_label === 'richtext'" v-model="formData[row.key]"/>
                     <!-- 提示文本 -->
                     <span v-if="row.tip" class="tip-text">{{ row.tip }}</span>
                 </template>
@@ -299,6 +299,10 @@
         if (props.activeTab === props.options.key) {
             fetchData()
         }
+    })
+
+    defineExpose({
+        fetchData
     })
 </script>
 

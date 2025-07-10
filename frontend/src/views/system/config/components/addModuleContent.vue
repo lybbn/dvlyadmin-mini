@@ -1,117 +1,117 @@
 <template>
-  <div>
-    <ly-dialog 
-      v-model="dialogVisible" 
-      :title="loadingTitle" 
-      width="560px" 
-      :before-close="handleClose"
-    >
-      <el-form 
-        :inline="false" 
-        :model="formData" 
-        :rules="rules" 
-        ref="formRef" 
-        label-position="right" 
-        label-width="auto"
-      >
-        <!-- 所属分组 -->
-        <el-form-item label="所属分组" prop="parent">
-          <el-select 
-            v-model="formData.parent" 
-            placeholder="请选择分组" 
-            clearable 
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="(item, index) in groupList"
-              :key="index"
-              :label="item.title"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-
-        <!-- 标题 -->
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="formData.title" placeholder="请输入" clearable />
-        </el-form-item>
-
-        <!-- key值 -->
-        <el-form-item label="key值" prop="key">
-          <el-input v-model="formData.key" placeholder="请输入" clearable />
-        </el-form-item>
-
-        <!-- 表单类型 -->
-        <el-form-item label="表单类型" prop="form_item_type">
-          <el-select 
-            v-model="formData.form_item_type" 
-            placeholder="请选择" 
-            clearable 
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="(item, index) in formTypeList"
-              :key="index"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-
-        <!-- 选项字典 (仅当表单类型为checkbox或radio时显示) -->
-        <el-form-item 
-          label="选项字典" 
-          prop="data_options" 
-          v-if="[5, 6].includes(formData.form_item_type)"
+    <div>
+        <ly-dialog 
+        v-model="dialogVisible" 
+        :title="loadingTitle" 
+        width="560px" 
+        :before-close="handleClose"
         >
-          <el-input 
-            v-model="formData.data_options" 
-            type="textarea" 
-            :rows="2" 
-            placeholder="请输入如[{'label':'启用','value':'1'},{'label':'禁用','value':'0'}]" 
-          />
-        </el-form-item>
+        <el-form 
+            :inline="false" 
+            :model="formData" 
+            :rules="rules" 
+            ref="formRef" 
+            label-position="right" 
+            label-width="auto"
+        >
+            <!-- 所属分组 -->
+            <el-form-item label="所属分组" prop="parent">
+                <el-select 
+                    v-model="formData.parent" 
+                    placeholder="请选择分组" 
+                    clearable 
+                    style="width: 100%"
+                >
+                    <el-option 
+                    v-for="(item, index) in groupList"
+                    :key="index"
+                    :label="item.title"
+                    :value="item.id"
+                    />
+                </el-select>
+            </el-form-item>
 
-        <!-- 校验规则 (隐藏) -->
-        <el-form-item label="校验规则" v-show="false">
-          <el-select 
-            v-model="formData.rule" 
-            multiple 
-            placeholder="请选择(可多选)" 
-            clearable 
-            style="width: 100%"
-          >
-            <el-option 
-              v-for="(item, index) in ruleOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
+            <!-- 标题 -->
+            <el-form-item label="标题" prop="title">
+                <el-input v-model="formData.title" placeholder="请输入" clearable />
+            </el-form-item>
 
-        <!-- 提示信息 -->
-        <el-form-item label="提示信息" prop="placeholder">
-          <el-input v-model="formData.placeholder" placeholder="请输入" clearable />
-        </el-form-item>
+            <!-- key值 -->
+            <el-form-item label="key值" prop="key">
+                <el-input v-model="formData.key" placeholder="请输入" clearable />
+            </el-form-item>
 
-        <!-- 底部说明 -->
-        <el-form-item label="底部说明" prop="tip">
-          <el-input v-model="formData.tip" placeholder="为空则不显示" clearable />
-        </el-form-item>
+            <!-- 表单类型 -->
+            <el-form-item label="表单类型" prop="form_item_type">
+                <el-select 
+                    v-model="formData.form_item_type" 
+                    placeholder="请选择" 
+                    clearable 
+                    style="width: 100%"
+                >
+                    <el-option 
+                    v-for="(item, index) in formTypeList"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"
+                    />
+                </el-select>
+            </el-form-item>
 
-        <!-- 排序 -->
-        <el-form-item label="排序" prop="sort">
-          <el-input-number v-model="formData.sort" :min="0" :max="999" />
-        </el-form-item>
-      </el-form>
+            <!-- 选项字典 (仅当表单类型为checkbox或radio时显示) -->
+            <el-form-item 
+            label="选项字典" 
+            prop="data_options" 
+            v-if="[5, 6].includes(formData.form_item_type)"
+            >
+                <el-input 
+                    v-model="formData.data_options" 
+                    type="textarea" 
+                    :rows="2" 
+                    placeholder="请输入如[{'label':'启用','value':'1'},{'label':'禁用','value':'0'}]" 
+                />
+            </el-form-item>
 
-      <template #footer>
-        <el-button @click="handleClose" :loading="loadingSave">取消</el-button>
-        <el-button type="primary" @click="submitForm" :loading="loadingSave">确定</el-button>
-      </template>
-    </ly-dialog>
-  </div>
+            <!-- 校验规则 (隐藏) -->
+            <el-form-item label="校验规则" v-show="false">
+                <el-select 
+                    v-model="formData.rule" 
+                    multiple 
+                    placeholder="请选择(可多选)" 
+                    clearable 
+                    style="width: 100%"
+                >
+                    <el-option 
+                    v-for="(item, index) in ruleOptions"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.value"
+                    />
+                </el-select>
+            </el-form-item>
+
+            <!-- 提示信息 -->
+            <el-form-item label="提示信息" prop="placeholder">
+                <el-input v-model="formData.placeholder" placeholder="请输入" clearable />
+            </el-form-item>
+
+            <!-- 底部说明 -->
+            <el-form-item label="底部说明" prop="tip">
+                <el-input v-model="formData.tip" placeholder="为空则不显示" clearable />
+            </el-form-item>
+
+            <!-- 排序 -->
+            <el-form-item label="排序" prop="sort">
+                <el-input-number v-model="formData.sort" :min="0" :max="999" />
+            </el-form-item>
+        </el-form>
+
+        <template #footer>
+            <el-button @click="handleClose" :loading="loadingSave">取消</el-button>
+            <el-button type="primary" @click="submitForm" :loading="loadingSave">确定</el-button>
+        </template>
+        </ly-dialog>
+    </div>
 </template>
 
 <script setup>
@@ -228,8 +228,6 @@
             tip: null,
             sort: 0
         }
-        // 触发父组件刷新数据
-        emit('refreshData')
     }
 
     /**
@@ -272,38 +270,41 @@
      * 提交表单处理
      */
     const submitForm = async () => {
-    try {
-        // 验证表单
-        const valid = await formRef.value.validate()
-        if (!valid) return
-        
-        loadingSave.value = true
-        
-        // 准备提交参数
-        const params = { ...formData.value }
-        
-        // 根据是否有id决定是新增还是编辑
-        const apiFn = params.id ? Api.platformsettingsSysconfigEdit : Api.platformsettingsSysconfigAdd
-        
-        // 调用API
-        const res = await apiFn(params)
-        
-        if (res.code === 2000) {
-        ElMessage.success(res.msg)
-        handleClose()
-        } else {
-        ElMessage.warning(res.msg)
+        try {
+            // 验证表单
+            const valid = await formRef.value.validate()
+            if (!valid) return
+            
+            loadingSave.value = true
+            
+            // 准备提交参数
+            const params = { ...formData.value }
+            
+            // 根据是否有id决定是新增还是编辑
+            const apiFn = params.id ? Api.platformsettingsSysconfigEdit : Api.platformsettingsSysconfigAdd
+            
+            // 调用API
+            const res = await apiFn(params)
+            
+            if (res.code === 2000) {
+                ElMessage.success(res.msg)
+                // 触发父组件刷新数据
+                const targetItem = groupList.value.find(item => item.id === formData.value.parent);
+                emit('refreshData',targetItem)
+                handleClose()
+            } else {
+                ElMessage.warning(res.msg)
+            }
+        } catch (error) {
+            console.error('表单提交错误:', error)
+            ElMessage.error('操作失败')
+        } finally {
+            loadingSave.value = false
         }
-    } catch (error) {
-        console.error('表单提交错误:', error)
-        ElMessage.error('操作失败')
-    } finally {
-        loadingSave.value = false
-    }
     }
 
     defineExpose({
-    addModuleFn
+        addModuleFn
     })
 </script>
 

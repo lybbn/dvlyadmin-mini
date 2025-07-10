@@ -18,12 +18,12 @@
                 :name="item.key"
             >   
                 <apiWhiteList :options="item" v-if="item.key == 'apiWhiteList'" @refreshData="getGroups"></apiWhiteList>
-                <FormItem :options="item" :activeTab="activeTab" v-else></FormItem>
+                <FormItem :ref="(el) => setItemRef(el, item)" :options="item" :activeTab="activeTab" v-else></FormItem>
             </el-tab-pane>
         </el-tabs>
         <el-empty v-else></el-empty>
         <AddModuleGroup ref="addGroupFlag" @refreshData="getGroups"></AddModuleGroup>
-        <AddModuleContent ref="addContentFlag" @refreshData="getGroups"></AddModuleContent>
+        <AddModuleContent ref="addContentFlag" @refreshData="getContentRefresh"></AddModuleContent>
     </el-card>
 </template>
 
@@ -56,6 +56,27 @@
                 editableTabs.value = res.data.data
             }
         })
+    }
+    const formItemRefs = ref([]); // 存储所有 ref
+    // 动态设置 ref
+    const setItemRef = (el, item) => {
+        if (el) {
+            formItemRefs.value[item.key] = el;
+        }
+    }
+
+    // 获取指定 ref
+    const getRefByKey = (key) => {
+        return formItemRefs.value[key];
+    }
+
+    function getContentRefresh(item){
+        if(item.key == activeTab.value){
+            const targetRef = getRefByKey(item.key);
+            if (targetRef) {
+                targetRef.fetchData(); // 调用子组件方法
+            }
+        }
     }
 
     onMounted(() => {
