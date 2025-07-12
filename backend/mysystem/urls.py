@@ -18,6 +18,7 @@ from mysystem.views.frontend import SysImagesUploadView
 from mysystem.views.dictionary import DictionaryViewSet
 from mysystem.views.login_log import LoginLogViewSet
 from mysystem.views.system_config import SystemConfigViewSet,GetSystemConfigSettingsView
+from mysystem.views.notification import NotificationViewSet
 
 system_url = routers.SimpleRouter()
 system_url.register(r'menu', MenuViewSet)
@@ -32,6 +33,7 @@ system_url.register(r'operation_log', OperationLogViewSet)
 system_url.register(r'dictionary', DictionaryViewSet)
 system_url.register(r'login_log', LoginLogViewSet)
 system_url.register(r'sysconfig', SystemConfigViewSet)
+system_url.register(r'msg', NotificationViewSet)
 
 urlpatterns = [
     path('sys_image_upload/', SysImagesUploadView.as_view()),
@@ -70,5 +72,9 @@ urlpatterns = [
     re_path('sysconfig/save_content/(?P<pk>.*?)/', SystemConfigViewSet.as_view({'put': 'save_content'}), name='保存配置'),
     path('sysconfig/get_models_info_list/', SystemConfigViewSet.as_view({'get': 'get_models_info_list'}), name='获取所有models列表信息'),
     path('getconfig/', GetSystemConfigSettingsView.as_view()),
+
+    path('msg/ownmsg/',NotificationViewSet.as_view({'get':'get_own_receive'}), name='获取自己的消息列表'),
+    path('msg/delownmsg/',NotificationViewSet.as_view({'post':'del_own_receive'}), name='删除自己的消息'),
+    path('msg/readownmsg/',NotificationViewSet.as_view({'post':'read_own_receive'}), name='设置自己的消息已读'),
 ]
 urlpatterns += system_url.urls

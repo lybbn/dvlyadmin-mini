@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
+@Author:lybbn
+@QQ:1042594286
 @Remark: 自定义异常处理
 """
 import logging
@@ -42,7 +44,7 @@ def CustomExceptionHandler(ex, context):
         code = 4001
         msg = ex.detail
     elif isinstance(ex, exceptions.ValidationError):
-        msg = ex.detail
+        msg = str(ex.detail)
         errorMsg = msg
         try:
             for key in errorMsg:
@@ -78,7 +80,7 @@ def CustomExceptionHandler(ex, context):
         msg = str(ex.detail)
     elif isinstance(ex, exceptions.APIException):
         set_rollback()
-        msg = ex.detail
+        msg = str(ex.detail)
     elif isinstance(ex, ProtectedError):
         set_rollback()
         msg = "删除失败:该条数据与其他数据有相关绑定"

@@ -167,4 +167,20 @@ Api.platformsettingsSysconfigSavecontent = params => ajaxPut({url: `/api/system/
 // 系统配置 -- 获取所有models列表信息
 Api.platformsettingsSysconfigGetmodelsInfoList = params => ajaxGet({url: `/api/system/sysconfig/get_models_info_list/`,params})
 
+//消息公告
+Api.messagesMessagenotice = params => ajaxGet({url: `/api/system/msg/`,params})
+//消息公告-新增
+Api.messagesMessagenoticeAdd = params => ajaxPost({url: `/api/system/msg/`,params})
+//消息公告-修改
+Api.messagesMessagenoticeEdit = params => ajaxPut({url: `/api/system/msg/`,params})
+//消息公告-删除
+Api.messagesMessagenoticeDelete = params => ajaxDelete({url: `/api/system/msg/`,params})
+
+//我的消息 列表
+Api.getOwnMessage = params => ajaxGet({url: `/api/system/msg/ownmsg/`,params})
+//我的消息 删除
+Api.delOwnMessage = params => ajaxPost({url: `/api/system/msg/delownmsg/`,params})
+//我的消息 设置已读
+Api.readOwnMessage = params => ajaxPost({url: `/api/system/msg/readownmsg/`,params})
+
 export default Api

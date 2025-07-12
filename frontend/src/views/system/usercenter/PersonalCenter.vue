@@ -73,23 +73,23 @@
                     </div>
                 </el-tab-pane>
                 
-                <el-tab-pane label="消息通知" name="notifications">
+                <el-tab-pane label="消息通知" name="notifications" v-auth="'PMsg'">
                     <div class="notification-section">
                         <el-card shadow="never" v-for="(item, index) in notifications" :key="index" 
-                                    class="notification-card" :class="{'unread': !item.read}">
+                                    class="notification-card" :class="{'unread': !item.is_read}">
                             <div class="notification-content">
                                 <div class="notification-icon">
-                                    <el-icon :size="24" :color="notificationTypes[item.type].color">
-                                        <component :is="notificationTypes[item.type].icon" />
+                                    <el-icon :size="24" :color="notificationTypes[item.notification.tag_type].color">
+                                        <component :is="notificationTypes[item.notification.tag_type].icon" />
                                     </el-icon>
                                 </div>
                                 <div class="notification-main">
-                                    <h4>{{ item.title }}</h4>
-                                    <p>{{ item.content }}</p>
+                                    <h4>{{ item.notification.title }}</h4>
+                                    <p v-html="item.notification.content"></p>
                                     <div class="notification-meta">
-                                        <span>{{ item.time }}</span>
-                                        <el-tag size="small" :type="notificationTypes[item.type].tagType">
-                                            {{ notificationTypes[item.type].name }}
+                                        <span>{{ item.notification.create_datetime }}</span>
+                                        <el-tag size="small" :type="notificationTypes[item.notification.tag_type].tagType">
+                                            {{ notificationTypes[item.notification.tag_type].name }}
                                         </el-tag>
                                     </div>
                                 </div>
@@ -97,7 +97,15 @@
                         </el-card>
                         
                         <div class="view-more">
-                            <el-button type="primary" text @click="goToNotificationPage">查看更多消息</el-button>
+                            <el-button 
+                                type="primary" 
+                                :loading="loadingMore"
+                                :disabled="noMoreData"
+                                @click="getMoreNotifycation"
+                            >
+                                {{ noMoreData ? '没有更多了' : '加载更多' }}
+                            </el-button>
+                            <el-button type="primary" text @click="goToNotificationPage">查看全部消息</el-button>
                         </div>
                     </div>
                 </el-tab-pane>
@@ -343,6 +351,10 @@
     import pictureSingleUpload from '@/components/upload/single-picture.vue'
     import Pagination from '@/components/Pagination.vue'
 
+    import { useRouter } from 'vue-router'
+
+    const router = useRouter()
+
     const userState = useUserState()
     // 响应式窗口大小
     const { width } = useWindowSize()
@@ -388,23 +400,22 @@
 
     // 消息通知数据
     const notifications = ref([
-        { id: 1, title: '系统升级通知', content: '系统将于2023-06-25 00:00至06:00进行升级维护', type: 'system', time: '2023-06-20 09:15', read: false },
-        { id: 2, title: '新的任务分配', content: '您有一个新的任务需要处理：首页改版设计', type: 'task', time: '2023-06-19 14:30', read: false },
-        { id: 3, title: '审批通过', content: '您的请假申请已通过审批', type: 'approval', time: '2023-06-18 16:45', read: true },
-        { id: 4, title: '安全提醒', content: '检测到您的账号在异地登录，如非本人操作请及时修改密码', type: 'security', time: '2023-06-17 22:10', read: true },
-        { id: 5, title: '版本更新', content: '新版本v2.5.0已发布，包含多项功能优化和问题修复', type: 'system', time: '2023-06-16 10:20', read: true },
-        { id: 6, title: '会议提醒', content: '您有一个会议安排在明天上午10:00，主题：项目进度汇报', type: 'reminder', time: '2023-06-15 17:30', read: true },
+        // { id: 1, notification:{title: '系统升级通知', content: '系统将于2023-06-25 00:00至06:00进行升级维护', tag_type: 0, create_datetime: '2023-06-20 09:15'}, is_read: false },
+        // { id: 2, notification:{title: '新的任务分配', content: '您有一个新的任务需要处理：首页改版设计', tag_type: 1, create_datetime: '2023-06-19 14:30'}, is_read: false },
+        // { id: 3, notification:{title: '审批通过', content: '您的请假申请已通过审批', tag_type: 2, create_datetime: '2023-06-18 16:45'}, is_read: true },
+        // { id: 4, notification:{title: '安全提醒', content: '检测到您的账号在异地登录，如非本人操作请及时修改密码', tag_type: 3, create_datetime: '2023-06-17 22:10'}, is_read: true },
+        // { id: 5, notification:{title: '版本更新', content: '新版本v2.5.0已发布，包含多项功能优化和问题修复', tag_type: 0, create_datetime: '2023-06-16 10:20'}, is_read: true },
+        // { id: 6, notification:{title: '会议提醒', content: '您有一个会议安排在明天上午10:00，主题：项目进度汇报', tag_type: 4, create_datetime: '2023-06-15 17:30'}, is_read: true },
     ])
 
     // 消息类型配置
     const notificationTypes = {
-        system: { name: '系统', icon: 'Setting', color: '#409EFF', tagType: '' },
-        task: { name: '任务', icon: 'List', color: '#67C23A', tagType: 'success' },
-        approval: { name: '审批', icon: 'DocumentChecked', color: '#E6A23C', tagType: 'warning' },
-        security: { name: '安全', icon: 'Lock', color: '#F56C6C', tagType: 'danger' },
-        reminder: { name: '提醒', icon: 'Bell', color: '#909399', tagType: 'info' },
-        hr: { name: '人事', icon: 'UserFilled', color: '#8E44AD', tagType: '' },
-        message: { name: '消息', icon: 'ChatDotRound', color: '#3498DB', tagType: '' }
+        0: { name: '系统', icon: 'Setting', color: '#409EFF', tagType: 'info' },
+        1: { name: '任务', icon: 'List', color: '#67C23A', tagType: 'success' },
+        2: { name: '审批', icon: 'DocumentChecked', color: '#E6A23C', tagType: 'warning' },
+        3: { name: '安全', icon: 'Lock', color: '#F56C6C', tagType: 'danger' },
+        4: { name: '提醒', icon: 'Bell', color: '#909399', tagType: 'info' },
+        5: { name: '消息', icon: 'ChatDotRound', color: '#3498DB', tagType: 'info' }
     }
 
     // 编辑资料对话框
@@ -609,8 +620,11 @@
     }
 
     const goToNotificationPage = () => {
-        ElMessage.info('跳转到消息列表页面')
-        // 实际项目中应该是路由跳转
+        router.push({path:"/myMessage"})
+    }
+
+    function getMoreNotifycation(){
+        getMsgData(true)
     }
 
     function getSystemUserInfo(){
@@ -664,6 +678,47 @@
         }
     }
 
+    const loadingMore = ref(false)
+    const noMoreData = ref(false)
+    const getMsgData = async (loadMore = false) => {
+        if (!loadMore) {
+            // 首次加载或刷新
+            formInline.value.page = 1
+            notifications.value = []
+            noMoreData.value = false
+        }
+        
+        try {
+            loadingMore.value = true
+            const res = await Api.getOwnMessage({
+                page: formInline.value.page,
+                limit: formInline.value.limit,
+                ...formInline.value
+            })
+            
+            if (res.code === 2000) {
+                if (loadMore) {
+                    // 加载更多时追加数据
+                    notifications.value = [...notifications.value, ...res.data.data]
+                } else {
+                    // 首次加载
+                    notifications.value = res.data.data
+                }
+                
+                // 检查是否还有更多数据
+                const totalPages = Math.ceil(res.data.total / formInline.value.limit)
+                noMoreData.value = formInline.value.page >= totalPages
+                
+                // 页码自增
+                formInline.value.page++
+            }
+        } catch (error) {
+            console.error('获取消息失败:', error)
+        } finally {
+            loadingMore.value = false
+        }
+    }
+
     const callFather = (parm) => {
         formInline.value.page = parm.page
         formInline.value.limit = parm.limit
@@ -683,6 +738,12 @@
             tableData.value = []
             pageparm.value.page = 1
             getLoginLogsData()
+        }else if(e == "notifications"){
+            formInline.value.page = 1
+            formInline.value.limit = 10
+            notifications.value = []
+            pageparm.value.page = 1
+            getMsgData()
         }
     }
 

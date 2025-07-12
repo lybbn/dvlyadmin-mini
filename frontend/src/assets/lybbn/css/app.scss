@@ -175,13 +175,13 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 }
 
 .ly-is-full{
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 99;
-    background:var(--el-bg-color);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2000;
+	background:var(--el-bg-color);
 }
 
 .tableSelect{

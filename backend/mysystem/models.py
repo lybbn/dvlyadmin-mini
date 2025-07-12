@@ -407,9 +407,21 @@ class LoginLog(CoreModel):
         ordering = ('-create_datetime',)
 
 class Notification(CoreModel):
+    TYPE_CHOICES = (
+        (0, "平台公告"),
+        (1, "按用户"),
+        (2, "按部门"),
+        (3, "按角色"),
+    )
+    TAG_TYPE_CHOICES = (
+        (0, "系统"),
+        (1, "任务"),
+        (2, "审批"),
+    )
     title = models.CharField(max_length=100,verbose_name="标题")
     content = models.TextField(verbose_name="内容")
-    target_type = models.SmallIntegerField(default=0, verbose_name="目标类型")
+    target_type = models.SmallIntegerField(default=0,choices=TYPE_CHOICES, verbose_name="目标类型")
+    tag_type = models.SmallIntegerField(default=0,choices=TYPE_CHOICES, verbose_name="标签类型")
     users = models.ManyToManyField(Users, through='NotificationUsers', blank=True, related_name='notifications_users',verbose_name="关联用户")
     dept = models.ManyToManyField(Dept, blank=True, db_constraint=False,verbose_name="关联部门")
     role = models.ManyToManyField(Role, blank=True, db_constraint=False,verbose_name="关联角色")
@@ -425,6 +437,7 @@ class NotificationUsers(models.Model):
     notification = models.ForeignKey(Notification, on_delete=models.CASCADE,db_constraint=False,verbose_name="关联消息")
     is_read = models.BooleanField(default=False, blank=True, null=True, verbose_name="是否已读")
     read_at = models.DateTimeField(null=True, blank=True, verbose_name="已读时间")
+    is_delete = models.BooleanField(default=False, verbose_name="是否逻辑删除", help_text="是否逻辑删除")
     
     class Meta:
         db_table = table_prefix + 'message_users'
