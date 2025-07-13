@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `captcha_captchastore` (
   UNIQUE KEY `hashkey` (`hashkey`)
 ) ENGINE=InnoDB AUTO_INCREMENT=282 DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.captcha_captchastore 的数据：~18 rows (大约)
+-- 正在导出表  dvlyadmin_mini.captcha_captchastore 的数据：~19 rows (大约)
 DELETE FROM `captcha_captchastore`;
 /*!40000 ALTER TABLE `captcha_captchastore` DISABLE KEYS */;
 INSERT INTO `captcha_captchastore` (`id`, `challenge`, `response`, `hashkey`, `expiration`) VALUES
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `django_migrations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.django_migrations 的数据：~28 rows (大约)
+-- 正在导出表  dvlyadmin_mini.django_migrations 的数据：~27 rows (大约)
 DELETE FROM `django_migrations`;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
@@ -243,17 +243,7 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 	(15, 'captcha', '0001_initial', '2025-05-24 19:32:19.184561'),
 	(16, 'captcha', '0002_alter_captchastore_id', '2025-05-24 19:32:19.191878'),
 	(17, 'mysystem', '0001_initial', '2025-05-24 19:32:20.460787'),
-	(18, 'sessions', '0001_initial', '2025-05-24 19:32:20.522068'),
-	(19, 'mysystem', '0002_users_is_active', '2025-05-25 09:58:43.898800'),
-	(20, 'mysystem', '0003_loginlog_msg_loginlog_status', '2025-05-25 10:08:00.219620'),
-	(21, 'mysystem', '0004_remove_role_data_scope_remove_role_dept_and_more', '2025-06-27 10:38:51.273530'),
-	(22, 'mysystem', '0005_rolemenupermission_data_scope_and_more', '2025-06-27 10:48:50.002637'),
-	(23, 'mysystem', '0006_alter_fieldpermission_role_and_more', '2025-06-30 13:48:02.979773'),
-	(24, 'mysystem', '0007_operationlog_creator_name_alter_users_gender', '2025-07-04 09:53:47.081826'),
-	(25, 'mysystem', '0008_notification_remove_dictionary_code_and_more', '2025-07-05 20:26:59.925791'),
-	(26, 'mysystem', '0009_systemconfig', '2025-07-08 09:12:23.916249'),
-	(27, 'mysystem', '0010_notification_tag_type_alter_notification_target_type', '2025-07-12 21:24:18.139812'),
-	(28, 'mysystem', '0011_notificationusers_is_delete', '2025-07-12 23:51:56.334790');
+	(18, 'sessions', '0001_initial', '2025-05-24 19:32:20.522068');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 
 -- 导出  表 dvlyadmin_mini.django_session 结构
@@ -407,7 +397,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_login_log` (
   KEY `lyadmin_login_log_creator_id_2aae8b60` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_login_log 的数据：~1 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_login_log 的数据：~0 rows (大约)
 DELETE FROM `lyadmin_login_log`;
 /*!40000 ALTER TABLE `lyadmin_login_log` DISABLE KEYS */;
 /*!40000 ALTER TABLE `lyadmin_login_log` ENABLE KEYS */;
@@ -597,7 +587,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_message` (
   KEY `lyadmin_message_creator_id_6cfcc649` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_message 的数据：~3 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_message 的数据：~1 rows (大约)
 DELETE FROM `lyadmin_message`;
 /*!40000 ALTER TABLE `lyadmin_message` DISABLE KEYS */;
 INSERT INTO `lyadmin_message` (`id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `title`, `content`, `target_type`, `creator_id`, `tag_type`) VALUES
@@ -682,7 +672,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_operation_log` (
   KEY `lyadmin_operation_log_creator_id_7b08f4e1` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_operation_log 的数据：~55 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_operation_log 的数据：~0 rows (大约)
 DELETE FROM `lyadmin_operation_log`;
 /*!40000 ALTER TABLE `lyadmin_operation_log` DISABLE KEYS */;
 /*!40000 ALTER TABLE `lyadmin_operation_log` ENABLE KEYS */;
