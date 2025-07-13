@@ -36,6 +36,8 @@ from jwt import decode as jwt_decode
 from rest_framework_simplejwt.authentication import AUTH_HEADER_TYPE_BYTES
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import UntypedToken
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser, User
 
 class ApiLoggingMiddleware(MiddlewareMixin):
     """

@@ -21,30 +21,30 @@
 		<div class="screen panel-item" @click="screenFunc">
 			<el-icon><FullScreen /></el-icon>
 		</div>
-		<div class="msg panel-item" @click="showMsg" v-if="false">
-			<el-badge :hidden="msgList.length==0" :value="msgList.length" class="badge" type="danger">
+		<div class="msg panel-item" @click="showMsg">
+			<el-badge :hidden="lywebsocket.msgInfo.msgNumber==0" :value="lywebsocket.msgInfo.msgNumber" class="badge" type="danger">
 				<el-tooltip  effect="dark" content="消息列表" placement="bottom">
 					<el-icon><ChatDotRound /></el-icon>
 				</el-tooltip>
 			</el-badge>
-			<el-drawer title="新消息" v-model="msg" :size="400" append-to-body destroy-on-close>
+			<el-drawer title="新消息" v-model="msg" :size="600" append-to-body destroy-on-close>
 				<el-container>
-					<el-main class="nopadding">
+					<el-main class="nopadding" v-loading="isLoadingMsg">
 						<el-scrollbar>
 							<ul class="msg-list">
 								<li v-for="item in msgList" v-bind:key="item.id">
 									<a :href="item.link" target="_blank">
-										<div class="msg-list__icon">
+										<!-- <div class="msg-list__icon">
 											<el-badge is-dot type="danger">
 												<el-avatar :size="40" :src="item.avatar"></el-avatar>
 											</el-badge>
-										</div>
+										</div> -->
 										<div class="msg-list__main">
-											<h2>{{item.title}}</h2>
-											<p>{{item.describe}}</p>
+											<h2>{{item.notification.title}}</h2>
+											<p v-html="item.notification.content"></p>
 										</div>
 										<div class="msg-list__time">
-											<p>{{item.time}}</p>
+											<p>{{item.notification.create_datetime}}</p>
 										</div>
 									</a>
 								</li>
@@ -106,7 +106,9 @@
 	import {useSiteThemeStore} from "@/store/siteTheme";
 	import {useUserState} from "@/store/userState";
 	import { useRouter } from 'vue-router';
+	import { useLywebsocket } from "@/store/websocket";
 	
+	const lywebsocket = useLywebsocket()
 	const router = useRouter()
 	const siteThemeStore = useSiteThemeStore()
 	const userState = useUserState()
@@ -117,6 +119,7 @@
 	let msg = ref(false)
 	let msgList = ref([])
 	let onlyRestartVisiable = ref(false)
+	let isLoadingMsg = ref(false)
 
 	let currentLang = ref(siteThemeStore.language || 'zh-cn')
 
@@ -128,10 +131,31 @@
 	//显示短消息
 	function showMsg(){
 		msg.value = true
+		isLoadingMsg.value = true
+		Api.getOwnMessage({is_read:false,page:1,limit:999}).then(res=>{
+			isLoadingMsg.value = false
+			if(res.code === 2000){
+				msgList.value = res.data.data
+			}else{
+				ElMessage.warning(res.msg)
+			}
+		})
+		
 	}
 	//标记已读
 	function markRead(){
-		msgList.value = []
+		if(msgList.value.length<1){
+			return
+		}
+		Api.readOwnMessage({type:"ALL"}).then(res=>{
+			if(res.code === 2000){
+				ElMessage.success(res.msg)
+				msgList.value = []
+				lywebsocket.setUnread(0)
+			}else{
+				ElMessage.warning(res.msg)
+			}
+		})
 	}
 	//搜索
 	function searchFunc(){
@@ -199,7 +223,7 @@
 	.msg-list__main {flex: 1;}
 	.msg-list__main h2 {font-size: 15px;font-weight: normal;color: #333;}
 	.msg-list__main p {font-size: 12px;color: #999;line-height: 1.8;margin-top: 5px;}
-	.msg-list__time {width: 100px;text-align: right;color: #999;}
+	.msg-list__time {width: 120px;text-align: right;color: #999;}
 
 	.dark .msg-list__main h2 {color: #d0d0d0;}
 	.dark .msg-list li {border-top:1px solid #363636;}

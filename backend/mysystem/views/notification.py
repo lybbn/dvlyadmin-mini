@@ -209,7 +209,7 @@ class NotificationViewSet(CustomModelViewSet):
         id = reqData.get("id")
         user = self.request.user
         NotificationUsers.objects.filter(id=id,user=user).update(is_delete=True)
-        return SuccessResponse(msg="删除成功")
+        return DetailResponse(msg="删除成功")
     
     def read_own_receive(self, request):
         """
@@ -217,6 +217,10 @@ class NotificationViewSet(CustomModelViewSet):
         """
         reqData = get_parameter_dic(request)
         id = reqData.get("id")
+        type = reqData.get("type","")
         user = self.request.user
-        NotificationUsers.objects.filter(id=id,user=user,is_read=False).update(is_read=True,read_at=datetime.datetime.now())
-        return SuccessResponse(msg="删除成功")
+        if not type:
+            NotificationUsers.objects.filter(id=id,user=user,is_read=False).update(is_read=True,read_at=datetime.datetime.now())
+        elif type == "ALL":
+            NotificationUsers.objects.filter(user=user,is_read=False).update(is_read=True,read_at=datetime.datetime.now())
+        return DetailResponse(msg="设置成功")

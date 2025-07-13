@@ -13,9 +13,6 @@ export const useUserState = defineStore('userState', {
             userInfo:{
                 username:""
             },
-			msgInfo:{
-				msgNumber:0,
-			},
             sysConfig:{
                 sysVersion:config.APP_VER,
                 loginCaptcha:false,
@@ -199,7 +196,7 @@ export const useUserState = defineStore('userState', {
 	},
     persist: [
         {
-            pick: ['userInfo','msgInfo','sysConfig','menus','permissions'],
+            pick: ['userInfo','sysConfig','menus','permissions'],
             storage: localStorage,//sessionStorage
         }
     ],

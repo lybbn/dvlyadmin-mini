@@ -32,7 +32,7 @@ python manage.py init
 python manage.py runserver 127.0.0.1:8000
 
 #ASGI 部署方式（支持 WebSocket）
-或使用 daphne (使用【终端服务】的需要使用此asgi方式部署来支持websocket):
+或使用 daphne (需要使用此asgi方式部署来支持websocket):
 
 daphne -b 0.0.0.0 -p 8000 --proxy-headers application.asgi:application
 

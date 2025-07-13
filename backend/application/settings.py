@@ -208,7 +208,7 @@ STATIC_URL = '/static/'
 # python manage.py collectstatic
 STATIC_ROOT=os.path.join(BASE_DIR,'static')
 STATICFILES_DIRS = [
-    os.path.join(FRONTEND_ROOT,"admin","static"),
+    os.path.join(FRONTEND_ROOT,"lyadmin","static"),
     os.path.join(FRONTEND_ROOT,"h5","static"),
 ]
 # 访问上传文件的url地址前缀

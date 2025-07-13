@@ -9,7 +9,7 @@ const distPath = path.resolve(__dirname, '../../dist');
 
 // 目标目录列表
 const targetDirs = [
-    path.resolve(__dirname, '../../../backend/frontend/admin'),
+    path.resolve(__dirname, '../../../backend/frontend/lyadmin'),
 ];
 
 console.log('开始复制构建文件到backend...');

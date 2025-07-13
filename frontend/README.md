@@ -22,7 +22,7 @@ npm start
 npm run build
 ```
 
-注意：默认打包后的静态文件位置：```backend/frontend/admin``` 目录中
+注意：默认打包后的静态文件位置：```backend/frontend/lyadmin``` 目录中
 
 ### 集成部署打包
 
@@ -30,7 +30,7 @@ npm run build
 npm run build:backend
 ```
 
-注意：此命令会把打包后的静态文件复制到：```backend/frontend/admin``` 目录中，方面与后端集成部署
+注意：此命令会把打包后的静态文件复制到：```backend/frontend/lyadmin``` 目录中，方面与后端集成部署
 
 ## 疑问
 
@@ -58,9 +58,7 @@ src/
 ├── store/              # pinia状态管理
 │   ├── keepAlive.js    # 缓存模块
 │   ├── cancelRequest.js# 页面离开取消请求模块
-│   ├── siteTheme.js    # 主题配置模块
-│   │   ├── menu.js     # 菜单模块
-│   │   └── role.js     # 角色模块
+│   ├── websocket.js    # websocket模块
 │   └── index.js
 ├── utils/              # 工具函数
 │   ├── directive.js    # 命令封装

@@ -59,5 +59,5 @@ urlpatterns += [
     #集成部署后端管理页面和uniapp h5页面
     path('h5/',h5web ,name='h5端页面部署'),
     path('favicon.ico',RedirectView.as_view(url=r'static/favicon.ico')),
-    path('', TemplateView.as_view(template_name="admin/index.html"),name='后台管理默认页面'),
+    path('', TemplateView.as_view(template_name="lyadmin/index.html"),name='后台管理默认页面'),
 ]

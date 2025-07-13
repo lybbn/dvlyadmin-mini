@@ -11,8 +11,11 @@
     import config from '@/config'
     import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
     import en from 'element-plus/dist/locale/en.mjs'
+    import { useLywebsocket } from "@/store/websocket";
+    import { useRoute } from 'vue-router';
 
-
+    const route = useRoute()
+    const lywebsocket = useLywebsocket()
     const userState = useUserState()
     const siteThemeStore = useSiteThemeStore()
     const colorPrimary = siteThemeStore.colorPrimary
@@ -33,6 +36,20 @@
         }
 
     })
+
+    watch( () => route.path, () => {
+            if (!lywebsocket.isWebsocket()) {
+                try {
+                    lywebsocket.initWebSocket()
+                } catch (e) {
+                    console.log('websocket错误');
+                }
+            }
+        },
+        {
+            deep: true,
+        }
+    );
 
     // 监听宽度变化，更新全局 CSS 变量
     watch(() => siteThemeStore.menuWidth,
