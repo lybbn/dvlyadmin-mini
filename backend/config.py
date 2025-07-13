@@ -34,7 +34,6 @@ API_LOG_METHODS = ['POST', 'UPDATE', 'DELETE', 'PUT']  # ['POST', 'DELETE']
 IS_DEMO = False #是否演示模式（演示模式只能查看无法保存、编辑、删除、新增）
 DEBUG = True #是否调试模式
 ALLOWED_HOSTS = ["*"]
-LOGIN_AUTH_CAPTCHA = True #是否开启登录页验证码验证
 IS_SINGLE_TOKEN = False #是否只允许单用户单一地点登录(只有一个人在线上)(默认多地点登录),只针对后台用户生效
 ALLOW_FRONTEND = True#是否关闭前端API访问
 LOGIN_ERROR_RETRY_TIMES = 0 #登录错误次数限制，0表示不限制

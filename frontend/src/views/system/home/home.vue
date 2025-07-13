@@ -95,8 +95,8 @@
                         </div>
                     </template>
                     <el-row :gutter="10">
-                        <el-col :xs="8" :sm="6" v-for="action in quickActions" :key="action.icon">
-                            <el-button class="quick-action-btn" :icon="action.icon" @click="handleQuickAction(action)">
+                        <el-col :xs="8" :sm="6" v-for="(action,index) in quickActions" :key="action.icon">
+                            <el-button class="quick-action-btn" :icon="action.icon" @click="handleQuickAction(action)" v-if="index<12">
                             {{ action.name }}
                             </el-button>
                         </el-col>

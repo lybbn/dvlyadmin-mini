@@ -11,7 +11,7 @@
 - 🔒 **认证系统**：使用 [Django REST Framework SimpleJWT](https://pypi.org/project/djangorestframework-simplejwt)，支持多终端认证系统
 - ⚙️ **权限管理**：支持加载动态权限菜单，提供多种方式轻松实现权限控制
 - 📊 **列权限管控**：全新的列权限管理机制，粒度细化到每一列
-
+- ⚡️ **CRUD**：全新设计CRUD页面，适合快速开发CRUD页面，喜欢基于配置或深度自定义的页面的小伙伴
 ---
 
 ## 💻 技术栈
@@ -44,7 +44,7 @@
 
 **答**：添加菜单时路由和组件名称最好与新建的菜单文件名一致，会自动发现并注册路由，无需填写【组件路径】，否则需填写此项！！！
 
-### 如何快速实现的导出功能？
+### 如何快速实现导出功能？
 
 **答**：继承了CustomModelViewSet方法的都会自动生成export_data接口，默认使用前端导出字段和serializer_class作为导出参数,也可单独配置export_serializer_class和export_field_dict实现导出自定义！！！
 
