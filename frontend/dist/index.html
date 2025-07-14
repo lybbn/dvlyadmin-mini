@@ -1,73 +1,104 @@
 <!--
 //此内容不能删除
-Program django-vue-lyadmin mini
+Program dvlyadmin-mini
 Copyright by lybbn
 Author:lybbn
 QQ:1042594286
 -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta content='django-vue-lyadmin mini'>
-    <meta content='http://www.lybbn.cn' author="lybbn" contact="qq:1042594286">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="./favicon.ico">
-    <title>dvlyadmin-mini 加载中...</title>
-    <style>
-      @keyframes loader {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-      }
-    </style>
-    <script>
-        var _hmt = _hmt || [];
-        var hmid = "33e0b6798fd8809c21ef51bc99e3149e";
-        (function () { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?" + hmid; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })();
-    </script>
-    <script type="module" crossorigin src="/static/index.BzyJV2mc.js"></script>
-    <link rel="modulepreload" crossorigin href="/static/@vue.CkPKv8Ma.js">
-    <link rel="modulepreload" crossorigin href="/static/lodash-es.CUM784Py.js">
-    <link rel="modulepreload" crossorigin href="/static/@vueuse.DLh4vTy9.js">
-    <link rel="modulepreload" crossorigin href="/static/@element-plus.Bd8ZSeX6.js">
-    <link rel="modulepreload" crossorigin href="/static/@popperjs.DxP-MrnL.js">
-    <link rel="modulepreload" crossorigin href="/static/@ctrl.D-8vaqgC.js">
-    <link rel="modulepreload" crossorigin href="/static/clipboard.Dq8D7HKw.js">
-    <link rel="modulepreload" crossorigin href="/static/dayjs.qwFxEAt8.js">
-    <link rel="modulepreload" crossorigin href="/static/async-validator.BTKOuuO-.js">
-    <link rel="modulepreload" crossorigin href="/static/memoize-one.Ds0C_khL.js">
-    <link rel="modulepreload" crossorigin href="/static/normalize-wheel-es.BhHBPXsK.js">
-    <link rel="modulepreload" crossorigin href="/static/@floating-ui.DhpmN5Iz.js">
-    <link rel="modulepreload" crossorigin href="/static/element-plus.iYbxkz79.js">
-    <link rel="modulepreload" crossorigin href="/static/axios.BEuh1VCq.js">
-    <link rel="modulepreload" crossorigin href="/static/crypto-js.Cc_qfrXD.js">
-    <link rel="modulepreload" crossorigin href="/static/js-cookie.Ch5AnFJE.js">
-    <link rel="modulepreload" crossorigin href="/static/pinia.BlOZzj71.js">
-    <link rel="modulepreload" crossorigin href="/static/vue-router.CWS0_WYm.js">
-    <link rel="modulepreload" crossorigin href="/static/nprogress.C05CkHze.js">
-    <link rel="modulepreload" crossorigin href="/static/destr.WfmzGWA8.js">
-    <link rel="modulepreload" crossorigin href="/static/deep-pick-omit.DP_A4OSP.js">
-    <link rel="modulepreload" crossorigin href="/static/pinia-plugin-persistedstate.CT3HPKdK.js">
-    <link rel="modulepreload" crossorigin href="/static/@tsparticles.xnORxQhz.js">
-    <link rel="stylesheet" crossorigin href="/static/element-plus.B-lIW7_t.css">
-    <link rel="stylesheet" crossorigin href="/static/nprogress.BgDCIyLK.css">
-    <link rel="stylesheet" crossorigin href="/static/index.DiH72c41.css">
-  </head>
-  <body>
-    <noscript>
-      <strong>Welcome lybbn panel</strong>
-    </noscript>
-    <script type="text/javascript">
-      var dark = window.localStorage.getItem('siteTheme');
-      if(dark && dark=="dark"){
-        document.documentElement.classList.add("dark")
-      }
-    </script>
-    <div id="app" class="lybbn-panel"></div>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <meta content='django-vue-lyadmin mini'>
+        <meta content='http://www.lybbn.cn' author="lybbn" contact="qq:1042594286">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="dvlyadmin-mini 基于RBAC模型的权限控制的基础开发平台，权限达到列级别，前后端分离，后端采用django + django-rest-framework，前端采用基于 vue3 + Setup Js + vite + element plus"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="icon" href="./favicon.ico">
+        <title>dvlyadmin-mini</title>
+        <style>
+            .app-loading {position: absolute;top:0px;left:0px;right:0px;bottom:0px;display: flex;justify-content: center;align-items: center;flex-direction: column;background:fff;transition: background-color 0.3s ease;}
+            .app-loading__logo {margin-bottom: 30px;}
+            .app-loading__logo img {width: 90px;vertical-align: bottom;animation: floatUpDown 2.5s ease-in-out infinite;}
+            .app-loading__loader {box-sizing: border-box;width: 35px;height: 35px;border: 5px solid transparent;border-top-color: #000;border-radius: 50%;animation: .5s loader linear infinite;position: relative;}
+            .app-loading__loader:before {box-sizing: border-box;content: '';display: block;width: inherit;height: inherit;position: absolute;top: -5px;left: -5px;border: 5px solid #ccc;border-radius: 50%;opacity: .5;}
+            .app-loading__title {font-size: 24px;color: #666;margin-top: 30px;}
+            .dark .app-loading {background: #222225;}
+            .dark .app-loading__loader {border-top-color: #fff;}
+            .dark .app-loading__title {color: #d0d0d0;}
+            @keyframes floatUpDown {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-15px);
+                }
+            }
+            @keyframes loader {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+        <script>
+            var _hmt = _hmt || [];
+            var hmid = "33e0b6798fd8809c21ef51bc99e3149e";
+            (function () { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?" + hmid; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })();
+        </script>
+      <script type="module" crossorigin src="/static/index.BUyuwBtk.js"></script>
+      <link rel="modulepreload" crossorigin href="/static/@vue.CTT56OrY.js">
+      <link rel="modulepreload" crossorigin href="/static/lodash-es.CUM784Py.js">
+      <link rel="modulepreload" crossorigin href="/static/@vueuse.CukHfzOw.js">
+      <link rel="modulepreload" crossorigin href="/static/@element-plus.tjgKJvim.js">
+      <link rel="modulepreload" crossorigin href="/static/@popperjs.DxP-MrnL.js">
+      <link rel="modulepreload" crossorigin href="/static/@ctrl.D-8vaqgC.js">
+      <link rel="modulepreload" crossorigin href="/static/clipboard.BH1IpNUa.js">
+      <link rel="modulepreload" crossorigin href="/static/dayjs.CwJUaLwj.js">
+      <link rel="modulepreload" crossorigin href="/static/async-validator.BTKOuuO-.js">
+      <link rel="modulepreload" crossorigin href="/static/memoize-one.Ds0C_khL.js">
+      <link rel="modulepreload" crossorigin href="/static/normalize-wheel-es.BhHBPXsK.js">
+      <link rel="modulepreload" crossorigin href="/static/@floating-ui.BbuwF5u5.js">
+      <link rel="modulepreload" crossorigin href="/static/element-plus.BWDa8Hpr.js">
+      <link rel="modulepreload" crossorigin href="/static/axios.CtpuQClY.js">
+      <link rel="modulepreload" crossorigin href="/static/crypto-js.BwwD63ou.js">
+      <link rel="modulepreload" crossorigin href="/static/js-cookie.Ch5AnFJE.js">
+      <link rel="modulepreload" crossorigin href="/static/pinia.CYgQB127.js">
+      <link rel="modulepreload" crossorigin href="/static/xe-utils.LM9zE5Pe.js">
+      <link rel="modulepreload" crossorigin href="/static/sortablejs.x4doCK27.js">
+      <link rel="modulepreload" crossorigin href="/static/@intlify.B-R3CSVF.js">
+      <link rel="modulepreload" crossorigin href="/static/vue-i18n.BLiZqmy6.js">
+      <link rel="modulepreload" crossorigin href="/static/file-saver.D_O7Ogxb.js">
+      <link rel="modulepreload" crossorigin href="/static/destr.WfmzGWA8.js">
+      <link rel="modulepreload" crossorigin href="/static/deep-pick-omit.DP_A4OSP.js">
+      <link rel="modulepreload" crossorigin href="/static/pinia-plugin-persistedstate.D1HXlU0X.js">
+      <link rel="modulepreload" crossorigin href="/static/vue-router.Bny5QHRu.js">
+      <link rel="modulepreload" crossorigin href="/static/nprogress.C0Z5vlpN.js">
+      <link rel="modulepreload" crossorigin href="/static/@tsparticles.Bk5sZqlL.js">
+      <link rel="stylesheet" crossorigin href="/static/element-plus.B7X6g09D.css">
+      <link rel="stylesheet" crossorigin href="/static/nprogress.BgDCIyLK.css">
+      <link rel="stylesheet" crossorigin href="/static/index.WITXI7w2.css">
+    </head>
+    <body>
+        <noscript>
+            <strong>很抱歉，dvlyadmin-mini 需要启用 JavaScript 才能正常运行。请启用后继续。</strong>
+        </noscript>
+        <div id="app" class="lybbn-panel">
+            <div class="app-loading lyloading_particles" id="lyloading_particles">
+                <div class="app-loading__logo">
+                    <img src="./logo.png"/>
+                </div>
+                <div class="app-loading__loader"></div>
+                <div class="app-loading__title">加载中</div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var dark = window.localStorage.getItem('siteTheme');
+            if(dark && dark=="dark"){
+                document.documentElement.classList.add("dark")
+            }
+        </script>
+    </body>
 </html>
