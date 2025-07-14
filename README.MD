@@ -2,13 +2,20 @@
 
 [![img](https://img.shields.io/badge/python-%3E=3.11.x-green.svg)](https://python.org/)  [![PyPI - Django Version badge](https://img.shields.io/badge/django%20versions-%3E%3D%204.x-blue)](https://docs.djangoproject.com/zh-hans/4.1/) [![img](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)](https://nodejs.org/zh-cn/) [![img](https://gitee.com/lybbn/dvlyadmin-mini/badge/star.svg?theme=dark)](https://gitee.com/lybbn/dvlyadmin-mini)
 
-[预 览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)
+[在线预览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)
 
 ## 🌟 简介
 
 **dvlyadmin-mini** 是专为追求页面极致效果的开发者设计的一套 **django-vue-lyadmin** 优化升级的精简版。我们通过大量重构架构，去除了无用冗余代码，力求做到小而精。前端采用 **Vite + Vue 3 + Element Plus**，支持适配手机端，助力快速开发项目及提升项目质量！
 
-### 主要特性：
+## 💡 交流
+
+- QQ群号：
+
+1. django-vue-lyadmin交流01群(已满)：755277564
+1. django-vue-lyadmin交流02群：877020250 <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=bQteR0foj1tZuZE0kdVF3XV9xozOmr9p&jump_from=webapi&authKey=8GRzb/ATMG1hXE7G1n2oCHyoHrP0+mg7xBzskR6mnw8eqb9LTv6FuAhHtoqs2F3y"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="点击链接加入群聊" title="django-vue-lyadmin交流02群"></a>
+
+## 🎨 主要特性：
 
 - 💻 **前端技术栈**：Vue 3 + Setup JS + Pinia + Element Plus
 - 🖥️ **后端技术栈**：Python 语言 Django 框架以及强大的 [Django REST Framework](https://pypi.org/project/djangorestframework)
@@ -66,3 +73,15 @@
 backend/                # 后端代码目录
 frontend/               # 前端代码目录
 ```
+
+## ✅ 演示图
+
+![登录](https://foruda.gitee.com/images/1752461064099761356/404e5c89_4823422.png "wechat_2025-07-14_104123_881.png")
+![首页](https://foruda.gitee.com/images/1752461080317609620/bbc20f96_4823422.png "wechat_2025-07-14_104159_622.png")
+![个人中心](https://foruda.gitee.com/images/1752461095093419420/509ffd91_4823422.png "wechat_2025-07-14_104208_520.png")
+![用户管理](https://foruda.gitee.com/images/1752461107939022968/53d97e3d_4823422.png "wechat_2025-07-14_104237_798.png")
+![菜单管理](https://foruda.gitee.com/images/1752461123060391528/e0e5573d_4823422.png "wechat_2025-07-14_104252_982.png")
+![权限管理](https://foruda.gitee.com/images/1752461137054532488/065360f7_4823422.png "wechat_2025-07-14_104304_906.png")
+![操作日志](https://foruda.gitee.com/images/1752461150156275848/b71b3e88_4823422.png "wechat_2025-07-14_104319_022.png")
+![系统配置](https://foruda.gitee.com/images/1752461163988365301/7817a2e2_4823422.png "wechat_2025-07-14_104328_836.png")
+![字典管理](https://foruda.gitee.com/images/1752461182186356276/8ff97750_4823422.png "wechat_2025-07-14_104336_924.png")
