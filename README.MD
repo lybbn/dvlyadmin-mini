@@ -1,4 +1,8 @@
-# dvlyadmin-mini 精简版介绍
+# dvlyadmin-mini 介绍
+
+[![img](https://img.shields.io/badge/python-%3E=3.11.x-green.svg)](https://python.org/)  [![PyPI - Django Version badge](https://img.shields.io/badge/django%20versions-%3E%3D%204.x-blue)](https://docs.djangoproject.com/zh-hans/4.1/) [![img](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)](https://nodejs.org/zh-cn/) [![img](https://gitee.com/lybbn/dvlyadmin-mini/badge/star.svg?theme=dark)](https://gitee.com/lybbn/dvlyadmin-mini)
+
+[预 览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)
 
 ## 🌟 简介
 
@@ -11,21 +15,21 @@
 - 🔒 **认证系统**：使用 [Django REST Framework SimpleJWT](https://pypi.org/project/djangorestframework-simplejwt)，支持多终端认证系统
 - ⚙️ **权限管理**：支持加载动态权限菜单，提供多种方式轻松实现权限控制
 - 📊 **列权限管控**：全新的列权限管理机制，粒度细化到每一列
-- ⚡️ **CRUD**：全新设计CRUD页面，适合快速开发CRUD页面，喜欢基于配置或深度自定义的页面的小伙伴
+- ⚡️ **CRUD增强**：全新设计CRUD页面，适合快速开发CRUD页面，喜欢基于配置或深度自定义的页面的小伙伴
 ---
 
 ## 💻 技术栈
 
 ### 前端
 
-- **构建工具**：[Vite](https://vitejs.dev/)
-- **框架**：[Vue 3](https://vuejs.org/)
-- **UI 组件库**：[Element Plus](https://element-plus.org/)
-- **编程模式**：JavaScript Setup 语法
+- **构建工具**：[Vite（极速构建）](https://vitejs.dev/)
+- **框架**：[Vue 3（组合式 API）](https://vuejs.org/)
+- **UI 组件库**：[Element Plus （企业级 UI）](https://element-plus.org/)
+- **编程模式**：JavaScript Setup 语法糖
 
 ---
 
-## 💪 优势
+## 💪 核心优势
 
 1. **页面简洁美观** - 极致的设计理念，带来清爽的视觉体验，搜索框多行默认显示一行，然后手动展开和收起，避免搜索暂用过多。
 2. **响应式设计** - 完美适配手机端，随时随地高效工作。
@@ -50,7 +54,7 @@
 
 ---
 
-### 额外提示
+### 专业版推荐
 
 - 如果你希望进一步定制或扩展你的应用，[dvlyadmin_pro](https://doc.lybbn.cn/support/subscribe.html) 提供了更丰富的功能，确保你能快速上手并进行个性化调整。
 
