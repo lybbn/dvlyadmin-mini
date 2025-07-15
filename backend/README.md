@@ -36,14 +36,4 @@ python manage.py runserver 127.0.0.1:8000
 
 daphne -b 0.0.0.0 -p 8000 --proxy-headers application.asgi:application
 
-#异步任务celery启动
-如需使用celery【计划任务】，还需要额外启动celery 和 beat（调度器）
-
-mac/linux:
-celery -A application worker -B -l info
-
-windows:(需要安装: pip install eventlet)
-celery -A application worker -P eventlet -l info
-celery -A application beat -l info
-
 ```

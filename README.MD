@@ -53,6 +53,13 @@
 - **UI 组件库**：[Element Plus （企业级 UI）](https://element-plus.org/)
 - **编程模式**：JavaScript Setup 语法糖
 
+### 后端
+
+- **Python**：>=Python3.11.x
+- **Django**：>=Django4.x
+- **DRF**：Django REST Framework
+- **JWT**：Django REST Framework SimpleJWT
+
 ---
 
 ## 💪 核心优势
