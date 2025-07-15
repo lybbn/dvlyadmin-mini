@@ -8,6 +8,25 @@
 
 **dvlyadmin-mini** 是专为追求页面极致效果的开发者设计的一套 **django-vue-lyadmin** 优化升级的精简版。我们通过大量重构架构，去除了无用冗余代码，力求做到小而精。前端采用 **Vite + Vue 3 + Element Plus**，支持适配手机端，助力快速开发项目及提升项目质量！
 
+## 🚀 在线体验
+
+<div style="border-left: 4px solid #3498db; padding-left: 1em; margin: 1em 0;">
+  <table>
+    <tr>
+      <td><strong>🌍 访问地址</strong></td>
+      <td><a href="https://dvlyadmin-mini.lybbn.cn" target="_blank" rel="noreferrer">https://dvlyadmin-mini.lybbn.cn</a></td>
+    </tr>
+    <tr>
+      <td><strong>👤 测试账号</strong></td>
+      <td><code>admin</code></td>
+    </tr>
+    <tr>
+      <td><strong>🔑 登录密码</strong></td>
+      <td><code>123456</code></td>
+    </tr>
+  </table>
+</div>
+
 ## 💡 交流
 
 - QQ群号：
