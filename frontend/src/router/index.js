@@ -1,3 +1,4 @@
+import {nextTick} from "vue"
 import {createRouter, createWebHashHistory} from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -70,8 +71,11 @@ router.beforeEach(async (to, from, next) => {
     try {
         // 加载动态路由（如果尚未加载）
         if (routesList.value.length === 0 && !isGetBackendRoute) {
+            await nextTick();
             await userState.getSystemWebRouter(router);
             isGetBackendRoute = true
+            // 重新触发导航以确保新路由生效
+            return next(to.fullPath); 
         }
         // 检查目标路由是否存在
         const hasRoute = checkRouteExists(router, to);
@@ -159,13 +163,21 @@ export async function initRoutes(dRoutes=dynamicRoutes){
 
 async function setAddRoute(dRoutes=dynamicRoutes) {
 	let routeChildren = await setFilterRoute(dRoutes=dynamicRoutes)
+    // 先移除所有动态路由（避免重复添加）
+    routeChildren.forEach(route => {
+        router.removeRoute(route.name); 
+    });
+    // 添加新路由
     routeChildren.forEach((route) => {
 		router.addRoute(route);
 	});
     router.addRoute(RedirectRoute);
     router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
     
-    return router
+    // 返回一个 Promise 确保路由更新完成
+    return new Promise(resolve => {
+        nextTick(() => resolve(router));
+    });
 }
 
 //保留嵌套路由层级

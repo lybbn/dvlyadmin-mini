@@ -35,6 +35,7 @@ export default defineConfig({
         overlay: false,
     },
     build: {
+        // cssCodeSplit: false,//不分割css
         target: 'esnext', // 允许使用顶级 await
         minify: 'terser', // 是否进行压缩,boolean | 'terser' | 'esbuild',默认使用terser
         manifest: false,
