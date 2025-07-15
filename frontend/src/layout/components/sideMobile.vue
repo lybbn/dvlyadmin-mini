@@ -4,7 +4,7 @@
 	<el-drawer ref="mobileNavMenuBox" title="移动端菜单" :size="200" v-model="nav" direction="ltr" :with-header="false" destroy-on-close>
 		<el-container class="mobile-nav">
 			<el-header class="mobileheader">
-				<div class="logo-bar"><img class="logo" :src="userState.sysConfig.logo"></div>
+				<div class="logo-bar"><ly-img class="logo" :src="userState.sysConfig.logo" /></div>
 				<span class="headertitle">{{ userState.sysConfig.systitle }}</span>
 			</el-header>
 			<el-main>

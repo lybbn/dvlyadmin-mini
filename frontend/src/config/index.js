@@ -13,7 +13,7 @@ export default {
 	API_HOST:API_HOST,
 
     //接口地址
-    API_URL : "http://"+API_HOST,
+    API_URL : window.location.protocol+"//"+API_HOST,
 
     //标题
     APP_TITLE : "dvlyadmin-mini",

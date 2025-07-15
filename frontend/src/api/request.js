@@ -6,11 +6,11 @@ import { cancelRequestState } from "@/store/cancelRequest";
 
 let API_BASE_URL = sysConfig.API_URL
 
-// 当前是生产环境
-if (import.meta.env.PROD) {
-    // 获取浏览器地址
-    API_BASE_URL = window.location.origin;
-}
+// // 当前是生产环境
+// if (import.meta.env.PROD) {
+//     // 获取浏览器地址
+//     API_BASE_URL = window.location.origin;
+// }
 
 var request = axios.create({
     timeout: sysConfig.TIMEOUT,

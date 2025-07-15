@@ -164,7 +164,7 @@ class CustomPermission(BasePermission):
 
         for (whitelist_path, whitelist_method) in combined_whitelist:
             # 方法不匹配则跳过
-            if current_method != whitelist_method or not whitelist_method == "ALL":
+            if current_method != whitelist_method and not whitelist_method == "ALL":
                 continue
                 
             # 精确匹配完整路径

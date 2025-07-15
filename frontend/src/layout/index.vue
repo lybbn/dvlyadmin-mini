@@ -4,7 +4,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" :src="userState.sysConfig.logo">
+					<ly-img class="logo" :src="userState.sysConfig.logo" />
 					<span v-if="!ismobile">{{ userState.sysConfig.systitle}}</span>
 				</div>
 			</div>
@@ -51,7 +51,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" :src="userState.sysConfig.logo">
+					<ly-img class="logo" :src="userState.sysConfig.logo" />
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
@@ -88,7 +88,7 @@
 		<header class="lybbn-panel-header">
 			<div class="lybbn-panel-header-left">
 				<div class="logo-bar">
-					<img class="logo" :src="userState.sysConfig.logo">
+					<ly-img class="logo" :src="userState.sysConfig.logo" />
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
 			</div>
@@ -393,6 +393,7 @@ function canUpgradeClick(){
 onMounted(() => {
 	userState.getSystemConfig()
 	onLayoutResize();
+	userState.getSystemWebRouter(router)
 	window.addEventListener('resize', onLayoutResize);
 	// menu.value = filterUrl(storesRoutesList.routesList);
 	showThis()

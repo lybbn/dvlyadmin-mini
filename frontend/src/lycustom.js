@@ -4,6 +4,8 @@ import api from "@/api/api"
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import directives from '@/utils/directive.js';
 import lyTable from "@/components/lyTable/index.vue";
+import lyImage from '@/components/image/lyImage.vue';
+import lyImg from '@/components/image/lyImg.vue';
 
 export default {
     install(app) {
@@ -15,5 +17,7 @@ export default {
         }
         app.use(directives)
         app.component("ly-table", lyTable);
+        app.component("ly-image", lyImage);
+        app.component("ly-img", lyImg);
     }
 }

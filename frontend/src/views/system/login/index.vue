@@ -25,11 +25,11 @@
 				<!-- 品牌展示区 -->
 				<div class="brand-section">
 					<div class="logo-wrapper">
-						<img 
+						<ly-img 
 							:alt="config.APP_NAME" 
 							:src="userState.sysConfig.logo"
 							class="logo-image"
-						>
+						/>
 					</div>
 					<h1 class="app-name">{{ config.APP_NAME }}</h1>
 					<p class="welcome-text">欢迎回来，请登录您的账户</p>

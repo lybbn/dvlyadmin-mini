@@ -46,7 +46,7 @@
                             <el-button type="danger" plain icon="delete" :disabled="selection.length==0" title="批量删除" @click="batch_del" v-auth="'Delete'"></el-button>
                         </template>
                         <template #avatar="scope">
-                            <el-image  :src="scope.row.avatar ? scope.row.avatar : defaultAvatar" :preview-src-list="[scope.row.avatar]" style="width: 30px;height: 30px" preview-teleported v-if="scope.row.avatar"></el-image>
+                            <ly-image  :src="scope.row.avatar ? scope.row.avatar : defaultAvatar" :preview-src-list="[scope.row.avatar]" style="width: 30px;height: 30px" preview-teleported v-if="scope.row.avatar"></ly-image>
                         </template>
                         <template #dept="scope">
                             <el-tag v-if="!!scope.row.deptName">{{scope.row.deptName}}</el-tag>

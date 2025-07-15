@@ -25,11 +25,11 @@
                 <!-- 品牌展示区 -->
                 <div class="brand-section">
                     <div class="logo-wrapper">
-                        <img 
+                        <ly-img 
                             :alt="config.APP_NAME" 
                             :src="userState.sysConfig.logo"
                             class="logo-image"
-                        >
+                        />
                     </div>
                     <h1 class="app-name">立即注册</h1>
                     <p class="welcome-text">加入我们的社区，开启全新体验</p>

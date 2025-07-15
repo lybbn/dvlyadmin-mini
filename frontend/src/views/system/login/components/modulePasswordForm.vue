@@ -10,7 +10,7 @@
 		<el-form-item prop="captcha" v-if="userState.sysConfig.loginCaptcha">
             <el-input type="text" prefix-icon="circle-check" v-model.trim="formData.captcha" auto-complete="off" placeholder="验证码" :rules="userState.sysConfig.loginCaptcha?captchaRules:[]">
                   <template #append>
-                    <img class="login-captcha" :src="image_base" @click="getCaptchas" />
+                    <ly-img class="login-captcha" :src="image_base" @click="getCaptchas" />
                   </template>
             </el-input>
           </el-form-item>

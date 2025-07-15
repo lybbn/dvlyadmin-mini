@@ -13,7 +13,6 @@
     import en from 'element-plus/dist/locale/en.mjs'
     import { useLywebsocket } from "@/store/websocket";
     import { useRoute } from 'vue-router';
-
     const route = useRoute()
     const lywebsocket = useLywebsocket()
     const userState = useUserState()
