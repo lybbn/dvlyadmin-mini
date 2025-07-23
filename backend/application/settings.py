@@ -409,7 +409,6 @@ API_LOG_ENABLE = locals().get("API_LOG_ENABLE", True)
 API_LOG_METHODS = locals().get("API_LOG_METHODS", ['POST', 'UPDATE', 'DELETE', 'PUT'])  # ['POST', 'DELETE']
 #日志记录显示的请求模块中文名映射
 API_MODEL_MAP = {
-    "/token/": "登录模块",
     "/api/token/": "登录模块",
     "/api/token/refresh/":"登录刷新",
     "/api/super/operate/":"前端API关闭开启",

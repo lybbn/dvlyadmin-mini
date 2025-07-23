@@ -15,7 +15,7 @@ export function generateLocalRoutes() {
     // 获取所有非components目录的vue文件
     const modules = import.meta.glob([
         '/src/views/**/*.vue',
-        '!/src/views/**/components/**'
+        '!/src/views/**/components/**/*.vue'
     ]);
 
     return Object.entries(modules)

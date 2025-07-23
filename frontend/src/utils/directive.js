@@ -130,6 +130,7 @@ export default {
             mounted(el, binding) {
                 el.style.cursor = 'move';
                 el.style.userSelect = 'none'; // 防止拖动时选中文本
+                el.style.touchAction = 'none'; // 禁用浏览器默认触摸行为
                 
                 let startX = 0, startY = 0;
                 let initialLeft = 0, initialTop = 0;
@@ -141,7 +142,6 @@ export default {
                 const boundary = binding.value?.boundary ?? true;
                 const withinParent = binding.value?.withinParent ?? false;
 
-                // Define handlers as properties of the element so they can be accessed in unmounted
                 el.__dragHandlers__ = {
                     startDrag: function(e) {
                         // 记录点击开始时间
@@ -221,14 +221,14 @@ export default {
                     endDrag: function(e) {
                         // 判断是否为点击事件
                         const clickDuration = Date.now() - clickStartTime;
-                        const isClick = !moved && clickDuration < 200;
+                        const isClick = !moved && clickDuration < 20;
                         
                         if (isClick) {
                             // 如果是点击，触发原始点击事件
                             const clickEvent = new MouseEvent('click', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
+                                bubbles: true,
+                                cancelable: true,
+                                view: window
                             });
                             el.dispatchEvent(clickEvent);
                         }
