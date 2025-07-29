@@ -71,6 +71,11 @@ export const autoStorage = {
 					}
 					result.content = JSON.parse(crypto.AES.decrypt(result.content, appConfig.LS_ENCRYPTION_KEY))
 				}
+				if(result == "true"){
+					return true
+				}else if(result == "false"){
+					return false
+				}
 				return result
 			}
 			return null
