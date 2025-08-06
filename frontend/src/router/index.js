@@ -100,12 +100,10 @@ router.beforeEach(async (to, from, next) => {
         if (!hasRoute) {
             NProgress.done();
             // 检查是否是动态路由加载后导致的404
-            if (routesList.value.length > 0) {
-                return next('/404');
-            }
-            // 可能是动态路由尚未加载，尝试重新加载
-            if (!isGetBackendRoute) {
-                await userState.getSystemWebRouter(router);
+            if (isGetBackendRoute) {
+                return next('/404')
+            }else{
+                await userState.getSystemWebRouter(router)
                 isGetBackendRoute = true
             }
             const retryHasRoute = router.getRoutes().some(r => r.path === to.path);
