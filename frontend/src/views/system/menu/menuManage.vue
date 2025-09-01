@@ -37,15 +37,15 @@
                             <template #default="{ node, data }">
                                 <span class="tree-node" :class="'level-' + getLevel(data)">
                                     <span class="tree-node-content">
-                                    <el-icon><component :is="data.icon || 'Menu'" /></el-icon>
-                                    <span class="node-label">{{ node.label }}</span>
-                                    <div class="actions">
-                                        <el-button link type="info" size="small" @click.stop="">排序({{ data.sort }})</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="editMenu(data)" v-auth="'Update'">编辑</el-button>
-                                        <el-button link type="danger" size="small" @click.stop="deleteMenu(data)" v-auth="'Delete'">删除</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="moveUp(data)" v-auth="'Move'">上移</el-button>
-                                        <el-button link type="primary" size="small" @click.stop="moveDown(data)" v-auth="'Move'">下移</el-button>
-                                    </div>
+                                        <SvgIcon :icon-class="data?.icon || 'Menu'" style="font-size:16px !important;"></SvgIcon>
+                                        <span class="node-label">{{ node.label }}</span>
+                                        <div class="actions">
+                                            <el-button link type="info" size="small" @click.stop="">排序({{ data.sort }})</el-button>
+                                            <el-button link type="primary" size="small" @click.stop="editMenu(data)" v-auth="'Update'">编辑</el-button>
+                                            <el-button link type="danger" size="small" @click.stop="deleteMenu(data)" v-auth="'Delete'">删除</el-button>
+                                            <el-button link type="primary" size="small" @click.stop="moveUp(data)" v-auth="'Move'">上移</el-button>
+                                            <el-button link type="primary" size="small" @click.stop="moveDown(data)" v-auth="'Move'">下移</el-button>
+                                        </div>
                                     </span>
                                 </span>
                             </template>
@@ -354,6 +354,7 @@
     import moduleMenuButton from "./components/moduleMenuButton.vue";
     import DialogTableList from "@/components/dialog/dialogTableList.vue"
     import { useUserState } from "@/store/userState";
+    import SvgIcon from '@/components/icons/svgIcon.vue'
 
     let userState = useUserState()
 
