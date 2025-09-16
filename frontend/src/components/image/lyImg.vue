@@ -6,12 +6,14 @@
  * @program：dvlyadmin-mini
 -->
 <template>
-    <img :src="processedUrl" v-bind="$attrs" />
+    <img :src="processedUrl" ref="lyimgRef" v-bind="$attrs" />
 </template>
 
 <script setup>
-    import { computed } from 'vue';
+    import { computed,ref } from 'vue';
     import sysConfig from "@/config"
+
+    let lyimgRef = ref(null)
 
     const props = defineProps({
         src: {
@@ -30,4 +32,8 @@
         }
         return props.src;
     });
+
+    defineExpose({
+        lyimgRef
+    })
 </script>

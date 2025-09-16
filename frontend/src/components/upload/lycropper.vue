@@ -147,7 +147,7 @@
 
 	const initCropper = () => {
 		if (imgRef.value) {
-			crop.value = new Cropper(imgRef.value, cropperOptions.value)
+			crop.value = new Cropper(imgRef.value.lyimgRef, cropperOptions.value)
 		}
 	}
 

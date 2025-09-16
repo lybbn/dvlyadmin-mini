@@ -43,13 +43,13 @@
 			</slot>
 		</el-upload>
 		<span style="display:none!important"><el-input v-model="value"></el-input></span>
-		<lyDialog :bodyPadding="0" title="剪裁" draggable v-model="cropperDialogVisible" width="780px" @closed="cropperClosed" destroy-on-close>
+		<el-dialog :bodyPadding="0" title="剪裁" draggable v-model="cropperDialogVisible" width="780px" @closed="cropperClosed" destroy-on-close>
 			<lyCropper :src="cropperFile.tempCropperFile" :compress="compress" :aspectRatio="aspectRatio" ref="cropper"></lyCropper>
 			<template #footer>
 				<el-button @click="cropperDialogVisible=false" >取 消</el-button>
 				<el-button type="primary" @click="cropperSave">确 定</el-button>
 			</template>
-		</lyDialog>
+		</el-dialog>
 	</div>
 </template>
 
