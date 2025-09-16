@@ -9,7 +9,7 @@
 	<div class="ly-cropper-container">
 		<div class="ly-cropper">
 		<div class="ly-cropper__img-container">
-			<ly-img :src="src" ref="imgRef" class="cropper-image" :alt="altText" />
+			<img :src="src" ref="imgRef" class="cropper-image" :alt="altText" />
 		</div>
 		<div class="ly-cropper__controls">
 			<div class="ly-cropper__dimensions">
