@@ -37,14 +37,15 @@ urlpatterns = [
     path('media/<path:path>', streamingmedia_serve, {'document_root': settings.MEDIA_ROOT}, ),  # 处理媒体文件
     
     #接口文档（线上部署需注释掉，确保安全性，已添加需认证访问增强安全性）
-    path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(authentication_classes=[JWTAuthentication],permission_classes=[IsAuthenticated,CustomPermission]), name='schema'),
+    path('api/schema/lyjson/', SpectacularJSONAPIView.as_view(authentication_classes=[JWTAuthentication],permission_classes=[IsAuthenticated,CustomPermission]), name='schema-auth'),
 ]
 
 if settings.DEBUG:
     #接口文档（线上部署需注释掉，确保安全性）
     urlpatterns += [
-        path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),#api/schema/lyjson/有认证情况下，需要去除lyjson接口认证，否则报错
-        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),#api/schema/lyjson/有认证情况下，需要去除lyjson接口认证，否则报错
+        path('api/schema/lyjson-public/', SpectacularJSONAPIView.as_view(), name='schema'),
+        path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     ]
 
 urlpatterns += [
