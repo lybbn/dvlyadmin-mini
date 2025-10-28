@@ -286,9 +286,8 @@ class ImportExportMixin:
         }
         """
         export_fields = request.data.get('export_fields', {})
-        if not export_fields:
-            assert self.export_field_dict, "'%s' 请配置对应的导出模板字段。" % self.__class__.__name__
-        self.export_field_dict = export_fields
+        if export_fields: # 前端传递了导出字段，使用前端传递的导出字段
+            self.export_field_dict = export_fields
         selected_ids = request.data.get('selected_ids', [])
         queryset = self.get_export_queryset()
         if selected_ids:
