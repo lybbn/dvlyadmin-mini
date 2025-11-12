@@ -2,7 +2,7 @@
 
 [![img](https://img.shields.io/badge/python-%3E=3.11.x-green.svg)](https://python.org/)  [![PyPI - Django Version badge](https://img.shields.io/badge/django%20versions-%3E%3D%204.x-blue)](https://docs.djangoproject.com/zh-hans/4.1/) [![img](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)](https://nodejs.org/zh-cn/) [![img](https://gitee.com/lybbn/dvlyadmin-mini/badge/star.svg?theme=dark)](https://gitee.com/lybbn/dvlyadmin-mini)
 
-[在线预览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)
+[在线预览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)| [关于授权](https://doc.lybbn.cn/dvlyadmin_mini/subscribe.html)
 
 ## 🌟 简介
 
