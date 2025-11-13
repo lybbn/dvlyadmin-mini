@@ -74,6 +74,8 @@ router.beforeEach(async (to, from, next) => {
             await nextTick();
             await userState.getSystemWebRouter(router);
             isGetBackendRoute = true
+            // 等待路由完全注册后再重定向
+            await nextTick()
             // 重新触发导航以确保新路由生效
             return next(to.fullPath); 
         }
