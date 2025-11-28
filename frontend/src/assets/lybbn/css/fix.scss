@@ -231,9 +231,6 @@ body .tox-tinymce-aux {z-index: 5700;}
 	--message-radius: 12px;
 	--message-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
-	position: fixed;
-	left: 50%;
-	transform: translateX(-50%);
 	border-radius: var(--message-radius) !important;
 	box-shadow: var(--message-shadow) !important;
 	padding: var(--message-padding) !important;
