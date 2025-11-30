@@ -101,8 +101,19 @@ export const useUserState = defineStore('userState', {
                 if (menu.type == 1 && menu.component) {
                     try {
                         // 尝试加载目标组件
-                        route.component = () => import(`@/views/${menu.component}.vue`)
+                        let componentPath = menu.component;
+                        // 如果路径不包含扩展名，添加.vue
+                        if (!componentPath.endsWith('.vue')) {
+                            componentPath += '.vue';
+                        }
+                        // 确保路径以正确的格式开头
+                        if (!componentPath.startsWith('/src/views/')) {
+                            componentPath = `/src/views/${componentPath}`;
+                        }
+                        // 使用正确的动态导入语法 - 使用字符串字面量而不是模板字符串
+                        route.component = () => import(/* @vite-ignore */ componentPath)
                     } catch (error) {
+                        console.error('动态导入组件失败:', menu.component, error);
                         route.component = Component404
                     }
                     
@@ -112,6 +123,7 @@ export const useUserState = defineStore('userState', {
                     if(fitem){
                         route.component = fitem.component
                     }else{
+                        console.error("未找到本地vue文件，重启vite再试:",menu.component_name,fitem)
                         route.component = Component404
                     }
                 }
