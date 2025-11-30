@@ -9,7 +9,7 @@ import json
 import re
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
-from mysystem.models import OperationLog
+from mysystem.models import OperationLog,RoleMenuButtonPermission
 from utils.request_util import (
     get_request_user, 
     get_request_ip, 
@@ -268,10 +268,16 @@ def has_permission(user, path):
             return False
         if method == 5 and api == "/ws/msg/":
             return True
-        userApiList = user.role.values('permission__api', 'permission__method')  # 获取当前用户的角色拥有的所有接口
+        roles = user.role.filter(status=True)
+        if not roles.exists():#如果用户没有关联角色则返回False
+            return False
+        role_ids = roles.values_list('id', flat=True)
+        userApiList = RoleMenuButtonPermission.objects.filter(
+            role__in=role_ids
+        ).values('menu_button__api', 'menu_button__method')
         for item in userApiList:
-            valid = ValidationApi(api, item.get('permission__api'))
-            if valid and (method == item.get('permission__method')):
+            valid = ValidationApi(api, item.get('menu_button__api'))
+            if valid and (method == item.get('menu_button__method')):
                 return True
     return False
 
