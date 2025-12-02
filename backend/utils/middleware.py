@@ -73,6 +73,19 @@ class ApiLoggingMiddleware(MiddlewareMixin):
                 data[field] = '*' * len(data[field])
         return data
 
+    def _get_request_modular(self, request):
+        """获取请求模块名称 - 线程安全的方式"""
+        # 优先从API_MODEL_MAP中获取
+        modular = settings.API_MODEL_MAP.get(request.request_path, "")
+        
+        # 如果API_MODEL_MAP中没有配置，则尝试从视图的queryset获取verbose_name
+        if not modular and hasattr(request, 'resolver_match') and request.resolver_match:
+            view_func = request.resolver_match.func
+            if hasattr(view_func, 'cls') and hasattr(view_func.cls, 'queryset'):
+                modular = get_verbose_name(view_func.cls.queryset)
+        
+        return modular
+
     def _get_response_data(self, response):
         """获取响应数据"""
         if not hasattr(response, 'data') or not isinstance(response.data, dict):
@@ -114,12 +127,8 @@ class ApiLoggingMiddleware(MiddlewareMixin):
             },
         }
 
-        # 获取模块名称
-        temp_request_modular = (
-            settings.API_MODEL_MAP.get(request.request_path, "")
-            if not self.request_modular
-            else self.request_modular
-        )
+        # 获取模块名称 - 使用线程安全的方式
+        temp_request_modular = self._get_request_modular(request)
 
         OperationLog.objects.create(
             req_modular=temp_request_modular,
