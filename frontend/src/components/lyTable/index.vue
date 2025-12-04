@@ -172,6 +172,7 @@
 	import { debounce } from 'lodash-es';
 	import LyDialog from "@/components/dialog/dialog.vue"
 	import lyImportFile from '@/components/lyImportFile.vue'
+	import XEUtils from 'xe-utils'
 
 	const props = defineProps({
 		tableName: { type: String, default: "lyTable" },
@@ -252,18 +253,6 @@
 		sequence:props.showSequence
 	})
 
-	// 动态导入 XEUtils
-    const loadXEUtils = async () => {
-		try {
-			// 使用动态导入
-			const XEUtils = await import('xe-utils')
-			return XEUtils
-		} catch (error) {
-			console.error('Failed to load XEUtils:', error)
-			return null
-		}
-    }
-
 	// Watchers
 	watch(() => props.data, (newVal) => {
 		tableData.value = newVal
@@ -342,9 +331,8 @@
 			} else {
 				emptyText.value = "暂无数据"
 				let tdata = res.data.data
-				if(props.isTree){
-					const XEUtils = await loadXEUtils()
-      				tdata = XEUtils.toArrayTree(tdata, { parentKey: 'parent', strict: false })
+				if (props.isTree) {
+					tdata = XEUtils.toArrayTree(tdata, { parentKey: 'parent', strict: false })
 				}
 				tableData.value = tdata || []
 				total.value = res.data.total || 0
