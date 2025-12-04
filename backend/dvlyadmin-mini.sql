@@ -151,9 +151,9 @@ CREATE TABLE IF NOT EXISTS `captcha_captchastore` (
   `expiration` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hashkey` (`hashkey`)
-) ENGINE=InnoDB AUTO_INCREMENT=282 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.captcha_captchastore 的数据：~19 rows (大约)
+-- 正在导出表  dvlyadmin_mini.captcha_captchastore 的数据：~20 rows (大约)
 DELETE FROM `captcha_captchastore`;
 /*!40000 ALTER TABLE `captcha_captchastore` DISABLE KEYS */;
 INSERT INTO `captcha_captchastore` (`id`, `challenge`, `response`, `hashkey`, `expiration`) VALUES
@@ -174,7 +174,9 @@ INSERT INTO `captcha_captchastore` (`id`, `challenge`, `response`, `hashkey`, `e
 	(276, '7*1=', '7', '3514e9bae290fb4d27dbc95e737e87d027a94df0', '2025-07-10 16:09:28.597445'),
 	(277, '10*5=', '50', '12bb78ddb2107d001f6dcd711e83201c09a074bf', '2025-07-10 16:10:56.233024'),
 	(279, '8+7=', '15', '1b49bea4ea41173c303a41f0b86bef1b65546faa', '2025-07-13 15:47:22.755477'),
-	(280, '3*1=', '3', '05b56eaffb4345842d235f56607d35b9b5d3350e', '2025-07-13 15:47:24.838903');
+	(280, '3*1=', '3', '05b56eaffb4345842d235f56607d35b9b5d3350e', '2025-07-13 15:47:24.838903'),
+	(283, '10*1=', '10', '23c1fd8ac3f2135a0283f12ad95587ef5849980b', '2025-07-15 10:07:15.123540'),
+	(285, '9-5=', '4', 'a9dbf7a99fcdede0252d067c6b5fb2cead2ce5ff', '2025-07-15 11:05:16.199901');
 /*!40000 ALTER TABLE `captcha_captchastore` ENABLE KEYS */;
 
 -- 导出  表 dvlyadmin_mini.django_content_type 结构
@@ -220,9 +222,9 @@ CREATE TABLE IF NOT EXISTS `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.django_migrations 的数据：~27 rows (大约)
+-- 正在导出表  dvlyadmin_mini.django_migrations 的数据：~18 rows (大约)
 DELETE FROM `django_migrations`;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
 INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
@@ -369,7 +371,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_field_permission` (
   PRIMARY KEY (`id`),
   KEY `lyadmin_field_permission_field_id_d5a3eac4` (`field_id`),
   KEY `lyadmin_field_permission_role_id_90bd14cf` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=259 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 正在导出表  dvlyadmin_mini.lyadmin_field_permission 的数据：~0 rows (大约)
 DELETE FROM `lyadmin_field_permission`;
@@ -397,9 +399,13 @@ CREATE TABLE IF NOT EXISTS `lyadmin_login_log` (
   KEY `lyadmin_login_log_creator_id_2aae8b60` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_login_log 的数据：~0 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_login_log 的数据：~2 rows (大约)
 DELETE FROM `lyadmin_login_log`;
 /*!40000 ALTER TABLE `lyadmin_login_log` DISABLE KEYS */;
+INSERT INTO `lyadmin_login_log` (`id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `username`, `ip`, `agent`, `browser`, `os`, `login_type`, `ip_area`, `creator_id`, `msg`, `status`) VALUES
+	('2c918e63582246a894635ba63b4ffac6', NULL, '', '2025-07-14 10:41:53.000932', '2025-07-14 10:41:53.000932', 'superadmin', '127.0.0.1', 'PC / Windows 10 / Edge 138.0.0', 'Edge 138.0.0', 'Windows 10', 1, NULL, '0', '登录成功', 1),
+	('c6d0228c0b7f40be9da644bf48007394', NULL, '', '2025-07-15 11:04:29.156904', '2025-07-15 11:04:29.156904', 'admin', '127.0.0.1', 'PC / Windows 10 / Edge 138.0.0', 'Edge 138.0.0', 'Windows 10', 1, NULL, '1792aea416944eff9e3845aec6ac88b4', '登录成功', 1),
+	('f2e31bfcde3f48be80163d854aa8802b', NULL, '', '2025-07-15 10:07:15.570902', '2025-07-15 10:07:15.570902', 'admin', '127.0.0.1', 'PC / Windows 10 / Edge 138.0.0', 'Edge 138.0.0', 'Windows 10', 1, NULL, '1792aea416944eff9e3845aec6ac88b4', '登录成功', 1);
 /*!40000 ALTER TABLE `lyadmin_login_log` ENABLE KEYS */;
 
 -- 导出  表 dvlyadmin_mini.lyadmin_menu 结构
@@ -434,21 +440,21 @@ DELETE FROM `lyadmin_menu`;
 INSERT INTO `lyadmin_menu` (`id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `icon`, `name`, `sort`, `type`, `link_url`, `web_path`, `component`, `component_name`, `status`, `isautopm`, `cache`, `visible`, `creator_id`, `parent_id`) VALUES
 	('01599f73f61848aa811f687b1cfc1588', '0', '', '2025-07-06 10:27:49.284326', '2025-07-06 10:27:49.284326', 'Football', '功能演示', 60, 0, '', '/functionsDemosDirs', '', '', 1, 0, 0, 1, '0', NULL),
 	('150e0957200146b3bd0226c45e8031f7', '0', '', '2025-06-19 23:38:50.658405', '2025-05-27 19:23:03.104927', 'Link', 'iframe嵌套', 61, 2, 'https://doc.lybbn.cn', '/docdvlyadmin', '', '', 1, 0, 0, 1, '0', '01599f73f61848aa811f687b1cfc1588'),
-	('1b5018bdb5e04698b84da505e8a6b93c', '0', '', '2025-06-20 10:41:09.509479', '2025-06-20 10:41:09.509479', 'TrophyBase', '角色管理', 100, 1, '', '/roleManage', '', 'roleManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('205910763e0e42fbbc12833d2f7d61bb', '0', '', '2025-07-06 10:25:52.268867', '2025-07-06 10:25:52.268867', 'Reading', '字典管理', 30, 1, '', '/sysDictionary', '', 'sysDictionary', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
-	('24d2eb79a21141afbe73058cc02545e0', '0', '', '2025-07-03 17:50:53.774912', '2025-07-03 17:50:53.774912', 'ChatLineSquare', '操作日志', 200, 1, '', '/journalManage', '', 'journalManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('2e9937b37ac94e248e9ed159bfe7b655', '0', '', '2025-05-30 11:59:11.410779', '2025-05-27 16:51:27.224927', 'Collection', '菜单管理', 90, 1, '', '/menuManage', '', 'menuManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('31552696153b42599ce1faf6fe495824', '0', '', '2025-06-28 22:39:05.420221', '2025-06-28 22:37:29.608094', 'User', '用户管理', 40, 1, '', '/buserManage', '', 'buserManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('44662b7fe6b54395994f28ed88eaf3f0', '0', '', '2025-07-12 22:54:52.529651', '2025-07-12 22:51:19.303097', 'Message', '我的消息', 30, 1, '', '/myMessage', '', 'myMessage', 1, 0, 0, 1, '0', NULL),
-	('4a7a7748387f44dbab72027d8bdc87f7', '0', '', '2025-06-19 22:36:22.877877', '2025-05-27 16:48:37.075299', 'House', '首页', 10, 1, '', '/home', '', 'home', 1, 0, 0, 1, '0', NULL),
-	('4f947108c5bf44f2b97e4a80daebf772', '0', '', '2025-07-11 15:23:13.273011', '2025-07-11 15:23:13.273011', 'ChatDotRound', '通知公告', 20, 1, '', '/messagNotice', '', 'messagNotice', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
+	('1b5018bdb5e04698b84da505e8a6b93c', '0', '', '2025-06-20 10:41:09.509479', '2025-06-20 10:41:09.509479', 'TrophyBase', '角色管理', 100, 1, '', '/roleManage', 'system/role/roleManage', 'roleManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('205910763e0e42fbbc12833d2f7d61bb', '0', '', '2025-07-06 10:25:52.268867', '2025-07-06 10:25:52.268867', 'Reading', '字典管理', 30, 1, '', '/sysDictionary', 'system/dict/sysDictionary', 'sysDictionary', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
+	('24d2eb79a21141afbe73058cc02545e0', '0', '', '2025-07-03 17:50:53.774912', '2025-07-03 17:50:53.774912', 'ChatLineSquare', '操作日志', 200, 1, '', '/journalManage', 'system/log/journalManage', 'journalManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('2e9937b37ac94e248e9ed159bfe7b655', '0', '', '2025-05-30 11:59:11.410779', '2025-05-27 16:51:27.224927', 'Collection', '菜单管理', 90, 1, '', '/menuManage', 'system/menu/menuManage', 'menuManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('31552696153b42599ce1faf6fe495824', '0', '', '2025-06-28 22:39:05.420221', '2025-06-28 22:37:29.608094', 'User', '用户管理', 40, 1, '', '/buserManage', 'system/user/buserManage', 'buserManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('44662b7fe6b54395994f28ed88eaf3f0', '0', '', '2025-07-12 22:54:52.529651', '2025-07-12 22:51:19.303097', 'Message', '我的消息', 30, 1, '', '/myMessage', 'system/messageCenter/myMessage', 'myMessage', 1, 0, 0, 1, '0', NULL),
+	('4a7a7748387f44dbab72027d8bdc87f7', '0', '', '2025-06-19 22:36:22.877877', '2025-05-27 16:48:37.075299', 'House', '首页', 10, 1, '', '/home', 'system/home/home', 'home', 1, 0, 0, 1, '0', NULL),
+	('4f947108c5bf44f2b97e4a80daebf772', '0', '', '2025-07-11 15:23:13.273011', '2025-07-11 15:23:13.273011', 'ChatDotRound', '通知公告', 20, 1, '', '/messagNotice', 'system/messageCenter/messagNotice', 'messagNotice', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
 	('563092a536194a1493551a0043f1f1a3', '0', '', '2025-07-06 10:28:00.572624', '2025-07-06 10:24:28.612173', 'Operation', '系统工具', 80, 0, '', '/systemToolsMgDirs', '', '', 1, 0, 0, 1, '0', NULL),
-	('6354ba32ae734b5eaa799a65f76deee6', '0', '', '2025-07-07 22:53:48.969388', '2025-07-07 22:53:36.719556', 'Setting', '系统设置', 27, 1, '', '/systemConfig', '', 'systemConfig', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
-	('8faec98030e443b99ce0d4c636163db7', '0', '', '2025-06-26 10:04:29.302735', '2025-06-26 10:04:29.302735', 'Guide', '权限管理', 120, 1, '', '/authorityManage', '', 'authorityManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('95227fe101e747908c12b56d2bae5e8e', '0', '', '2025-06-24 17:34:34.764656', '2025-05-30 11:59:59.799346', 'OfficeBuilding', '部门管理', 50, 1, '', '/deptManage', '', 'deptManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
-	('98870fbaffb348ab9fd16a88e946bf09', '0', '', '2025-06-19 22:11:43.622822', '2025-05-27 16:50:26.693349', 'User', '个人中心', 19, 1, '', '/PersonalCenter', '', 'PersonalCenter', 1, 0, 0, 1, '0', NULL),
+	('6354ba32ae734b5eaa799a65f76deee6', '0', '', '2025-07-07 22:53:48.969388', '2025-07-07 22:53:36.719556', 'Setting', '系统设置', 27, 1, '', '/systemConfig', 'system/config/systemConfig', 'systemConfig', 1, 0, 0, 1, '0', '563092a536194a1493551a0043f1f1a3'),
+	('8faec98030e443b99ce0d4c636163db7', '0', '', '2025-06-26 10:04:29.302735', '2025-06-26 10:04:29.302735', 'Guide', '权限管理', 120, 1, '', '/authorityManage', 'system/role/authorityManage', 'authorityManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('95227fe101e747908c12b56d2bae5e8e', '0', '', '2025-06-24 17:34:34.764656', '2025-05-30 11:59:59.799346', 'OfficeBuilding', '部门管理', 50, 1, '', '/deptManage', 'system/dept/deptManage', 'deptManage', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('98870fbaffb348ab9fd16a88e946bf09', '0', '', '2025-06-19 22:11:43.622822', '2025-05-27 16:50:26.693349', 'User', '个人中心', 19, 1, '', '/PersonalCenter', 'system/usercenter/PersonalCenter', 'PersonalCenter', 1, 0, 0, 1, '0', NULL),
 	('9ece0330c65e40df8da00190107d908e', '0', '', '2025-06-19 23:39:35.291735', '2025-06-19 23:39:35.292565', 'Link', '外链测试', 60, 3, 'https://doc.lybbn.cn', '/docdvlyadminlink', '', '', 1, 0, 0, 1, '0', '01599f73f61848aa811f687b1cfc1588'),
-	('a8b435647f0b4a3f852ec796433e8919', '0', '', '2025-07-06 16:23:15.637839', '2025-07-06 16:23:15.637839', 'AddLocation', '登录日志', 230, 1, '', '/loginLogs', '', 'loginLogs', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
+	('a8b435647f0b4a3f852ec796433e8919', '0', '', '2025-07-06 16:23:15.637839', '2025-07-06 16:23:15.637839', 'AddLocation', '登录日志', 230, 1, '', '/loginLogs', 'system/log/loginLogs', 'loginLogs', 1, 0, 0, 1, '0', 'af862854dc44410d84b8b2ae5c16c90d'),
 	('af862854dc44410d84b8b2ae5c16c90d', '0', '', '2025-07-06 10:28:11.422074', '2025-05-27 16:52:51.726054', 'Setting', '系统管理', 90, 0, '', '/dirsettingsDirs', '', '', 1, 0, 0, 1, '0', NULL);
 /*!40000 ALTER TABLE `lyadmin_menu` ENABLE KEYS */;
 
@@ -464,7 +470,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_menu_button` (
   KEY `lyadmin_menu_button_menu_id_74205633` (`menu_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_menu_button 的数据：~73 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_menu_button 的数据：~71 rows (大约)
 DELETE FROM `lyadmin_menu_button`;
 /*!40000 ALTER TABLE `lyadmin_menu_button` DISABLE KEYS */;
 INSERT INTO `lyadmin_menu_button` (`id`, `name`, `value`, `api`, `method`, `menu_id`) VALUES
@@ -637,7 +643,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_message_users` (
   PRIMARY KEY (`id`),
   KEY `lyadmin_message_users_notification_id_cb1d078c` (`notification_id`),
   KEY `lyadmin_message_users_user_id_90dc6f12` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
 
 -- 正在导出表  dvlyadmin_mini.lyadmin_message_users 的数据：~2 rows (大约)
 DELETE FROM `lyadmin_message_users`;
@@ -672,9 +678,15 @@ CREATE TABLE IF NOT EXISTS `lyadmin_operation_log` (
   KEY `lyadmin_operation_log_creator_id_7b08f4e1` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_operation_log 的数据：~0 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_operation_log 的数据：~4 rows (大约)
 DELETE FROM `lyadmin_operation_log`;
 /*!40000 ALTER TABLE `lyadmin_operation_log` DISABLE KEYS */;
+INSERT INTO `lyadmin_operation_log` (`id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `req_modular`, `req_path`, `req_body`, `req_method`, `req_msg`, `req_ip`, `req_browser`, `resp_code`, `req_os`, `ip_area`, `json_result`, `status`, `creator_id`, `creator_name`) VALUES
+	('38c8407f78394e3b91d4948d3c007a0e', NULL, NULL, '2025-07-15 10:07:15.578960', '2025-07-15 10:07:15.578960', '登录模块', '/api/token/', '{\'username\': \'admin\', \'password\': \'******\', \'captcha\': \'20\', \'captchaKey\': 284}', 'POST', NULL, '127.0.0.1', 'Edge 138.0.0', '2000', 'Windows 10', '', '{\'code\': 2000, \'data\': {\'refresh\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjcxODAzNSwiaWF0IjoxNzUyNTQ1MjM1LCJqdGkiOiIyMzY3OTcxOTI1ZTM0MmIzOGE5NzY4NzYxMDI0NWZkNyIsInVzZXJfaWQiOiIxNzkyYWVhNDE2OTQ0ZWZmOWUzODQ1YWVjNmFjODhiNCJ9.FPTu16PmF7wHkNpmcBCOvikeav6rFPZrpqT8M8fyFjQ\', \'access\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjMxNjM1LCJpYXQiOjE3NTI1NDUyMzUsImp0aSI6IjY5MmVlMGY3ZGQ1NDRmNTNhMTVlMTI5ZWUzMGM5NGE4IiwidXNlcl9pZCI6IjE3OTJhZWE0MTY5NDRlZmY5ZTM4NDVhZWM2YWM4OGI0In0.JgadmHztIIToKgfVaUAGV2eq6g__dcx0lUcdNIXtsfg\'}, \'msg\': \'登录成功\'}', 1, NULL, ''),
+	('55377168e5b14ccca49f9b95a7745be0', NULL, NULL, '2025-07-14 10:41:53.016373', '2025-07-14 10:41:53.016373', '登录模块', '/api/token/', '{\'username\': \'superadmin\', \'password\': \'******\', \'captcha\': \'5\', \'captchaKey\': 282}', 'POST', NULL, '127.0.0.1', 'Edge 138.0.0', '2000', 'Windows 10', '', '{\'code\': 2000, \'data\': {\'refresh\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjYzMzcxMiwiaWF0IjoxNzUyNDYwOTEyLCJqdGkiOiI0YTI1ZWU5YjJlYTk0MzgxOWMxYTlmNTRiMjA2YzYxNiIsInVzZXJfaWQiOiIwIn0.u6hWw7WJRFfwJ_AbgO62Pe4XQW835kvrTEbtnM2TAR4\', \'access\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNTQ3MzEyLCJpYXQiOjE3NTI0NjA5MTIsImp0aSI6ImZiNTQ0OGJjZjMxZTQxOTE5MDZiZDE5ODBjN2U1ZThmIiwidXNlcl9pZCI6IjAifQ.XfjxzfITYNd6RQ8oOAXQULwqIT5Op_SVh5Dey69aAO0\'}, \'msg\': \'登录成功\'}', 1, NULL, ''),
+	('92915e553e654e76ab92e6b5759e0e2a', NULL, NULL, '2025-07-15 11:03:51.291876', '2025-07-15 11:03:51.291876', '登录刷新', '/api/token/refresh/', '{\'refresh\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjYzMzcxMiwiaWF0IjoxNzUyNDYwOTEyLCJqdGkiOiI0YTI1ZWU5YjJlYTk0MzgxOWMxYTlmNTRiMjA2YzYxNiIsInVzZXJfaWQiOiIwIn0.u6hWw7WJRFfwJ_AbgO62Pe4XQW835kvrTEbtnM2TAR4\'}', 'POST', NULL, '127.0.0.1', 'Edge 138.0.0', NULL, 'Windows 10', '', '{\'code\': None, \'data\': None, \'msg\': None}', 0, NULL, ''),
+	('adc3b2b30c4c461d954a23c5272bf8dd', NULL, NULL, '2025-07-16 12:35:34.499858', '2025-07-16 12:35:34.499858', '登录刷新', '/api/token/refresh/', '{\'refresh\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjcyMTQ2OSwiaWF0IjoxNzUyNTQ4NjY5LCJqdGkiOiIzYmYwOGFmYzYzYjQ0Y2IxYjA4ODlmYmQwM2RlYTgzYyIsInVzZXJfaWQiOiIxNzkyYWVhNDE2OTQ0ZWZmOWUzODQ1YWVjNmFjODhiNCJ9.8tUtSEfl2FPkTndyHws9ftprHqj0teJsz61O12DVp6w\'}', 'POST', NULL, '127.0.0.1', 'Edge 138.0.0', NULL, 'Windows 10', '', '{\'code\': None, \'data\': None, \'msg\': None}', 0, NULL, ''),
+	('e8d8fcb497b34df2a3d79934721349ca', NULL, NULL, '2025-07-15 11:04:29.167691', '2025-07-15 11:04:29.167691', '登录模块', '/api/token/', '{\'username\': \'admin\', \'password\': \'******\', \'captcha\': \'5\', \'captchaKey\': 286}', 'POST', NULL, '127.0.0.1', 'Edge 138.0.0', '2000', 'Windows 10', '', '{\'code\': 2000, \'data\': {\'refresh\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjcyMTQ2OSwiaWF0IjoxNzUyNTQ4NjY5LCJqdGkiOiIzYmYwOGFmYzYzYjQ0Y2IxYjA4ODlmYmQwM2RlYTgzYyIsInVzZXJfaWQiOiIxNzkyYWVhNDE2OTQ0ZWZmOWUzODQ1YWVjNmFjODhiNCJ9.8tUtSEfl2FPkTndyHws9ftprHqj0teJsz61O12DVp6w\', \'access\': \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjM1MDY5LCJpYXQiOjE3NTI1NDg2NjksImp0aSI6IjlhYWYwOGQ2ZWFlZTQ4MDA4NmFmYzk4ZTA4MzJjNmE1IiwidXNlcl9pZCI6IjE3OTJhZWE0MTY5NDRlZmY5ZTM4NDVhZWM2YWM4OGI0In0.944H-fzVG74nKwetglSrmX6UtibDB7TOvx3GD93TF1Y\'}, \'msg\': \'登录成功\'}', 1, NULL, '');
 /*!40000 ALTER TABLE `lyadmin_operation_log` ENABLE KEYS */;
 
 -- 导出  表 dvlyadmin_mini.lyadmin_role 结构
@@ -887,7 +899,7 @@ CREATE TABLE IF NOT EXISTS `lyadmin_system_config` (
   KEY `lyadmin_system_config_parent_id_2c3a27d0` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 正在导出表  dvlyadmin_mini.lyadmin_system_config 的数据：~5 rows (大约)
+-- 正在导出表  dvlyadmin_mini.lyadmin_system_config 的数据：~4 rows (大约)
 DELETE FROM `lyadmin_system_config`;
 /*!40000 ALTER TABLE `lyadmin_system_config` DISABLE KEYS */;
 INSERT INTO `lyadmin_system_config` (`id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `title`, `key`, `value`, `sort`, `status`, `data_options`, `form_item_type`, `rule`, `placeholder`, `tip`, `setting`, `creator_id`, `parent_id`) VALUES
@@ -932,8 +944,8 @@ CREATE TABLE IF NOT EXISTS `lyadmin_users` (
 DELETE FROM `lyadmin_users`;
 /*!40000 ALTER TABLE `lyadmin_users` DISABLE KEYS */;
 INSERT INTO `lyadmin_users` (`password`, `last_login`, `id`, `modifier`, `dept_belong`, `update_datetime`, `create_datetime`, `username`, `email`, `mobile`, `avatar`, `name`, `nickname`, `gender`, `login_error_nums`, `identity`, `is_delete`, `is_staff`, `is_superuser`, `creator_id`, `dept_id`, `is_active`) VALUES
-	('pbkdf2_sha256$390000$2Dj9ivbPKFiiZPXstZTQK3$5ymKI10SNdJ1PAOIs9RnQUiuSkko8T088e51wK8LVJ8=', '2025-07-13 15:46:45.585754', '0', NULL, NULL, '2025-07-13 15:46:45.585754', '2025-05-25 09:59:08.255150', 'superadmin', NULL, NULL, NULL, '超级管理员', '超级管理员', NULL, 0, 0, 0, 1, 1, NULL, '', 1),
-	('pbkdf2_sha256$390000$aLGgQHxt3Oairx8hYnYN4Z$+tkaUbcKM7fHPsbBpTxIcXO5Lu9ZBchPlMavG/lHhpw=', '2025-07-05 08:51:37.899112', '1792aea416944eff9e3845aec6ac88b4', '0', '', '2025-07-05 08:51:37.904545', '2025-06-30 12:24:34.575727', 'admin', '1042594286@qq.com', '15888888888', '', '管理员', '管理员', 2, 0, 1, 0, 1, 0, '0', '8b304f92647747aabffc7e8750397762', 1);
+	('pbkdf2_sha256$390000$2Dj9ivbPKFiiZPXstZTQK3$5ymKI10SNdJ1PAOIs9RnQUiuSkko8T088e51wK8LVJ8=', '2025-07-14 10:41:52.974956', '0', NULL, NULL, '2025-07-14 10:41:52.974956', '2025-05-25 09:59:08.255150', 'superadmin', NULL, NULL, NULL, '超级管理员', '超级管理员', NULL, 0, 0, 0, 1, 1, NULL, '', 1),
+	('pbkdf2_sha256$390000$aLGgQHxt3Oairx8hYnYN4Z$+tkaUbcKM7fHPsbBpTxIcXO5Lu9ZBchPlMavG/lHhpw=', '2025-07-15 11:04:29.152425', '1792aea416944eff9e3845aec6ac88b4', '0', '', '2025-07-15 11:04:29.152425', '2025-06-30 12:24:34.575727', 'admin', '1042594286@qq.com', '15888888888', '', '管理员', '管理员', 2, 0, 1, 0, 1, 0, '0', '8b304f92647747aabffc7e8750397762', 1);
 /*!40000 ALTER TABLE `lyadmin_users` ENABLE KEYS */;
 
 -- 导出  表 dvlyadmin_mini.lyadmin_users_role 结构

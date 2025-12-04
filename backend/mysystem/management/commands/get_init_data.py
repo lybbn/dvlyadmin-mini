@@ -1,3 +1,16 @@
+#!/bin/python
+#coding: utf-8
+# +-------------------------------------------------------------------
+# | system: dvlyadmin-mini
+# +-------------------------------------------------------------------
+# | Author: lybbn
+# +-------------------------------------------------------------------
+# | QQ: 1042594286
+# +-------------------------------------------------------------------
+
+# ------------------------------
+# 获取初始化数据
+# ------------------------------
 from django.core.management.base import BaseCommand
 from django.apps import apps
 from django.db import models
@@ -72,7 +85,7 @@ class Command(BaseCommand):
             # 输出结果
             self.stdout.write(self.style.SUCCESS(f"\n{options['model_name']} 数据（共 {len(result)} 条）："))
             for item in result:
-                self.stdout.write(str(item))
+                self.stdout.write(str(item)+',')
             
         except LookupError:
             self.stderr.write(self.style.ERROR(f'找不到模型: {model_name}'))
