@@ -41,7 +41,7 @@
 				<el-button-group>
 					<el-button 
 					v-for="ratio in presetRatios" 
-					:key="ratio.value" 
+					:key="ratio.label" 
 					size="small" 
 					@click="setAspectRatio(ratio.value)"
 					:type="currentRatio === ratio.value ? 'primary' : ''"
@@ -77,7 +77,8 @@
 		type: String, 
 		required: true,
 		validator: value => {
-		return /\.(jpe?g|png|gif|bmp|webp)$/i.test(value)
+			// 接受 blob URL 和常规图片 URL
+			return value.startsWith('blob:') || /\.(jpe?g|png|gif|bmp|webp)$/i.test(value)
 		}
 	},
 	compress: {
@@ -147,7 +148,7 @@
 
 	const initCropper = () => {
 		if (imgRef.value) {
-			crop.value = new Cropper(imgRef.value.lyimgRef, cropperOptions.value)
+			crop.value = new Cropper(imgRef.value, cropperOptions.value)
 		}
 	}
 
