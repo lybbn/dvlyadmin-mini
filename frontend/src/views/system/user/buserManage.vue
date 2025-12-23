@@ -229,7 +229,7 @@
         }).then(() => {
             crudOptions.value.request.setStatus({ id: row.id }).then(res => {
                 if (res.code == 2000) {
-                    originalStatus ? row.status = true : row.is_active = false
+                    originalStatus ? row.is_active = true : row.is_active = false
                     ElMessage.success(res.msg)
                     getData()
                 } else {
