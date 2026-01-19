@@ -16,7 +16,8 @@ export const useTabsStore = defineStore('tabs', () => {
         staticRoutes.forEach(ele => {
             noAddTabArr.push(ele.name)
         });
-        if (noAddTabArr.includes(tab.name) || !tab.name) {
+        // 检查路由是否隐藏或不符合标签页显示条件
+        if (noAddTabArr.includes(tab.name) || !tab.name || tab.meta?.hidden) {
             return;
         }
         // 检查是否已存在
