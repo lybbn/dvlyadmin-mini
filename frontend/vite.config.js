@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import VueSetupExtend from 'vite-plugin-vue-setup-extend'
+import viteCompression from 'vite-plugin-compression'
 import { resolve } from 'path';
 
 const pathResolve = (dir) => {
@@ -19,6 +20,13 @@ export default defineConfig({
         createSvgIconsPlugin({
             iconDirs: [resolve(process.cwd(), 'src/assets/lybbn/icons/svg')], // 你的 SVG 目录
             symbolId: 'icon-[name]', // 格式必须和 `iconName` 计算属性匹配
+        }),
+        // 构建时生成 gzip 预压缩文件，配合后端直接返回 .gz 文件
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz',
+            threshold: 1024, // 大于 1KB 的文件才压缩
+            deleteOriginFile: false,
         }),
     ],
     base: '/', // index.html文件所在位置
@@ -63,7 +71,31 @@ export default defineConfig({
                 assetFileNames: `static/[name].[hash].[ext]`,
                 manualChunks(id){
                     if (id.includes('node_modules')) {
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
+                        // vue 核心框架单独一个 chunk（几乎不变，长期缓存）
+                        if (id.includes('/vue/') || id.includes('\\vue\\') || id.includes('@vue/')) {
+                            return 'vue-core';
+                        }
+                        if (id.includes('vue-router') || id.includes('pinia') || id.includes('vue-i18n') || id.includes('pinia-plugin-persistedstate')) {
+                            return 'vue-core';
+                        }
+                        // element-plus 单独一个 chunk（大组件库，单独缓存）
+                        if (id.includes('element-plus') || id.includes('@element-plus')) {
+                            return 'element-plus';
+                        }
+                        // echarts 大图表库单独缓存
+                        if (id.includes('echarts')) {
+                            return 'echarts';
+                        }
+                        // codemirror 编辑器单独缓存
+                        if (id.includes('codemirror') || id.includes('@codemirror')) {
+                            return 'codemirror';
+                        }
+                        // xterm 终端单独缓存
+                        if (id.includes('xterm')) {
+                            return 'xterm';
+                        }
+                        // 其他第三方库
+                        return 'vendor';
                     }
                 }
             }
