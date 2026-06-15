@@ -90,10 +90,6 @@ export default defineConfig({
                         if (id.includes('codemirror') || id.includes('@codemirror')) {
                             return 'codemirror';
                         }
-                        // xterm 终端单独缓存
-                        if (id.includes('xterm')) {
-                            return 'xterm';
-                        }
                         // 其他第三方库
                         return 'vendor';
                     }
