@@ -18,7 +18,7 @@
     const props = defineProps({
         src: {
             type: String,
-            required: true,
+            default: "",
         },
         // 可选：自定义生产环境替换的目标地址（默认取当前域名）
         productionBase: {
@@ -27,6 +27,7 @@
         },
     });
     const processedUrl = computed(() => {
+        if (!props.src) return "";
         if (import.meta.env.PROD && props.src.includes('127.0.0.1:8000')) {
             return props.src.replace('http://127.0.0.1:8000', props.productionBase);
         }
