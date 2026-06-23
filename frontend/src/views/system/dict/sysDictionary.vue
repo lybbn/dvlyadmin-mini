@@ -229,7 +229,10 @@
 
 	// 编辑字典分类
 	const editDictionary = (data) => {
-		categoryDialog.value.addModuleFn(data,'编辑')
+		isDialogCategoryVisible.value = true
+		nextTick(()=>{
+			categoryDialog.value.addModuleFn(data,'编辑')
+		})
 	}
 
 	// 删除字典分类
