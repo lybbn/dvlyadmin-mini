@@ -1,0 +1,41 @@
+# ========== 通用 ==========
+.git
+.gitignore
+.idea
+.vscode
+*.log
+*.md
+LICENSE
+NOTICE
+CHANGELOG.md
+
+# ========== Python ==========
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+backend/venv/
+backend/.venv/
+backend/.env
+backend/db.sqlite3
+backend/logs/
+
+# ========== 前端 ==========
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# ========== 媒体与上传（运行时持久化，不入镜像） ==========
+backend/media/**
+!backend/media/.gitkeep
+backend/frontend/lyadmin/**
+backend/frontend/h5/static/**
+!backend/frontend/h5/static/.keep
+
+# ========== Docker 自身 ==========
+Dockerfile
+docker-compose.yml
+.dockerignore
+.env
+.env.*
+!.env.docker
