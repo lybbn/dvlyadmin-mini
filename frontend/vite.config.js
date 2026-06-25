@@ -71,26 +71,6 @@ export default defineConfig({
                 assetFileNames: `static/[name].[hash].[ext]`,
                 manualChunks(id){
                     if (id.includes('node_modules')) {
-                        // vue 核心框架单独一个 chunk（几乎不变，长期缓存）
-                        if (id.includes('/vue/') || id.includes('\\vue\\') || id.includes('@vue/')) {
-                            return 'vue-core';
-                        }
-                        if (id.includes('vue-router') || id.includes('pinia') || id.includes('vue-i18n') || id.includes('pinia-plugin-persistedstate')) {
-                            return 'vue-core';
-                        }
-                        // element-plus 单独一个 chunk（大组件库，单独缓存）
-                        if (id.includes('element-plus') || id.includes('@element-plus')) {
-                            return 'element-plus';
-                        }
-                        // echarts 大图表库单独缓存
-                        if (id.includes('echarts')) {
-                            return 'echarts';
-                        }
-                        // codemirror 编辑器单独缓存
-                        if (id.includes('codemirror') || id.includes('@codemirror')) {
-                            return 'codemirror';
-                        }
-                        // 其他第三方库
                         return 'vendor';
                     }
                 }
