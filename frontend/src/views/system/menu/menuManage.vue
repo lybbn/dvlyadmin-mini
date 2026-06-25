@@ -354,7 +354,7 @@
     import moduleMenuButton from "./components/moduleMenuButton.vue";
     import DialogTableList from "@/components/dialog/dialogTableList.vue"
     import { useUserState } from "@/store/userState";
-    import SvgIcon from '@/components/icons/svgIcon.vue'
+    import SvgIcon from '@/components/icons/SvgIcon.vue'
 
     let userState = useUserState()
 
