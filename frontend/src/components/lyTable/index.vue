@@ -729,10 +729,14 @@
 		flex-direction: column;
 		height: 100%;
 		width: 100%;
+		min-height: 0;
+		overflow: hidden;
 	}
 
 	.lyTable-table {
-		height:100%;
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
 	}
 
 	.lytopaction{
