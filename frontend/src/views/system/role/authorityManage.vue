@@ -396,6 +396,10 @@
             // 转换为树形结构
             menuOptions.value = XEUtils.toArrayTree(menuData, { parentKey: 'parent' })
 
+            // 等待 DOM 更新后，同步树的勾选状态（解决切换角色时勾选残留问题）
+            await nextTick()
+            menuTree.value?.setCheckedKeys(menuCheckedKeys.value)
+
         } catch (error) {
             ElMessage.error('获取菜单权限失败')
         } finally {
