@@ -21,7 +21,9 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+9y7-(76!+viys!c(lybbn24s3h&-zm&l#fujgn03*+-yj@4'
+# 生产环境可在 .env 中设置 DJANGO_SECRET_KEY 覆盖（python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())" 生成）；
+# 未设置时回退到此默认值，保证本地开发零配置可跑
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or 'django-insecure-+9y7-(76!+viys!c(lybbn24s3h&-zm&l#fujgn03*+-yj@4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = locals().get("DEBUG", True)
@@ -126,40 +128,58 @@ else:
     }
 
 # 缓存配置
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f'{REDIS_URL}/0',
-        'KEY_PREFIX': 'dvlyadmin',  # 项目名当做文件前缀
-        "TIMEOUT": None,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 512,  # 连接池的连接(最大连接)
-            },
-        }
-    },
-    "authapi": {  # 接口安全校验（验证接口重复第二次访问会拒绝）
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': [
-            f'{REDIS_URL}/1',
-        ],
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
-        }
-    },
-    "singletoken": {  # jwt单用户登录（确保一个账户只有一个地点登录，后一个会顶掉前一个）
-        'BACKEND': 'django_redis.cache.RedisCache',  # 缓存后端 Redis
-        # 连接Redis数据库(服务器地址)
-        'LOCATION': [
-            f'{REDIS_URL}/2',
-        ],
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
-            'CONNECTION_POOL_KWARGS': {'decode_responses': True}, # 添加这一行,防止取出的值带有b'' bytes
-        }
-    },
-}
+# 本地无 Redis 时，设置 DVLYADMIN_CACHE_LOCMEM=true 即可使用内存缓存（config.py 默认 True）
+if locals().get("CACHE_LOCMEM", False):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "dvlyadmin-locmem",
+            "TIMEOUT": None,
+        },
+        "authapi": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "dvlyadmin-authapi",
+        },
+        "singletoken": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "dvlyadmin-singletoken",
+        },
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f'{REDIS_URL}/0',
+            'KEY_PREFIX': 'dvlyadmin',  # 项目名当做文件前缀
+            "TIMEOUT": None,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 512,  # 连接池的连接(最大连接)
+                },
+            }
+        },
+        "authapi": {  # 接口安全校验（验证接口重复第二次访问会拒绝）
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': [
+                f'{REDIS_URL}/1',
+            ],
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
+            }
+        },
+        "singletoken": {  # jwt单用户登录（确保一个账户只有一个地点登录，后一个会顶掉前一个）
+            'BACKEND': 'django_redis.cache.RedisCache',  # 缓存后端 Redis
+            # 连接Redis数据库(服务器地址)
+            'LOCATION': [
+                f'{REDIS_URL}/2',
+            ],
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',  # 连接选项(默认，不改)
+                'CONNECTION_POOL_KWARGS': {'decode_responses': True}, # 添加这一行,防止取出的值带有b'' bytes
+            }
+        },
+    }
 
 CHANNEL_LAYERS = {
     'default': {
@@ -202,6 +222,15 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+# 邮件配置统一从 backend/config.py 引入，config.py 中的默认值仍可被环境变量覆盖。
+EMAIL_BACKEND = locals().get('EMAIL_BACKEND')
+EMAIL_HOST = locals().get('EMAIL_HOST', '')
+EMAIL_PORT = locals().get('EMAIL_PORT', 587)
+EMAIL_HOST_USER = locals().get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = locals().get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = locals().get('EMAIL_USE_TLS', True)
+DEFAULT_FROM_EMAIL = locals().get('DEFAULT_FROM_EMAIL', '')
 
 STATIC_URL = '/static/'
 # 收集静态文件，必须将 MEDIA_ROOT,STATICFILES_DIRS先注释
