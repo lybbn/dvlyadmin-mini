@@ -25,6 +25,7 @@
             :title="dialogTitle"
             width="60%"
             custom-class="glass-dialog"
+            :append-to-body="true"
             :before-close="handleClose"
         >
             <div class="search-container">
