@@ -101,7 +101,8 @@ if DATABASE_TYPE == "MYSQL":
             "USER": DATABASE_USER,
             "PASSWORD": DATABASE_PASSWORD,
             "NAME": DATABASE_NAME,
-            "CONN_MAX_AGE":0,# 0 每个请求结束时关闭数据库连接、 None 表示无限的持久数据库连接
+            "CONN_MAX_AGE": 60,         # 持久连接复用窗口（秒）：0=每请求新建连接开销大；None=永不关闭易被 MySQL wait_timeout 杀掉报 2006。须小于 MySQL wait_timeout
+            "CONN_HEALTH_CHECKS": True, # 复用前 ping 检活，连接失效自动重连（Django 4.1+），防 "MySQL server has gone away"
         }
     }
 elif DATABASE_TYPE == "POSTGRESQL":
