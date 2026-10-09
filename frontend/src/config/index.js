@@ -51,11 +51,11 @@ export default {
 	//左侧菜单默认宽度 默认 180
 	MENU_WIDTH: 180,
 
-	// 顶部导航颜色 默认 #272E39
-	MENU_HEADER_COLOR01:'#272E39',
+	// 顶部导航颜色 默认蓝调玻璃 rgba(248,250,255,0.78)
+	MENU_HEADER_COLOR01:'rgba(248, 250, 255, 0.78)',
 
-	// 左侧菜单颜色 默认 #fff
-	MENU_HEADER_COLOR02:'#fff',
+	// 左侧菜单颜色 默认蓝调玻璃 rgba(244,248,255,0.68)
+	MENU_HEADER_COLOR02:'rgba(244, 248, 255, 0.68)',
 
 	// 默认菜单是否折叠
 	IS_MENU_COLLAPSE: false,

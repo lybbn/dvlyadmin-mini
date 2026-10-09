@@ -145,7 +145,9 @@ export const staticRoutes = [
 	},
 	{
 		path: "/404",
-        name: 'notFound',
+        // 不能叫 'notFound'：与 NotFound catch-all 同名，initRoutes 注册 catch-all 时
+        // 会同名顶掉这条精确记录，导致 /404 匹配行为不稳定
+        name: '404static',
 		component: () => import('@/views/system/error/404.vue'),
 		meta: {
 			title: "404 notFound",

@@ -81,15 +81,13 @@ router.beforeEach(async (to, from, next) => {
         }
         // 检查目标路由是否存在
         const hasRoute = checkRouteExists(router, to);
-        // 处理首页特殊情况
+        // 检查首页特殊情况（与 checkRouteExists 同口径：resolve 真实匹配，
+        // 避免 getRoutes().path 字符串比较对嵌套/重定向场景误判）
         if (to.path === '/home') {
-            const hasHome = router.getRoutes().some(r => {
-                // 检查路径是否包含 '/home'（包括子路由）
-                const pathMatches  =  r.path == '/home' ? true : false;
-                // 检查名称条件
-                const nameCondition = to.name !== "notFound";
-                return pathMatches && nameCondition;
-            });
+            const homeResolved = router.resolve('/home');
+            const hasHome = homeResolved.matched.length > 0
+                && !homeResolved.matched.some(r => r.path.includes(':pathMatch'))
+                && to.name !== "notFound";
             if (!hasHome) {
                 const firstRoute = getFirstMenuRoutePath(routesList.value);
                 NProgress.done();
@@ -108,8 +106,10 @@ router.beforeEach(async (to, from, next) => {
                 await userState.getSystemWebRouter(router)
                 isGetBackendRoute = true
             }
-            const retryHasRoute = router.getRoutes().some(r => r.path === to.path);
-            return retryHasRoute ? next() : next('/404');
+            const retryHasRoute = checkRouteExists(router, to);
+            // 重试必须带 fullPath 重新导航：路由表刚重建，裸 next() 会沿用进入守卫时
+            // 的旧匹配记录（catch-all 404），导致"路由注册成功却仍渲染404"
+            return retryHasRoute ? next(to.fullPath) : next('/404');
         }
         
         next();
@@ -188,13 +188,15 @@ async function setFilterRoute(dRoutes=dynamicRoutes) {
 	return filterRoute;
 }
 
-//检查路由是否存在
+//检查路由是否存在（用 router.resolve 走真实匹配器，避免字符串比较误判：
+//动态路由异步注册间隙/路径尾部斜杠差异都会导致 r.path === to.path 比较失败而误跳 404）
 function checkRouteExists(router, to) {
-  // 精确匹配路径或名称（排除notFound）
-  return router.getRoutes().some(r => 
-    r.path === to.path || 
-    (r.name && r.name === to.name && to.name !== "notFound")
-  );
+  // 名称匹配（排除404兜底名）
+  if (to.name && to.name !== "notFound" && to.name !== "404" && router.hasRoute(to.name)) return true;
+  const resolved = router.resolve(to.fullPath);
+  if (resolved.matched.length === 0) return false;
+  // 命中的是 catch-all 兜底路由（/:pathMatch(.*)*）说明目标路由实际不存在
+  return !resolved.matched.some(r => r.path.includes(':pathMatch'));
 }
 
 function getCacheActiveTab(){

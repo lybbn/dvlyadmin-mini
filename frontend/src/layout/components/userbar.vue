@@ -68,7 +68,7 @@
 				<div class="profile-info">
 					<div class="profile-name">{{ userState.userInfo.name || '更多' }}</div>
 				</div>
-				<el-icon class="profile-arrow"><ArrowDown /></el-icon>
+				<!-- v4 头像区只有 头像+名字，无箭头（角落的箭头会像第二个下拉，与头像下拉语义冲突） -->
 			</div>
 			<template #dropdown>
 				<el-dropdown-menu class="profile-menu">
@@ -211,23 +211,34 @@
 </script>
 
 <style lang="scss" scoped>
-	.user-bar {display: flex;align-items: center;height: 100%;}
-	.user-bar .panel-item {padding: 0 10px;cursor: pointer;height: 100%;display: flex;align-items: center;}
-	.user-bar .panel-item i {font-size: 16px;}
-	.user-bar .panel-item:hover {background: rgba(0, 0, 0, 0.1);}
+	.user-bar {display: flex;align-items: center;height: 100%;gap: 4px;padding-right: 8px;}
+	/* v4 .icon-btn：34px 命中区、10px 圆角、hover 淡蓝渐变 + 上浮 */
+	.user-bar .panel-item {width: 34px;height: 34px;flex-shrink: 0;cursor: pointer;display: flex;align-items: center;justify-content: center;border-radius: 10px;transition: background var(--ly-duration-fast),color var(--ly-duration-fast),transform var(--ly-duration-fast);}
+	.user-bar .panel-item i {font-size: 17px;}
+	.user-bar .panel-item:hover {background: var(--ly-gradient-soft) !important;color: var(--el-color-primary) !important;transform: translateY(-1px);}
 
-	.msg-list li {border-top:1px solid #eee;}
-	.msg-list li a {display: flex;padding:20px;}
-	.msg-list li a:hover {background: #ecf5ff;}
-	.msg-list__icon {width: 40px;margin-right: 15px;}
-	.msg-list__main {flex: 1;}
-	.msg-list__main h2 {font-size: 15px;font-weight: normal;color: #333;}
-	.msg-list__main p {font-size: 12px;color: #999;line-height: 1.8;margin-top: 5px;}
-	.msg-list__time {width: 120px;text-align: right;color: #999;}
+	/* 语言切换：与相邻图标同尺寸、同色、垂直居中 */
+	.user-bar > .el-dropdown {display: flex;align-items: center;height: 34px;}
+	.changlang {color: var(--ly-header-text);width: 34px;justify-content: center;border-radius: 10px;transition: background var(--ly-duration-fast),color var(--ly-duration-fast),transform var(--ly-duration-fast);}
+	.changlang:hover {background: var(--ly-gradient-soft);color: var(--el-color-primary);transform: translateY(-1px);}
+	.changlang svg {width: 17px;height: 17px;display: block;}
 
-	.dark .msg-list__main h2 {color: #d0d0d0;}
-	.dark .msg-list li {border-top:1px solid #363636;}
-	.dark .msg-list li a:hover {background: #383838;}
+	/* 消息列表：对齐 v4 .cmd-list（胶囊条目 + 淡蓝渐变 hover + token 色） */
+	.msg-list {padding: 10px;}
+	.msg-list li {border-top: none;border-radius: 10px;overflow: hidden;}
+	.msg-list li + li {margin-top: 2px;}
+	.msg-list li a {display: flex;padding: 12px;border-radius: 10px;text-decoration: none;color: inherit;transition: background var(--ly-duration-fast),color var(--ly-duration-fast);}
+	.msg-list li a:hover {background: var(--ly-gradient-soft);}
+	.msg-list li a:hover h2 {color: var(--el-color-primary);}
+	.msg-list__main {flex: 1;min-width: 0;}
+	.msg-list__main h2 {font-size: 13.5px;font-weight: 600;color: var(--ly-text-1);transition: color var(--ly-duration-fast);}
+	.msg-list__main p {font-size: 12px;color: var(--ly-text-3);line-height: 1.8;margin-top: 5px;}
+	/* v-html 富文本里的链接：主色胶囊文字，不再裸奔蓝色下划线 */
+	.msg-list__main p :deep(a) {color: var(--el-color-primary);text-decoration: none;border-radius: 4px;padding: 0 2px;}
+	.msg-list__main p :deep(a:hover) {background: rgba(58, 123, 255, 0.10);text-decoration: none;}
+	.msg-list__time {width: 120px;flex-shrink: 0;text-align: right;color: var(--ly-text-3);font-size: 11px;}
+
+	.dark .msg-list li a:hover {background: rgba(58, 123, 255, 0.16);}
 
 	.user-profile {
 		margin-left: auto;
@@ -235,38 +246,33 @@
 		.profile-content {
 			display: flex;
 			align-items: center;
+			gap: 9px;
 			padding: 4px 8px;
-			border-radius: 18px;
-			transition: all 0.3s;
-		
+			border-radius: 10px;
+			transition: background var(--ly-duration-fast);
+
 			&:hover {
-				background:rgba(255, 255, 255, 0.1) !important;
-				// background: var(--el-color-primary-light-9);
+				background: var(--ly-glass-bg-soft) !important;
 			}
-			
+
 			.profile-avatar {
 				flex-shrink: 0;
+				/* v4 头像：白描边 + 主色柔投影 */
+				border: 2px solid #fff;
+				box-shadow: 0 2px 8px rgba(58, 123, 255, .25);
 			}
-			
+
 			.profile-info {
-				margin: 0 12px;
-				
+				margin: 0;
+
 				.profile-name {
-					font-size: 14px;
+					font-size: 13px;
 					font-weight: 500;
-					color: #fff;
+					color: var(--ly-header-text);
 					line-height: 1.2;
+					white-space: nowrap;
 				}
 			}
-			
-			.profile-arrow {
-				font-size: 14px;
-				color: #fff;
-				// color: var(--el-text-color-secondary);
-			}
 		}
-	}
-	.changlang{
-		color:var(--el-text-color-disabled);
 	}
 </style>

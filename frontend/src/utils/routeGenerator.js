@@ -48,12 +48,15 @@ export async function initRoutes(router,dRoutes=dynamicRoutes){
 
 async function setAddRoute(router,dRoutes=dynamicRoutes) {
 	let routeChildren = await setFilterRoute(router,dRoutes=dynamicRoutes)
+    // 先移除旧 layout（递归删其 children）：addRoute 同名只替换父记录，
+    // 旧 children 会变成孤儿路由残留在 matcher 中，造成重复匹配
+    if (router.hasRoute('layout')) router.removeRoute('layout');
     routeChildren.forEach((route) => {
 		router.addRoute(route);
 	});
     router.addRoute(RedirectRoute);
     router.addRoute(NotFound[0]);//外部404（非嵌套，未登录时有用）
-    
+
     const storesRoutesList = useRoutesList();
 	storesRoutesList.setRoutesList(routeChildren[0].children);
     return router

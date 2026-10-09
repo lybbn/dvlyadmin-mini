@@ -1,5 +1,5 @@
 <template>
-    <div :class="['journal-manage-container', { 'ly-is-full': isFull }]">
+    <div ref="containerRef" :class="['journal-manage-container', { 'ly-is-full': isFull }]">
         <el-card class="tableSelect" ref="tableSelect" shadow="hover">
             <lySearchBar :model="formInline" @search="search" @reset="handleEdit('','reset')">
                 <template #actions-right>
@@ -87,7 +87,7 @@
     import { ElMessage, ElMessageBox } from 'element-plus'
     import {FullScreen} from '@element-plus/icons-vue'
     import Pagination from '@/components/Pagination.vue'
-    import { dateFormats, getTableHeight } from '@/utils/util'
+    import { dateFormats, getTableHeight, fullScreen } from '@/utils/util'
     import lySearchBar from '@/components/lySearchBar.vue'
     import Api from '@/api/api'
     import { useSiteThemeStore } from "@/store/siteTheme";
@@ -228,11 +228,22 @@
         }
     }
 
+    // 切换全屏：原生 Fullscreen API（fixed+z-index 模拟会被 header 的层叠上下文压住）
+    const containerRef = ref(null)
     const setFull = () => {
-        isFull.value = !isFull.value
-        nextTick(() => {
-            getTheTableHeight()
-        })
+        fullScreen(containerRef.value)
+        // API 被拒/不可用（部分 WebView、iframe）时降级为 fixed 模拟
+        setTimeout(() => {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen) {
+                isFull.value = !isFull.value
+                listenResize()
+            }
+        }, 80)
+    }
+    // 全屏状态以浏览器实际状态为准，Esc 退出时自动同步
+    const onFullscreenChange = () => {
+        isFull.value = !!(document.fullscreenElement || document.webkitIsFullScreen)
+        listenResize()
     }
 
     const getTheTableHeight = () => {
@@ -249,6 +260,8 @@
 
     onMounted(() => {
         window.addEventListener('resize', listenResize)
+        document.addEventListener('fullscreenchange', onFullscreenChange)
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange)
         nextTick(() => {
             getTheTableHeight()
         })
@@ -257,6 +270,8 @@
 
     onUnmounted(() => {
         window.removeEventListener('resize', listenResize)
+        document.removeEventListener('fullscreenchange', onFullscreenChange)
+        document.removeEventListener('webkitfullscreenchange', onFullscreenChange)
     })
 </script>
 
@@ -276,7 +291,7 @@
             right: 0;
             bottom: 0;
             z-index: 2000;
-            background: #fff;
+            background: var(--ly-glass-bg-strong, #fff);
             padding: 16px;
             overflow: auto;
         }
@@ -284,8 +299,13 @@
 
     .table-container {
         flex: 1;
-        background: #fff;
-        border-radius: 4px;
+        /* 玻璃卡外壳：与通知公告/我的消息列表页同语言，表格不再裸飘在极光背景上 */
+        background: var(--ly-glass-bg, rgba(246, 249, 255, 0.66));
+        backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+        -webkit-backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+        border: 1px solid var(--ly-glass-border, rgba(255, 255, 255, 0.7));
+        border-radius: 16px;
+        box-shadow: var(--ly-shadow-card, 0 10px 34px rgba(27, 35, 64, 0.08));
         overflow: hidden;
 
         :deep(.el-table) {
@@ -293,7 +313,7 @@
                 padding: 8px 0;
             }
             .el-table__body-wrapper{
-                background:var(--el-bg-color);
+                background: transparent;
             }
 
             .json-cell {

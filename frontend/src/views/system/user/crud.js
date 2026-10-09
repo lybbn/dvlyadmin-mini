@@ -89,7 +89,7 @@ export function createCrudConfig(options = {}){
             },
             //crud按钮配置
             rowHandle:{
-                width: 205,//操作列宽度,0表示不显示表格操作列
+                width: 210,//操作列宽度,0表示不显示表格操作列
                 fixed:"right",//固定操作列在右侧
                 ...(options.rowHandle || {})
             },

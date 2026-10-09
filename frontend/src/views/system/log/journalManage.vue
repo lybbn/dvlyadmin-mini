@@ -81,7 +81,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column width="80" prop="resp_code" label="响应码">
+                <el-table-column width="90" prop="resp_code" label="响应码">
                     <template #default="{ row }">
                         <el-tag v-if="row.resp_code" :type="row.resp_code === '2000' ? 'success' : 'warning'">
                         {{ row.resp_code }}
@@ -342,7 +342,7 @@
             right: 0;
             bottom: 0;
             z-index: 2000;
-            background: #fff;
+            background: var(--ly-glass-bg-strong, #fff);
             padding: 16px;
             overflow: auto;
         }
@@ -350,8 +350,13 @@
 
     .table-container {
         flex: 1;
-        background: #fff;
-        border-radius: 4px;
+        /* 玻璃卡外壳：与通知公告/我的消息列表页同语言，表格不再裸飘在极光背景上 */
+        background: var(--ly-glass-bg, rgba(246, 249, 255, 0.66));
+        backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+        -webkit-backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+        border: 1px solid var(--ly-glass-border, rgba(255, 255, 255, 0.7));
+        border-radius: 16px;
+        box-shadow: var(--ly-shadow-card, 0 10px 34px rgba(27, 35, 64, 0.08));
         overflow: hidden;
 
         :deep(.el-table) {
@@ -359,7 +364,7 @@
                 padding: 8px 0;
             }
             .el-table__body-wrapper{
-                background:var(--el-bg-color);
+                background: transparent;
             }
 
             .json-cell {

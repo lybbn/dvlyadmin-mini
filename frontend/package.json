@@ -7,7 +7,7 @@
     "url": "https://gitee.com/lybbn"
   },
   "private": true,
-  "version": "1.0.1",
+  "version": "2.0.1",
   "description": "是django-vue-lyadmin项目的精简版，只保留了后台管理系统的部分功能，方便快速搭建后台管理系统。",
   "type": "module",
   "scripts": {
@@ -19,7 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
+    "@element-plus/icons-vue": "2.3.1",
     "@tsparticles/slim": "^3.8.1",
     "@tsparticles/vue3": "^3.0.1",
     "@wangeditor/editor": "^5.1.23",
@@ -28,7 +28,7 @@
     "cropper": "^4.1.0",
     "crypto-js": "^4.2.0",
     "echarts": "^5.6.0",
-    "element-plus": "^2.9.10",
+    "element-plus": "2.9.10",
     "file-saver": "^2.0.5",
     "js-cookie": "^3.0.5",
     "lodash-es": "^4.17.21",
@@ -50,9 +50,9 @@
     "sass": "^1.89.0",
     "terser": "^5.39.2",
     "vite": "^6.3.5",
+    "vite-plugin-compression": "^0.5.1",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",
-    "vite-plugin-compression": "^0.5.1",
     "vite-svg-loader": "^5.1.0"
   }
 }

@@ -4,6 +4,7 @@
 // @import 'pages.scss';
 // @import 'dark.scss';
 
+@forward 'tokens.scss';
 @forward 'app.scss';
 @forward 'fix.scss';
 @forward 'media.scss';

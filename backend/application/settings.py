@@ -317,7 +317,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_FAILURE_MESSAGE': '请求太频繁，请稍后再试',
     #线上部署正式环境，关闭web接口测试页面
     'DEFAULT_RENDERER_CLASSES':(
-        'rest_framework.renderers.JSONRenderer',
+        'utils.renderers.LoopbackRewriteJSONRenderer',  # 渲染前改写库内残留的 127/localhost 图片地址为 DOMAIN_HOST（开发环境原样返回）
     ),
 }
 

@@ -26,7 +26,9 @@ export const useUserState = defineStore('userState', {
                 menus: [],    // 原始菜单路径
                 buttons: [],  // {menuName:buttonCode}  menuName 菜单组件名 有唯一性
                 columns: []   // {tableName: {columnName: permissionType}}
-            }
+            },
+            // 菜单/路由重建进行中的单飞锁（不持久化，persist pick 未包含）
+            _webRouterLock: null
         }
     },
 	getters:{
@@ -180,20 +182,29 @@ export const useUserState = defineStore('userState', {
         },
 
         /**
-         * 获取菜单
+         * 获取菜单（单飞锁：路由守卫与 layout.onMounted 会并发调用，
+         * 必须共享同一次请求与路由重建——"删旧路由→await接口→重注册"窗口内
+         * 并发导航会全部落 catch-all 被误判 404）
          */
         async getSystemWebRouter(router){
-            const res = await Api.apiSystemWebRouter();
-            if(res.code == 2000){
-                let tmpdata = this.transformMenuToRoutes(res.data)
-                this.permissions.menus = res.data
-                this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: true })
-                await this.updateDynamicRoutes(router)
-            }else{
-                this.permissions.menus = []
-                this.menus = []
-                await this.updateDynamicRoutes(router)
-            }
+            if (this._webRouterLock) return this._webRouterLock
+            this._webRouterLock = (async () => {
+                try {
+                    const res = await Api.apiSystemWebRouter();
+                    if(res.code == 2000){
+                        let tmpdata = this.transformMenuToRoutes(res.data)
+                        this.permissions.menus = res.data
+                        this.menus = XEUtils.toArrayTree(tmpdata, { parentKey: 'parent', strict: true })
+                    }else{
+                        this.permissions.menus = []
+                        this.menus = []
+                    }
+                    await this.updateDynamicRoutes(router)
+                } finally {
+                    this._webRouterLock = null
+                }
+            })()
+            return this._webRouterLock
         },
         /**
          * 取系统配置

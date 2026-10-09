@@ -7,10 +7,12 @@
 					<ly-img class="logo" :src="userState.sysConfig.logo" />
 					<span v-if="!ismobile">{{ userState.sysConfig.systitle}}</span>
 				</div>
-			</div>
-			<div class="lybbn-panel-header-center" v-if="!ismobile">
-				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
-				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
+				<!-- v4 顶栏：logo 右侧的命令面板搜索入口（Ctrl K） -->
+				<div class="lybbn-topbar-search" v-if="!ismobile" @click="searchVisible = true">
+					<el-icon><Search /></el-icon>
+					<span>搜索菜单</span>
+					<kbd>Ctrl K</kbd>
+				</div>
 			</div>
 			<div class="lybbn-panel-header-right">
 				<userbar></userbar>
@@ -56,13 +58,9 @@
 				</div>
 			</div>
 			<div v-if="!ismobile" class="lybbn-header-menu" style="margin-left: 20px;margin-right: 20px;">
-				<el-menu mode="horizontal" ellipsis :default-active="active" style="width:100%;overflow-x:auto;overflow-y: hidden;" router background-color="var(--ly-header-bg)" text-color="#fff" active-text-color="var(--el-color-primary-light-1)">
+				<el-menu mode="horizontal" ellipsis :default-active="active" style="width:100%;overflow-x:auto;overflow-y: hidden;" router background-color="transparent" text-color="var(--ly-header-text)" active-text-color="var(--el-color-primary)">
 					<NavMenu :navMenus="menu"></NavMenu>
 				</el-menu>
-			</div>
-			<div class="lybbn-panel-header-center" v-if="!ismobile">
-				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
-				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
 			</div>
 			<SideMobile v-if="ismobile"></SideMobile>
 			<div class="lybbn-panel-header-right">
@@ -91,10 +89,6 @@
 					<ly-img class="logo" :src="userState.sysConfig.logo" />
 					<span v-if="!ismobile">{{ config.APP_NAME}}</span>
 				</div>
-			</div>
-			<div class="lybbn-panel-header-center" v-if="!ismobile">
-				<a href="https://doc.lybbn.cn/" target="_blank">Copyright © lybbn</a>
-				<span style="cursor: pointer;padding-right:8px;margin-left: 5px;" @click="canUpgradeClick">v{{ userState.sysConfig.sysVersion }}</span>
 			</div>
 			<div class="lybbn-panel-header-right">
 				<userbar></userbar>
@@ -162,6 +156,11 @@
 	<div class="main-maximize-exit" @click="exitMaximize">
 		<el-icon><Close /></el-icon>
 	</div>
+
+	<!-- v4 顶栏命令面板（Ctrl K / 点击顶栏搜索胶囊） -->
+	<el-dialog v-model="searchVisible" :width="700" title="搜索" center destroy-on-close>
+		<search @success="searchVisible=false"></search>
+	</el-dialog>
 </template>
 
 <script setup>
@@ -180,9 +179,22 @@ import { useRouter, useRoute } from 'vue-router'
 import config from '@/config'
 import Api from "@/api/api";
 import { ElMessageBox } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
+import search from './components/search.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+// v4 顶栏命令面板：Ctrl K / Cmd K 快捷键
+const searchVisible = ref(false)
+function onGlobalKeydown(e){
+	if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+		e.preventDefault()
+		searchVisible.value = true
+	}
+}
+onMounted(() => window.addEventListener('keydown', onGlobalKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 
 const siteThemeStore = useSiteThemeStore()
 const KeepAliveStore = useKeepAliveStore()
@@ -441,21 +453,7 @@ onBeforeUnmount(() => {
 	margin-left: 5px;
 }
 
-.lybbn-panel-side-scroll:deep(.el-menu-item).is-active{
-	background-color: var(--el-color-primary-light-8) !important;
-}
-.lybbn-panel-side-scroll:deep(.el-menu-item.is-active)::before{
-	position: absolute;
-    border-radius: 4px;
-    left: 12px;
-    width: 4px;
-    height: 14px;
-    content: "";
-	background-color: var(--el-color-primary-light-3) !important;
-}
-.lybbn-panel-side-scroll:deep(.el-menu-item:hover){
-	background-color: var(--el-color-primary-light-9) !important;
-}
+/* 激活样式统一由全局 app.scss 管理（此处曾重复加 box-shadow 与 filter 叠加成伪影，已移除） */
 .lybbn-panel-header-center {display: flex;align-items: center;}
-.lybbn-panel-header-center a{font-size: 12px;color: #b5afaf;text-decoration: none;letter-spacing: .5px;}
+.lybbn-panel-header-center a{font-size: 12px;color: var(--ly-text-3);text-decoration: none;letter-spacing: .5px;}
 </style>

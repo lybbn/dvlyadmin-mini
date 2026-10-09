@@ -1,14 +1,17 @@
 <template>
-    <el-config-provider :locale="locale" :size="siteThemeStore.elementSize" :zIndex="siteThemeStore.elementzIndex">
-        <router-view></router-view>
-    </el-config-provider>
+	<ly-aurora />
+	<el-config-provider :locale="locale" :size="siteThemeStore.elementSize" :zIndex="siteThemeStore.elementzIndex">
+		<router-view></router-view>
+	</el-config-provider>
 </template>
 
 <script setup>
+    import lyAurora from '@/components/lyAurora/lyAurora.vue'
     import {ref, onMounted,computed,watch} from 'vue'
     import {useSiteThemeStore} from "@/store/siteTheme";
     import {useUserState} from "@/store/userState";
     import config from '@/config'
+    import {autoStorage} from '@/utils/util'
     import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
     import en from 'element-plus/dist/locale/en.mjs'
     import { useLywebsocket } from "@/store/websocket";
@@ -26,6 +29,15 @@
 
     onMounted(()=>{
         siteThemeStore.setColorPrimary(colorPrimary)
+        // 旧版主题缓存迁移：localStorage 中仍是历史旧默认色时自动升级为新蓝调玻璃色
+        const OLD_HEADER_COLORS = ['#272E39', 'rgba(255, 255, 255, 0.72)']
+        const OLD_MENU_COLORS = ['#fff', 'rgba(255, 255, 255, 0.62)']
+        if (OLD_HEADER_COLORS.includes(autoStorage.get('menuHeaderColor01'))) {
+            siteThemeStore.setMenuHeaderColor01(menuHeaderColor01)
+        }
+        if (OLD_MENU_COLORS.includes(autoStorage.get('menuHeaderColor02'))) {
+            siteThemeStore.setMenuHeaderColor02(menuHeaderColor02)
+        }
         if (siteThemeStore.siteTheme === 'dark') {
             document.documentElement.classList.add('dark')
         } else {

@@ -14,7 +14,8 @@
 		</el-menu-item>
 		<el-sub-menu v-else :index="navMenu.path" :data-id="navMenu.path" @contextmenu="handleRightClick($event, navMenu.path)">
 			<template #title>
-				<SvgIcon v-if="navMenu.meta?.icon" :icon-class="navMenu.meta?.icon" style="font-size:20px !important;"></SvgIcon>
+				<!-- 图标尺寸不单独放大：v4 菜单图标统一 17px（1.28em），内联放大曾造成折叠态/展开态大小不均 -->
+				<SvgIcon v-if="navMenu.meta?.icon" :icon-class="navMenu.meta?.icon"></SvgIcon>
 				<span>{{ navMenu.meta.title }}</span>
 			</template>
 			<NavMenu :navMenus="navMenu.children"></NavMenu>

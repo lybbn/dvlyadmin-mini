@@ -1,5 +1,5 @@
 <template>
-	<div class="dict-container" :class="{ 'full-screen': isFullScreen }">
+	<div ref="containerRef" class="dict-container" :class="{ 'full-screen': isFullScreen }">
 		<el-container class="main-container">
 			<!-- 字典树面板 -->
 			<el-aside :width="isMobile ? '100%' : '300px'" class="tree-panel">
@@ -96,7 +96,8 @@
 </template>
 
 <script setup name="sysDictionary">
-	import { ref, computed, onMounted, nextTick,watch } from 'vue'
+	import { ref, computed, onMounted, onUnmounted, nextTick,watch } from 'vue'
+	import { fullScreen } from '@/utils/util'
 	import { useRoute } from 'vue-router'
 	import { useWindowSize } from '@vueuse/core'
 	import { Search, Edit, Delete, Plus} from '@element-plus/icons-vue'
@@ -141,10 +142,16 @@
 
 	// 生命周期钩子
 	onMounted(() => {
+		document.addEventListener('fullscreenchange', onFullscreenChange)
+		document.addEventListener('webkitfullscreenchange', onFullscreenChange)
 		fetchDictionaryTree()
 		if (!isMobile.value) {
 			showTable.value = true
 		}
+	})
+	onUnmounted(() => {
+		document.removeEventListener('fullscreenchange', onFullscreenChange)
+		document.removeEventListener('webkitfullscreenchange', onFullscreenChange)
 	})
 
 	// 方法
@@ -378,64 +385,82 @@
 		selectedItems.value = selection
 	}
 
-	// 切换全屏
+	// 切换全屏：原生 Fullscreen API（fixed+z-index 模拟会被 header 的层叠上下文压住）
+	const containerRef = ref(null)
 	const toggleFullScreen = () => {
-		isFullScreen.value = !isFullScreen.value
+		fullScreen(containerRef.value)
+		// API 被拒/不可用（部分 WebView、iframe）时降级为 fixed 模拟
+		setTimeout(() => {
+			if (!document.fullscreenElement && !document.webkitIsFullScreen) {
+				isFullScreen.value = !isFullScreen.value
+			}
+		}, 80)
+	}
+	// 全屏状态以浏览器实际状态为准，Esc 退出时自动同步
+	const onFullscreenChange = () => {
+		isFullScreen.value = !!(document.fullscreenElement || document.webkitIsFullScreen)
 	}
 </script>
 
 <style scoped lang="scss">
 	.dict-container {
-		padding:10px;
+		padding:14px 20px 20px 18px;
 		height: 100%;
 		display: flex;
-		background-color: var(--el-bg-color-page);
-	
+		background: transparent; /* 透出全局蓝调渐变+极光，不再整块白底 */
+
 	&.full-screen {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 2000;
-		background-color: white;
+		/* 原生全屏下浏览器保证盖住 header，此样式只负责全屏视觉 */
+		background-color: var(--ly-bg-page, #EEF2FB);
+		background-image: var(--ly-page-gradient, none);
 	}
-	
+
 	.main-container {
 		height: 100%;
-		border-radius: 6px;
-		overflow: hidden;
-		background-color: var(--el-bg-color);
-		border: 1px solid var(--el-border-color-light);
-		
+		flex: 1;
+		gap: 14px;
+		background: transparent;
+		border: none;
+		overflow: visible;
+
 		.tree-panel {
-			border-right: 1px solid var(--el-border-color-light);
-			background-color: var(--el-bg-color);
+			border-right: none;
+			border-radius: 16px;
+			background: var(--ly-glass-bg, rgba(246, 249, 255, 0.66));
+			backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+			-webkit-backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+			border: 1px solid var(--ly-glass-border, rgba(255, 255, 255, 0.7));
+			box-shadow: var(--ly-shadow-card, 0 10px 34px rgba(27, 35, 64, 0.08));
 			transition: all 0.3s ease;
-		
+
 			.tree-container {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
 			}
 		}
-		
+
 		.content-container {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			background-color: var(--el-bg-color);
+			border-radius: 16px;
+			background: var(--ly-glass-bg, rgba(246, 249, 255, 0.66));
+			backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+			-webkit-backdrop-filter: var(--ly-glass-blur, saturate(1.6) blur(20px));
+			border: 1px solid var(--ly-glass-border, rgba(255, 255, 255, 0.7));
+			box-shadow: var(--ly-shadow-card, 0 10px 34px rgba(27, 35, 64, 0.08));
 		}
 	}
-	
+
 	.panel-header {
 		padding: 16px;
-		background-color: var(--el-bg-color);
-		border-bottom: 1px solid var(--el-border-color-light);
+		background: transparent;
+		border-bottom: 1px solid var(--ly-line-soft, rgba(27, 35, 64, 0.06));
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		
+
 		.action-buttons {
 			display: flex;
 			flex-wrap: wrap;

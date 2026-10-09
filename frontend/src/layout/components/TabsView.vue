@@ -16,7 +16,7 @@
                 </div>
             </el-scrollbar>
             <div class="tabs-extra">
-                <el-dropdown trigger="click" @command="handleTabCommand">
+                <el-dropdown trigger="click" popper-class="ly-tabmenu-popper" @command="handleTabCommand">
                     <el-icon class="tabs-dropdown-icon">
                         <ArrowDown />
                     </el-icon>
@@ -33,7 +33,7 @@
 
         <!-- 移动端标签栏 -->
         <div v-else class="mobile-tabs-view">
-            <el-dropdown trigger="click" @command="handleMobileTabCommand">
+            <el-dropdown trigger="click" popper-class="ly-tabmenu-popper" @command="handleMobileTabCommand">
                 <div class="mobile-tabs-current">
                     <span>{{ currentTabTitle }}</span>
                     <el-icon class="mobile-tabs-icon">
@@ -204,17 +204,19 @@
 </script>
 
 <style scoped>
+    /* 标签栏：透明容器 + 芯片式标签（融入玻璃顶栏与极光背景） */
     .tabs-view-container {
-        height: 28px;
-        background-color: var(--el-bg-color);
-        box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+        height: 42px;
+        padding: 8px 0 4px;
+        background: transparent;
+        box-shadow: none;
     }
 
     /* 桌面端标签样式 */
     .tabs-view {
         display: flex;
         height: 100%;
-        border-bottom: 1px solid var(--el-border-color-light);
+        border-bottom: none;
     }
 
     .tabs-view .el-scrollbar {
@@ -229,6 +231,7 @@
 
     .tabs-list {
         display: flex;
+        align-items: center;
         height: 100%;
         padding: 0 10px;
     }
@@ -237,79 +240,79 @@
         position: relative;
         display: flex;
         align-items: center;
-        height: 100%;
+        height: 26px;
         padding: 0 12px;
-        margin-right: 5px;
-        font-size: 13px;
+        margin: 0 3px;
+        font-size: 12.5px;
         cursor: pointer;
-        color: var(--el-text-color-regular);
-        /* background-color: var(--el-fill-color-light); */
-        /* border: 1px solid var(--el-border-color-light); */
-        border:none;
-        border-bottom: none;
-        /* border-radius: 4px 4px 0 0; */
-        transition: all 0.3s;
+        color: var(--ly-text-2);
+        border: none;
+        border-radius: 13px;
+        transition: color .15s ease, background .15s ease, box-shadow .15s ease;
         flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .tabs-item:hover {
-        color: var(--el-color-primary);
-        background-color: var(--el-color-primary-light-9) !important;
+        color: var(--ly-color-primary);
+        background: var(--ly-header-item-hover);
     }
 
     .tabs-item.is-active {
-        color: var(--el-color-primary);
-        background-color: var(--el-bg-color);
-        /* border-color: var(--el-border-color-light);
-        border-bottom-color: transparent; */
-        
+        color: #fff;
+        background: var(--ly-gradient-primary);
+        box-shadow: var(--ly-sidebar-active-shadow);
     }
 
     .tabs-item.is-active::after {
-        content: '';
-        position: absolute;
-        /* top: 0; */
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: var(--el-color-primary);
+        display: none;
     }
 
     .tabs-item.is-active::before {
         content: "";
-        background: var(--el-color-primary);
+        background: #fff;
         display: inline-block;
         width: 5px;
         height: 5px;
         border-radius: 50%;
         position: relative;
         margin-right: 5px;
+        opacity: .9;
     }
 
     .tabs-close {
         margin-left: 8px;
         font-size: 12px;
         color: var(--el-text-color-secondary);
+        border-radius: 50%;
+        transition: all .15s ease;
     }
 
     .tabs-close:hover {
         color: var(--el-color-white);
         background-color: var(--el-color-primary-light-3);
-        border-radius: 100%;
         transform: scale(1.1);
+    }
+
+    .tabs-item.is-active .tabs-close {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .tabs-item.is-active .tabs-close:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.25);
     }
 
     .tabs-extra {
         display: flex;
         align-items: center;
         padding: 0 10px;
-        border-left: 1px solid var(--el-border-color-light);
+        border-left: none;
     }
 
     .tabs-dropdown-icon {
         cursor: pointer;
-        color: var(--el-text-color-secondary);
+        color: var(--ly-text-3);
     }
 
     .tabs-dropdown-icon:hover {
@@ -359,29 +362,35 @@
         background-color: var(--el-color-primary-light-9);
     }
 
-    /* 右键菜单样式 */
+    /* 标签栏下拉菜单：玻璃化圆角（append-to-body 场景用全局类名覆盖） */
     .tabs-contextmenu {
         position: fixed;
         z-index: 3000;
         margin: 0;
-        padding: 5px 0;
+        padding: 6px;
         list-style-type: none;
-        background-color: var(--el-bg-color-overlay);
-        border: 1px solid var(--el-border-color-light);
-        border-radius: 4px;
-        box-shadow: var(--el-box-shadow-light);
+        background-color: var(--ly-glass-bg-strong);
+        backdrop-filter: var(--ly-glass-blur);
+        -webkit-backdrop-filter: var(--ly-glass-blur);
+        border: 1px solid var(--ly-glass-border);
+        border-radius: var(--ly-radius-md);
+        box-shadow: var(--ly-shadow-card);
+        overflow: hidden;
     }
 
     .tabs-contextmenu li {
-        padding: 8px 16px;
+        padding: 8px 14px;
         font-size: 13px;
-        color: var(--el-text-color-regular);
+        color: var(--ly-text-2);
         cursor: pointer;
+        border-radius: 8px;
+        margin: 2px 2px;
+        transition: all .13s ease;
     }
 
     .tabs-contextmenu li:hover {
-        background-color: var(--el-color-primary-light-9);
-        color: var(--el-color-primary);
+        background: var(--ly-gradient-primary);
+        color: #fff;
     }
 
     /* 响应式调整 */

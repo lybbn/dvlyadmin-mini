@@ -313,7 +313,7 @@
 
 <style lang="scss" scoped>
     .form-container {
-        background: #fff;
+        background: transparent;
         border-radius: 4px;
         
         // 响应式表格

@@ -173,13 +173,13 @@
 <style scoped>
     .editor-wrapper {
         width:100%;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        border: 1px solid var(--ly-input-border, #dcdfe6);
+        border-radius: 10px;
         overflow: hidden;
     }
 
     .editor-toolbar {
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--ly-input-border, #dcdfe6);
     }
 
     .editor-content {

@@ -2,11 +2,43 @@
 
 [![img](https://img.shields.io/badge/python-%3E=3.11.x-green.svg)](https://python.org/)  [![PyPI - Django Version badge](https://img.shields.io/badge/django%20versions-%3E%3D%204.x-blue)](https://docs.djangoproject.com/zh-hans/4.1/) [![img](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)](https://nodejs.org/zh-cn/) [![img](https://gitee.com/lybbn/dvlyadmin-mini/badge/star.svg?theme=dark)](https://gitee.com/lybbn/dvlyadmin-mini)
 
-[在线预览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)| [关于授权](https://doc.lybbn.cn/dvlyadmin_mini/subscribe.html)
+[在线预览](https://dvlyadmin-mini.lybbn.cn) | [官网文档](https://doc.lybbn.cn/dvlyadmin_mini/introduce.html)
 
 ## 🌟 简介
 
 **dvlyadmin-mini** 是专为追求页面极致效果的开发者设计的一套 **django-vue-lyadmin** 优化升级的精简版。我们通过大量重构架构，去除了无用冗余代码，力求做到小而精。前端采用 **Vite + Vue 3 + Element Plus**，支持适配手机端，助力快速开发项目及提升项目质量！
+
+> 💡 本项目为 **Django 版本** 的 lyadmin 快速开发框架基座。如需其他语言/框架版本，请参考下方同系列项目。
+
+## 📦 同系列项目
+
+lyadmin 系列提供了多语言/多框架的快速开发框架基座，前端均采用统一的 **Vite + Vue 3 + Element Plus** 设计风格，可按技术栈自由选择：
+
+| 项目 | 技术栈 | 地址 |
+| --- | --- | --- |
+| **dvlyadmin-mini**（本项目） | Python + Django | [https://gitee.com/lybbn/dvlyadmin-mini](https://gitee.com/lybbn/dvlyadmin-mini) |
+| **dvlyadmin-fastapi** | Python + FastAPI | [https://gitee.com/lybbn/dvlyadmin-fastapi](https://gitee.com/lybbn/dvlyadmin-fastapi) |
+| **golyadmin** | Go (Golang) | [https://gitee.com/lybbn/golyadmin](https://gitee.com/lybbn/golyadmin) |
+
+分别用于 **Django**、**FastAPI** 和 **Go 语言** 的快速开发框架基座，开箱即用，助力不同技术栈的团队快速搭建后台管理系统。
+
+## 🛠️ 生态工具
+
+### RuYi Panel — 服务器面板，快速部署发布项目
+
+**RuYi Panel** 是一款用于**服务器面板快速部署发布项目**的运维管理面板，让项目部署像搭积木一样简单：
+
+- 🖥️ 可视化服务器管理：站点、进程、环境一键配置
+- 🚀 快速部署发布：无需手动敲命令，快速将项目发布上线
+- 🔧 运维省心：日志查看、状态监控、常见运维操作面板化
+
+### RuYi Workstation — 集中管理 RuYi Panel 的工作台（桌面版）
+
+**RuYi Workstation** 用于**集中管理多台 RuYi Panel**，实现本地项目的快速一键发布和更新：
+
+- 🗂️ 集中管理：在本地工作台中统一管理多台安装了 RuYi Panel 的服务器
+- ⚡ 一键发布/更新：本地项目快速一键发布和更新到 RuYi Panel，告别繁琐的手工上传与重启
+- 🔁 高效迭代：开发 → 发布 → 更新 流程一体化，大幅提升交付效率
 
 ## 🚀 在线体验 dvlyadmin-mini
 

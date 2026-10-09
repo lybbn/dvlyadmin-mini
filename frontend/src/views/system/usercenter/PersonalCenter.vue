@@ -771,11 +771,23 @@
     .profile-header {
         display: flex;
         padding: 30px;
-        background: linear-gradient(135deg, #f6f9fc 0%, #b0c5d5 100%);
+        background: linear-gradient(135deg, var(--ly-glass-bg-soft) 0%, rgba(58, 123, 255, 0.10) 55%, rgba(108, 155, 255, 0.16) 100%);
         position: relative;
         align-items: center;
         flex-wrap: wrap;
         gap: 20px;
+        overflow: hidden;
+    }
+
+    /* 横幅右上装饰光斑（与极光呼应） */
+    .profile-header::after {
+        content: "";
+        position: absolute;
+        top: -60px;right: -40px;
+        width: 220px;height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(58, 123, 255, 0.18) 0%, transparent 70%);
+        pointer-events: none;
     }
 
     .avatar-section {
@@ -869,8 +881,8 @@
     }
 
     .notification-card.unread {
-        background-color: #f5f9ff;
-        border-left: 3px solid #409EFF;
+        background-color: rgba(58, 123, 255, 0.06);
+        border-left: 3px solid var(--el-color-primary);
     }
 
     .notification-card:hover {

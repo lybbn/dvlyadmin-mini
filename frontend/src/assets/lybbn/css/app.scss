@@ -1,5 +1,11 @@
 /* 全局 */
-#app, body, html {width: 100%;height: 100%;background-color: #f6f8f9;font-size: 12px;}
+#app {width: 100%;height: 100%;font-size: 13px;}
+/* html 不能带背景：html 有背景时 body 背景不再上浮为画布背景，会以普通元素层级
+   绘制在 z-index:-1 的极光光斑之上，导致光斑永远被盖住（对齐设计稿：背景只在 body） */
+html {width: 100%;height: 100%;font-size: 13px;}
+body {width: 100%;height: 100%;background-color: var(--ly-bg-page, #EEF2FB);font-size: 13px;color: var(--ly-text-1, #1B2340);font-family: var(--ly-font-family);-webkit-font-smoothing: antialiased;}
+/* 全页蓝调氛围（token: --ly-page-gradient，暗色自动置 none） */
+body {background-image: var(--ly-page-gradient, none);background-attachment: fixed;}
 a {color: #333;text-decoration: none;}
 a:hover, a:focus {color: #000;text-decoration: none;}
 a:link {text-decoration: none;}
@@ -14,85 +20,186 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 /* 全局滚动条样式 */
 .scrollable {-webkit-overflow-scrolling: touch;}
 ::-webkit-scrollbar {width: 8px;height: 8px;}
-// ::-webkit-scrollbar-thumb {background-color: rgba(86, 85, 85, 0.3);} 
-::-webkit-scrollbar-thumb {background-color: rgba(136, 132, 132, 0.3);};
-::-webkit-scrollbar-thumb:hover {background-color: rgba(86, 85, 85, 0.6);}
-::-webkit-scrollbar-track {background-color: rgba(86, 85, 85, 0.1);}
-::-webkit-scrollbar-track:hover {background-color: rgba(86, 85, 85, 0.2);}
+::-webkit-scrollbar-thumb {background-color: rgba(27, 35, 64, 0.14);border-radius: 4px;}
+::-webkit-scrollbar-thumb:hover {background-color: rgba(27, 35, 64, 0.24);}
+::-webkit-scrollbar-track {background-color: transparent;}
+::-webkit-scrollbar-track:hover {background-color: transparent;}
 
-/* 头部 */
-.lybbn-panel-header {height: 48px;background: var(--ly-header-bg);color: #fff;display: flex;justify-content:space-between;}
-.lybbn-panel-header-left {display: flex;align-items: center;padding-left:20px;flex-shrink: 0;}
+/* 头部（亮色玻璃 + 毛玻璃模糊，文字色随暗色模式切换） */
+.lybbn-panel-header {height: var(--ly-topbar-height, 60px);background: var(--ly-header-bg);color: var(--ly-header-text);display: flex;justify-content:space-between;backdrop-filter: var(--ly-glass-blur);-webkit-backdrop-filter: var(--ly-glass-blur);border-bottom: 1px solid var(--ly-header-border);box-shadow: var(--ly-glass-highlight);position: relative;z-index: 5;}
+.lybbn-panel-header-left {display: flex;align-items: center;padding-left:20px;flex-shrink: 0;gap: 16px;}
 .lybbn-panel-header-center {display: flex;align-items: center;}
-.lybbn-panel-header-center a{font-size: 12px;color: #b5afaf;text-decoration: none;letter-spacing: .5px;}
+.lybbn-panel-header-center a{font-size: 12px;color: var(--ly-text-3);text-decoration: none;letter-spacing: .5px;}
 .lybbn-panel-header-right {display: flex;align-items: center;flex-shrink: 0;}
-.lybbn-panel-header .logo-bar {font-size: 20px;font-weight: bold;display: flex;align-items: center;}
-.lybbn-panel-header .logo-bar .logo {margin-right: 10px;width: 35px;height: 35px;}
+.lybbn-panel-header .logo-bar {font-size: 15px;font-weight: 700;letter-spacing: .2px;display: flex;align-items: center;}
+.lybbn-panel-header .logo-bar .logo {margin-right: 10px;width: 32px;height: 32px;border-radius: 9px;box-shadow: var(--ly-shadow-primary);}
+/* v4 顶栏搜索胶囊（Ctrl K 命令面板入口） */
+.lybbn-topbar-search {display: flex;align-items: center;gap: 8px;width: 260px;height: 36px;padding: 0 12px;border-radius: 18px;background: var(--ly-glass-bg-soft);border: 1px solid var(--ly-line-soft);color: var(--ly-text-3);font-size: 13px;cursor: pointer;transition: border-color var(--ly-duration-fast),box-shadow var(--ly-duration-fast),color var(--ly-duration-fast);
+	.el-icon {font-size: 15px;}
+	span {flex: 1;text-align: left;}
+	kbd {margin-left: auto;font-family: inherit;font-size: 11px;color: var(--ly-text-3);background: rgba(27,35,64,.05);border: 1px solid var(--ly-line-soft);border-radius: 6px;padding: 2px 6px;}
+	&:hover {border-color: var(--el-color-primary);box-shadow: var(--ly-focus-ring);color: var(--ly-text-2);}
+}
+html.dark .lybbn-topbar-search kbd {background: rgba(255,255,255,.06);}
 .lybbn-panel-header .nav {display: flex;height: 100%;margin-left: 40px;}
-.lybbn-panel-header .nav li {padding:0 10px;margin: 0 10px 0 0;font-size: 14px;color: rgba(255, 255, 255, 0.6);list-style: none;height: 100%;display: flex;align-items: center;cursor: pointer;}
+.lybbn-panel-header .nav li {padding:0 10px;margin: 0 10px 0 0;font-size: 14px;color: var(--ly-header-text);opacity: .65;list-style: none;height: 100%;display: flex;align-items: center;cursor: pointer;transition: opacity var(--ly-duration-fast),background var(--ly-duration-fast);}
 .lybbn-panel-header .nav li i {margin-right: 5px;}
-.lybbn-panel-header .nav li:hover {color: #fff;}
-.lybbn-panel-header .nav li.active {background: rgba(255, 255, 255, 0.1);color: #fff;}
-.lybbn-panel-header .user-bar .panel-item:hover {background: rgba(255, 255, 255, 0.1)!important;}
-.lybbn-panel-header .user-bar .user label{color: #fff;}
+.lybbn-panel-header .nav li:hover {opacity: 1;}
+.lybbn-panel-header .nav li.active {background: var(--ly-gradient-soft);opacity: 1;border-radius: 0;}
+.lybbn-panel-header .user-bar .user label{color: var(--ly-header-text);}
 
-/* 左侧菜单 */
-.lybbn-panel-side-split {width:65px;flex-shrink:0;background: #272E39;display: flex;flex-flow: column;}
+/* 左侧菜单（分栏布局竖栏：玻璃化） */
+.lybbn-panel-side-split {width:65px;flex-shrink:0;background: var(--ry-menu-bg);backdrop-filter: var(--ly-glass-blur);-webkit-backdrop-filter: var(--ly-glass-blur);border-right: 1px solid var(--ly-glass-border);display: flex;flex-flow: column;}
 .lybbn-panel-side-split-top {height: 49px;}
 .lybbn-panel-side-split-top a {display: inline-block;width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;}
 .lybbn-panel-side-split-top .logo {height:30px;vertical-align: bottom;}
 .lybbn-panel-side-split-scroll {overflow: auto;overflow-x:hidden;height: 100%;flex: 1;}
-.lybbn-panel-side-split li {cursor: pointer;width: 65px;height: 65px;color: #fff;text-align: center;display: flex;flex-direction: column;align-items: center;justify-content: center;}
-.lybbn-panel-side-split li i {font-size: 18px;}
-.lybbn-panel-side-split li p {margin-top:5px;}
-.lybbn-panel-side-split li:hover {background: rgba(255, 255, 255, 0.1);}
-.lybbn-panel-side-split li.active {background-color: var(--el-color-primary-light-1) !important;color: var(--el-color-primary-light-8);}
+.lybbn-panel-side-split li {cursor: pointer;width: 100%;min-height: 65px;color: var(--ly-text-2);text-align: center;display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 10px 4px;box-sizing: border-box;transition: background var(--ly-duration-fast),color var(--ly-duration-fast);}
+/* 竖栏只应纵向滚动：内容盒 64px（65-1px右边框），li 写死 65px 会恒定溢出 1px
+   触发 el-scrollbar 横向滚动条（页面底部左侧凭空多出一条），禁掉横向滚动 */
+.lybbn-panel-side-split .el-scrollbar__wrap {overflow-x: hidden;}
+.lybbn-panel-side-split .el-scrollbar__bar.is-horizontal {display: none;}
+.lybbn-panel-side-split li i {font-size: 18px;flex-shrink: 0;}
+.lybbn-panel-side-split li p {margin-top:5px;font-size: 12px;line-height: 1.2;max-width: 100%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.lybbn-panel-side-split li:hover {background: var(--ly-gradient-soft);color: var(--ly-color-primary);}
+/* 激活胶囊：不用固定高（48px 装不下图标+文字两行会重叠溢出），改 min-height 自适应，文字多时整体长高
+   水平 padding 归零保证 4 字标题完整显示（44px 会把 48px 的 4 个 12px 汉字截成省略号），文字居中无需内边距 */
+.lybbn-panel-side-split li.active {background: var(--ly-gradient-active) !important;color: #fff !important;box-shadow: var(--ly-sidebar-active-shadow);border-radius: 12px;margin: 3px 5px;width: auto;height: auto;min-height: 48px;padding: 7px 0 8px;}
 
-.lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb {background-color: rgba(255, 255, 255, 0.4);border-radius:5px;}
-.lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb:hover {background-color: rgba(255, 255, 255, 0.5);}
+.lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb {background-color: rgba(27, 35, 64, 0.2);border-radius:5px;}
+.lybbn-panel-side-split-scroll::-webkit-scrollbar-thumb:hover {background-color: rgba(27, 35, 64, 0.3);}
 .lybbn-panel-side-split-scroll::-webkit-scrollbar-track {background-color: rgba(255, 255, 255, 0);}
 .lybbn-panel-side-split-scroll::-webkit-scrollbar-track:hover {background-color: rgba(255, 255, 255, 0);}
 
-.lybbn-panel-side {background: var(--ry-menu-bg);display: flex;flex-flow: column;flex-shrink:0;width:var(--ry-menu-width);box-shadow: 2px 0 8px 0 rgba(29,35,41,.05);border-right: 1px solid #e6e6e6;transition:width 0.3s;}
-.lybbn-panel-side-top {border-bottom: 1px solid #ebeef5;height:50px;line-height: 50px;}
-.lybbn-panel-side-top h2 {padding:0 20px;font-size: 17px;color: #3c4a54;}
-.lybbn-panel-side-scroll {overflow: auto;overflow-x:hidden;flex: 1;}
-.lybbn-panel-side-bottom {border-top: 1px solid rgba(0,0,0,0.1);height:51px;cursor: pointer;display: flex;align-items: center;justify-content: center;}
+/* 左侧菜单（经典布局：v4 浮动圆角玻璃面板，离边 14px） */
+.lybbn-panel-side {
+	margin: 14px 0 14px 14px;border-radius: var(--ly-radius-xl);overflow: hidden;
+	background-color: var(--ry-menu-bg);
+	backdrop-filter: var(--ly-glass-blur);-webkit-backdrop-filter: var(--ly-glass-blur);
+	border: 1px solid var(--ly-glass-border);
+	box-shadow: var(--ly-glass-highlight),0 2px 4px rgba(27,35,64,.03),0 12px 32px rgba(27,35,64,.06);
+	display: flex;flex-flow: column;flex-shrink:0;width:var(--ry-menu-width);
+	animation: ly-sidebar-in .55s .05s backwards;
+	transition:width 0.3s,background var(--ly-duration-slow),border-color var(--ly-duration-slow);
+}
+@keyframes ly-sidebar-in {from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.lybbn-panel-side-top {border-bottom: 1px solid var(--ly-glass-border);height:50px;line-height: 50px;}
+.lybbn-panel-side-top h2 {padding:0 20px;font-size: 17px;color: var(--ly-text-1);}
+.lybbn-panel-side-scroll {overflow: auto;overflow-x:hidden;flex: 1;padding: 10px 0;}
+.lybbn-panel-side-bottom {border-top: 1px solid var(--ly-glass-border);height:51px;cursor: pointer;display: flex;align-items: center;justify-content: center;}
 .lybbn-panel-side-bottom i {font-size: 16px;}
-.lybbn-panel-side-bottom:hover {color: var(--el-color-primary);}
+.lybbn-panel-side-bottom:hover {color: var(--ly-color-primary);}
 .lybbn-panel-side.isCollapse {width: 65px;}
 .lybbn-header-menu {flex: 1;min-width: 0;overflow: hidden;}
-.lybbn-header-menu .el-menu {--el-menu-hover-bg-color: #171811 !important;height: 48px;}
+.lybbn-header-menu .el-menu {--el-menu-hover-bg-color: transparent !important;height: 48px;}
 .lybbn-header-menu .el-menu .el-sub-menu__title {background-color:transparent !important;}
-.lybbn-header-menu .el-menu--horizontal>.el-menu-item.is-active {background-color:#171811 ;}
+.lybbn-header-menu .el-menu--horizontal>.el-menu-item.is-active {background-color:transparent ;}
 .el-menu .menu-tag {position: absolute;height: 18px;line-height: 18px;background: var(--el-color-danger);font-size: 12px;color: #fff;right: 20px;border-radius:18px;padding:0 6px;}
 .el-menu .el-sub-menu__title .menu-tag {right: 40px;}
 .el-menu--horizontal > li .menu-tag {display: none;}
-.rymenu{background: var(--ry-menu-bg);}
+/* 菜单容器全透明（避免 el-menu 默认白底盖住玻璃面板，含子级展开菜单） */
+.rymenu,.rymenu .el-menu--inline,.rymenu .el-menu {background: transparent !important;}
+/* EP 默认 :hover/:focus 会刷 --el-menu-hover-bg-color（浅蓝 #ebf1ff），变量级置透明——任何情况下都不会再出现"伪激活"药丸 */
+.rymenu {--el-menu-hover-bg-color: transparent;}
+
+/* 菜单项：严格对齐 v4 设计稿（dashboard-preview-v4.html .menu a）
+   42px 视觉高 / 11px 视觉圆角 / 3px 间距用透明边框实现（纵向 margin 不计入 EP 展开动画的 scrollHeight，会导致子菜单展开跳动） */
+.rymenu {font-size: 13.5px;}
+.rymenu .el-menu-item,
+.rymenu .el-sub-menu__title {
+	height: 48px;box-sizing: border-box;line-height: 42px;
+	border: 3px solid transparent;background-clip: padding-box;
+	border-radius: 14px;margin: 0 10px;position: relative;
+	transition: background var(--ly-duration-fast),color var(--ly-duration-fast),box-shadow var(--ly-duration-normal);
+}
+/* hover：v4 淡蓝渐变 + 文字主题色 */
+.rymenu .el-menu-item:hover,
+.rymenu .el-sub-menu__title:hover {background-color: transparent;background-image: var(--ly-gradient-soft);color: var(--el-color-primary);}
+/* 点击后的焦点残留会套 hover 底色，看起来像双激活——变量+规则双层清除，激活态只认 .is-active */
+.rymenu .el-menu-item:focus,
+.rymenu .el-menu-item:focus-visible,
+.rymenu .el-sub-menu__title:focus,
+.rymenu .el-sub-menu__title:focus-visible {background-color: transparent !important;background-image: none !important;}
+/* 激活：v4 主渐变（135° 深蓝→主蓝）+ 白字 + 柔和投影 */
+.rymenu .el-menu-item.is-active,
+.rymenu .el-menu-item.is-active:focus,
+.rymenu .el-menu-item.is-active:hover {
+	background-color: transparent !important;
+	background-image: var(--ly-gradient-primary) !important;
+	color: #fff !important;font-weight: 500;
+	box-shadow: var(--ly-sidebar-active-shadow);
+}
+/* v4 标志性效果：激活项流光扫过 */
+.rymenu .el-menu-item.is-active::after {
+	content:"";position:absolute;inset:3px;border-radius:var(--ly-sidebar-item-radius);
+	background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.25) 50%,transparent 58%);
+	background-size:250% 100%;background-position:120% 0;
+	animation:ly-sheen 4.5s ease-in-out .8s infinite;pointer-events:none;
+}
+@keyframes ly-sheen {0%{background-position:120% 0}55%,100%{background-position:-120% 0}}
+/* 间距用的 3px 边框必须永远透明：EP 有休眠规则 .el-sub-menu.is-active .el-sub-menu__title{border-bottom-color:主色}，
+   展开父级菜单时会把透明底边框涂蓝（出现圆角蓝色横线），此处整体压制 */
+.rymenu .el-menu-item,
+.rymenu .el-menu-item.is-active,
+.rymenu .el-sub-menu__title,
+.rymenu .el-sub-menu.is-active .el-sub-menu__title {border-color: transparent !important;}
+/* 折叠态：EP 给菜单项内联 padding-left(层级缩进)，叠加胶囊 margin 后图标偏左——清掉内边距并显式居中 */
+.lybbn-panel-side.isCollapse .rymenu .el-menu-item,
+.lybbn-panel-side.isCollapse .rymenu .el-sub-menu__title,
+.rymenu.el-menu--collapse .el-menu-item,
+.rymenu.el-menu--collapse .el-sub-menu__title {
+	padding-left: 0 !important;padding-right: 0 !important;
+	text-align: center;justify-content: center;margin-left: 8px;margin-right: 8px;
+}
+/* 折叠态：标题文字必须隐藏（span 仍占宽会把图标挤到右侧） */
+.lybbn-panel-side.isCollapse .rymenu .el-menu-item > span,
+.lybbn-panel-side.isCollapse .rymenu .el-sub-menu__title > span,
+.rymenu.el-menu--collapse .el-menu-item > span,
+.rymenu.el-menu--collapse .el-sub-menu__title > span {display: none !important;}
+/* 折叠态图标绝对居中：EP 内联 padding-left(层级缩进)随缩放变化，压不干净，直接几何居中最稳 */
+.lybbn-panel-side.isCollapse .rymenu .el-menu-item .el-icon,
+.lybbn-panel-side.isCollapse .rymenu .el-sub-menu__title .el-sub-menu__icon-arrow,
+.rymenu.el-menu--collapse .el-menu-item .el-icon,
+.rymenu.el-menu--collapse .el-sub-menu__title .el-sub-menu__icon-arrow {
+	position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);margin: 0;
+}
 
 /* 右侧内容 */
 .lybbn-panel-body {flex: 1;display: flex;flex-flow: column;}
 
-.lybbn-panel-topbar {height: 50px;border-bottom: 1px solid #ebeef5;background: #fff;box-shadow: 0 1px 4px rgba(0,21,41,.08);display: flex;justify-content:space-between;}
+.lybbn-panel-topbar {height: 50px;border-bottom: 1px solid var(--ly-glass-border);background: var(--ly-glass-bg);backdrop-filter: var(--ly-glass-blur);-webkit-backdrop-filter: var(--ly-glass-blur);box-shadow: var(--ly-glass-highlight);display: flex;justify-content:space-between;}
 .lybbn-panel-topbar .left-panel {display: flex;align-items: center;}
 .lybbn-panel-topbar .right-panel {display: flex;align-items: center;}
 
 .right-panel-search {display: flex;align-items: center;}
 .right-panel-search > * + * {margin-left:10px;}
 
-.lybbn-panel-tags {height:35px;background: #fff;border-bottom: 1px solid #e6e6e6;}
+/* 多标签栏（玻璃 + 渐变激活块） */
+.lybbn-panel-tags {height:35px;background: var(--ly-glass-bg);backdrop-filter: var(--ly-glass-blur);-webkit-backdrop-filter: var(--ly-glass-blur);border-bottom: 1px solid var(--ly-glass-border);}
 .lybbn-panel-tags ul {display: flex;overflow: hidden;}
 .lybbn-panel-tags li {cursor: pointer;display: inline-block;float: left;height:34px;line-height: 34px;position: relative;flex-shrink: 0;}
-.lybbn-panel-tags li::after {content: " ";width:1px;height:100%;position: absolute;right:0px;background-image: linear-gradient(#fff, #e6e6e6);}
-.lybbn-panel-tags li a {display: inline-block;padding:0 10px;width:100%;height:100%;color: #999;text-decoration:none;display: flex;align-items: center;}
+.lybbn-panel-tags li::after {content: " ";width:1px;height:100%;position: absolute;right:0px;background-image: linear-gradient(transparent, var(--ly-glass-border));}
+.lybbn-panel-tags li a {display: inline-block;padding:0 10px;width:100%;height:100%;color: var(--ly-text-2);text-decoration:none;display: flex;align-items: center;}
 .lybbn-panel-tags li i {margin-left:10px;border-radius: 3px;width:18px;height:18px;display: flex;align-items: center;justify-content: center;}
 .lybbn-panel-tags li i:hover {background: rgba(0,0,0,.2);color: #fff;}
-.lybbn-panel-tags li:hover {background: #ecf5ff;}
-.lybbn-panel-tags li.active {background: #409EFF;}
+.lybbn-panel-tags li:hover {background: var(--ly-gradient-soft);}
+.lybbn-panel-tags li.active {background: var(--ly-gradient-primary);}
 .lybbn-panel-tags li.active a {color: #fff;}
 .lybbn-panel-tags li.sortable-ghost {opacity: 0;}
 
-.lybbn-panel-main {overflow: auto;background-color: #f6f8f9;flex: 1;}
+.lybbn-panel-main {overflow: auto;background-color: transparent;flex: 1;position: relative;}
+
+/* 路由页面入场过渡（切页时内容上浮淡入）。
+   fill 必须用 backwards 而非 both：both 会在动画结束后永久持有 transform 效果，
+   Chrome 视同 will-change:transform，使页面容器成为 fixed 弹窗遮罩的包含块，
+   遮罩被裁剪成内容区矩形盖不住侧栏/header（backwards 结束后效果移除，无此问题） */
+.lybbn-panel-main .el-scrollbar__view > *,
+.lybbn-panel-main > * {animation: ly-view-in var(--ly-duration-normal) backwards;}
+@keyframes ly-view-in {from {opacity: 0;transform: translateY(10px);}to {opacity: 1;transform: none;}}
+@media (prefers-reduced-motion: reduce) {
+	.lybbn-panel-main .el-scrollbar__view > *,
+	.lybbn-panel-main > * {animation: none;}
+}
 
 /*页面最大化*/
 .lybbn-panel.main-maximize {
@@ -175,14 +282,18 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 }
 
 .ly-is-full{
+	/* 降级 fixed 模拟全屏的覆盖布局（原生全屏时浏览器自动全屏，此类仅叠加背景视觉） */
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 2000;
-	background:var(--el-bg-color);
+	background: var(--ly-bg-page, #EEF2FB);
+	background-image: var(--ly-page-gradient, none);
 }
+/* fixed 模拟全屏的层级兜底：容器在 .lybbn-panel-main(z-index:1) 内，再大的 z-index 也会被
+   header(z-index:5) 压住；全屏态临时把 panel-main 提到 header 之上 */
+.lybbn-panel-main:has(.ly-is-full) {z-index: 3000;}
 
 .tableSelect{
 	margin-bottom: 10px;
@@ -262,7 +373,8 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 }
 
 .lycontainer{
-	padding:10px;
+	/* 横向节奏对齐 v4（.content 18/20px），顶部保留与标签栏的呼吸间距 */
+	padding:14px 20px 20px 18px;
 	display: flex;
     flex-direction: column;
 	height: 100%;
@@ -325,3 +437,62 @@ a,button,input,textarea{-webkit-tap-highlight-color:rgba(0,0,0,0);box-sizing: bo
 .w-e-full-screen-container{
 	z-index: 4000 !important;
 }
+
+/* wangEditor 富文本：玻璃主题适配（走官方 CSS 变量，工具栏/编辑区/弹窗全 token 化） */
+.editor-wrapper {
+	--w-e-toolbar-bg-color: transparent;
+	--w-e-toolbar-color: var(--ly-text-2);
+	--w-e-toolbar-active-color: var(--el-color-primary);
+	--w-e-toolbar-active-bg-color: rgba(58, 123, 255, 0.10);
+	--w-e-toolbar-disabled-color: var(--ly-text-4, #bcbccc);
+	--w-e-textarea-bg-color: transparent;
+	--w-e-textarea-color: var(--ly-text-1);
+	--w-e-textarea-border-color: var(--ly-input-border);
+	--w-e-textarea-slight-border-color: var(--ly-line-soft);
+	--w-e-textarea-slight-color: var(--ly-line-soft);
+	--w-e-textarea-selected-border-color: rgba(58, 123, 255, 0.45);
+	--w-e-textarea-handler-bg-color: var(--el-color-primary);
+	--w-e-modal-bg-color: var(--ly-glass-bg-strong);
+	--w-e-toolbar-border-color: var(--ly-line-soft);
+	background: var(--ly-input-bg, rgba(255, 255, 255, 0.45));
+}
+html.dark .editor-wrapper {
+	--w-e-toolbar-active-bg-color: rgba(58, 123, 255, 0.22);
+	--w-e-textarea-selected-border-color: rgba(58, 123, 255, 0.60);
+	background: rgba(255, 255, 255, 0.06);
+}
+/* 工具栏按钮 hover：淡蓝底主色字（对齐 v4 菜单 hover 语言） */
+.w-e-toolbar .w-e-menu-tooltip-v5:hover {background: rgba(58, 123, 255, 0.10);}
+/* 按钮 hover 提示（tooltip）：wangEditor 原生把提示文字色绑在 --w-e-toolbar-bg-color 上，
+   我们玻璃化时把它置为 transparent 导致提示文字隐形（只剩蓝色提示块），强制白字 */
+.w-e-menu-tooltip-v5:before {color: #fff !important;}
+.w-e-menu-tooltip-v5:before {background-color: var(--el-color-primary) !important;border-radius: 7px;padding: 6px 10px;}
+/* 工具栏下拉面板（字体/字号选择列表、drop-panel）：密集文字小面板，必须不透明底，
+   否则正文从面板后透出导致选项看不清（用户实测反馈）。用 EP 不透明 overlay 底自动适配明暗 */
+.w-e-select-list,
+.w-e-drop-panel {
+	background: var(--el-bg-color-overlay) !important;
+	border: 1px solid var(--ly-line-soft) !important;
+	border-radius: 12px !important;
+	box-shadow: 0 12px 36px rgba(27, 35, 64, 0.18) !important;
+	overflow: hidden;
+}
+.w-e-select-list ul {padding: 4px;}
+.w-e-select-list ul li {border-radius: 7px;margin: 1px 0;padding-left: 21px;transition: background-color .15s ease,color .15s ease;}
+.w-e-select-list ul li:hover {background: rgba(58, 123, 255, 0.08);color: var(--el-color-primary);}
+.w-e-select-list ul li.selected {color: var(--el-color-primary);font-weight: 600;}
+/* 编辑器内弹窗（插入链接/图片地址）：玻璃卡片 + token 表单控件 */
+.w-e-modal {
+	background: var(--ly-glass-bg-strong) !important;
+	backdrop-filter: var(--ly-glass-blur);
+	border: 1px solid var(--ly-glass-border);
+	border-radius: 12px;
+	box-shadow: 0 16px 48px rgba(27, 35, 64, 0.20), var(--ly-glass-highlight);
+}
+.w-e-modal input, .w-e-modal select, .w-e-modal textarea {
+	background: var(--ly-input-bg, rgba(255, 255, 255, 0.45));
+	border-color: var(--ly-input-border);
+	color: var(--ly-text-1);
+	border-radius: 8px;
+}
+html.dark .w-e-toolbar svg, html.dark .w-e-textarea svg {fill: var(--ly-text-2);}

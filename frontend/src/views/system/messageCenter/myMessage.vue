@@ -1,5 +1,5 @@
 <template>
-    <div :class="['message-manage-container', { 'ly-is-full': isFull }]">
+    <div ref="containerRef" :class="['message-manage-container', { 'ly-is-full': isFull }]">
         <el-card class="tableSelect" ref="tableSelect" shadow="hover">
             <lySearchBar :model="formInline" @search="search" @reset="handleEdit('','reset')">
                 <!-- <template #actions-right>
@@ -39,15 +39,15 @@
                 <el-table-column min-width="150" prop="notification.title" label="标题" show-overflow-tooltip></el-table-column>
                 <el-table-column min-width="200" prop="notification.content" show-overflow-tooltip label="内容">
                     <template #default="scope">
-                        <div v-html="customEllipsis(scope.row.notification.content)" class="ellipsis"></div>
+                        <div v-html="customEllipsis(scope.row.notification?.content)" class="ellipsis"></div>
                 </template>
                 </el-table-column>
                 <el-table-column min-width="100" label="目标类型">
                     <template #default="scope">
-                        <el-tag v-if="scope.row.notification.target_type == 0">平台公告</el-tag>
-                        <el-tag v-else-if="scope.notification.row.target_type == 1" type="primary">按用户</el-tag>
-                        <el-tag v-else-if="scope.notification.row.target_type == 2" type="primary">按部门</el-tag>
-                        <el-tag v-else-if="scope.notification.row.target_type == 3" type="primary">按角色</el-tag>
+                        <el-tag v-if="scope.row.notification?.target_type == 0">平台公告</el-tag>
+                        <el-tag v-else-if="scope.row.notification?.target_type == 1" type="primary">按用户</el-tag>
+                        <el-tag v-else-if="scope.row.notification?.target_type == 2" type="primary">按部门</el-tag>
+                        <el-tag v-else-if="scope.row.notification?.target_type == 3" type="primary">按角色</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column min-width="90" label="是否已读">
@@ -88,7 +88,7 @@
     import Api from '@/api/api'
     import { FullScreen } from '@element-plus/icons-vue'
     import lySearchBar from '@/components/lySearchBar.vue'
-    import {deepClone} from "@/utils/util"
+    import {deepClone, fullScreen} from "@/utils/util"
     import { ElMessage, ElMessageBox } from 'element-plus'
 
     // 路由
@@ -124,9 +124,21 @@
         return (pageparm.value.page-1)*pageparm.value.limit + $index +1
     }
 
-    // 切换全屏
+    // 切换全屏：原生 Fullscreen API（fixed+z-index 模拟会被 header 的层叠上下文压住）
+    const containerRef = ref(null)
     const setFull = () => {
-        isFull.value = !isFull.value
+        fullScreen(containerRef.value)
+        // API 被拒/不可用（部分 WebView、iframe）时降级为 fixed 模拟
+        setTimeout(() => {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen) {
+                isFull.value = !isFull.value
+                window.dispatchEvent(new Event('resize'))
+            }
+        }, 80)
+    }
+    // 全屏状态以浏览器实际状态为准，Esc 退出时自动同步
+    const onFullscreenChange = () => {
+        isFull.value = !!(document.fullscreenElement || document.webkitIsFullScreen)
         window.dispatchEvent(new Event('resize'))
     }
 
@@ -219,6 +231,12 @@
     // 生命周期钩子
     onMounted(() => {
         getData()
+        document.addEventListener('fullscreenchange', onFullscreenChange)
+        document.addEventListener('webkitfullscreenchange', onFullscreenChange)
+    })
+    onUnmounted(() => {
+        document.removeEventListener('fullscreenchange', onFullscreenChange)
+        document.removeEventListener('webkitfullscreenchange', onFullscreenChange)
     })
 
 </script>
@@ -234,15 +252,21 @@
         display: flex;
         flex-direction: column;
         height: 100%;
-        padding: 10px;
+        padding: 14px 20px 20px 18px; /* 对齐 v4 内容区节奏 */
         box-sizing: border-box;
         transition: all 0.3s ease;
     }
 
     .table-container {
         flex: 1;
-        background: #fff;
-        border-radius: 4px;
+        /* 玻璃卡片外壳：与 lyTable 页面的 el-card 表格容器视觉对齐（v4 表格坐于卡内） */
+        background: var(--ly-glass-bg);
+        backdrop-filter: var(--ly-glass-blur);
+        -webkit-backdrop-filter: var(--ly-glass-blur);
+        border: 1px solid var(--ly-card-border);
+        border-radius: var(--ly-card-radius);
+        box-shadow: var(--ly-glass-highlight), var(--ly-shadow-card);
+        padding: 0 0 8px; /* 横向贴边：留横向 padding 会让表格边框与卡片边框形成双线缝隙 */
         overflow: hidden;
 
         :deep(.el-table) {
@@ -250,7 +274,7 @@
                 padding: 8px 0;
             }
             .el-table__body-wrapper{
-                background:var(--el-bg-color);
+                background: transparent;
             }
         }
     }
