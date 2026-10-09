@@ -167,12 +167,18 @@ frontend/               # 前端代码目录
 
 ## ✅ 演示图
 
-![登录](https://foruda.gitee.com/images/1752461064099761356/404e5c89_4823422.png "wechat_2025-07-14_104123_881.png")
-![首页](https://foruda.gitee.com/images/1752461080317609620/bbc20f96_4823422.png "wechat_2025-07-14_104159_622.png")
-![个人中心](https://foruda.gitee.com/images/1752461095093419420/509ffd91_4823422.png "wechat_2025-07-14_104208_520.png")
-![用户管理](https://foruda.gitee.com/images/1752461107939022968/53d97e3d_4823422.png "wechat_2025-07-14_104237_798.png")
-![菜单管理](https://foruda.gitee.com/images/1752461123060391528/e0e5573d_4823422.png "wechat_2025-07-14_104252_982.png")
-![权限管理](https://foruda.gitee.com/images/1752461137054532488/065360f7_4823422.png "wechat_2025-07-14_104304_906.png")
-![操作日志](https://foruda.gitee.com/images/1752461150156275848/b71b3e88_4823422.png "wechat_2025-07-14_104319_022.png")
-![系统配置](https://foruda.gitee.com/images/1752461163988365301/7817a2e2_4823422.png "wechat_2025-07-14_104328_836.png")
-![字典管理](https://foruda.gitee.com/images/1752461182186356276/8ff97750_4823422.png "wechat_2025-07-14_104336_924.png")
+![登录](https://foruda.gitee.com/images/1791506066046958975/0afded43_4823422.png "登录")
+
+![首页](https://foruda.gitee.com/images/1791506090585942679/c911f3c0_4823422.png "首页")
+
+![个人中心](https://foruda.gitee.com/images/1791506113770100872/d018f51c_4823422.png "个人中心")
+
+![用户管理](https://foruda.gitee.com/images/1791506152816908706/10da2d6c_4823422.png "用户管理")
+
+![菜单管理](https://foruda.gitee.com/images/1791506182507712082/1c7200ca_4823422.png "菜单管理")
+
+![权限管理](https://foruda.gitee.com/images/1791506207427706092/d1379195_4823422.png "权限管理")
+
+![系统配置](https://foruda.gitee.com/images/1791506241678582214/697cd48c_4823422.png "系统配置")
+
+![字典管理](https://foruda.gitee.com/images/1791506271356529319/5f28d5e4_4823422.png "字典管理")
